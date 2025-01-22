@@ -1,163 +1,202 @@
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardActions,
-  Button,
-  Typography,
-  Box,
-} from "@mui/material";
-import Question from "../components/Question.jsx"; // Import the reusable Question component
+import { motion, AnimatePresence } from "framer-motion";
+import LinearProgress from "@mui/joy/LinearProgress";
+import { QuestionCard } from "../components/QuestionCard";
+import { useSpeechToText } from "../hooks/useSpeechToText";
+import { useTextToSpeech } from "../hooks/useTextToSpeech";
+// import { questions } from "./data/questions";
 
-function Services() {
-  const [answers, setAnswers] = useState({
-    question1: "",
-    question2: "",
-    question3: "",
-    question4: "",
-    question5: "",
-    question6: "",
-    question7: "",
-    question8: "",
-    question9: "",
-    question10: "",
-  });
+const questions = [
+  {
+    question:
+      "How would you describe your overall experience with our service today?",
+    tagalog:
+      "Paano mo ilalarawan ang kabuuang karanasan mo sa aming serbisyo ngayon?",
+  },
+  {
+    question:
+      "What did you think about the service staff's politeness and accommodation?",
+    tagalog: "Ano ang masasabi mo tungkol sa pakikitungo ng aming mga staff?",
+  },
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setAnswers({
-      ...answers,
-      [name]: value,
-    });
+  {
+    question: "Were the instructions clear? If not, what part was unclear?",
+    tagalog: "Maliwanag bang naiparating ang mga instruksiyon sa iyo?",
+  },
+  {
+    question: "Did you encounter any difficulties? Please describe them.",
+    tagalog:
+      "May naranasan ka bang problema sa aming serbisyo? (Maaari mo bang maipaliwanag?)",
+  },
+  {
+    question: "What aspects of the service process did you find most helpful?",
+    tagalog:
+      "Anong mga aspeto ng proseso ng serbisyo ang pinaka-nakatulong sa iyo?",
+  },
+  {
+    question: "What was your overall impression of the waiting area?",
+    tagalog: "Ano ang iyong kabuuang impresyon sa lugar ng paghihintay?",
+  },
+  {
+    question: "How would you describe your mood during the waiting process?",
+    tagalog: "Paano mo ilalarawan ang nararamdaman mo habang naghihintay?",
+  },
+  {
+    question: "How did you feel about the time it took to resolve your issue?",
+    tagalog:
+      "Ano ang pakiramdam mo tungkol sa tagal ng oras na kinuha para maayos ang iyong problema?",
+  },
+  {
+    question:
+      "How would you describe the cleanliness and maintenance of the waiting area?",
+    tagalog:
+      "Paano mo ipaliliwanag ang kalinisan at pangangalaga ng lugar ng paghihintay?",
+  },
+  {
+    question:
+      "Were there any distractions in the waiting area that affected your experience?",
+    tagalog:
+      "Mayroon bang mga sagabal sa lugar ng paghihintay na nakaapekto sa iyong karanasan?",
+  },
+];
+
+export default function Services() {
+  const [currentCard, setCurrentCard] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [start, setStart] = useState(false);
+  const [language, setLanguage] = useState("English");
+
+  const speech = useTextToSpeech();
+  const { isListening, startListening, stopListening, transcript } =
+    useSpeechToText();
+
+  const handleLanguage = (newLanguage) => {
+    setLanguage(newLanguage);
   };
 
-  const isFormComplete = Object.values(answers).every(
-    (answer) => answer !== ""
-  );
+  const handlePlay = () => {
+    const text =
+      language === "Tagalog"
+        ? questions[currentCard].tagalog
+        : questions[currentCard].question;
+    speech.speak(text, language);
+  };
+
+  const handlePlayNext = () => {
+    const text =
+      language === "Tagalog"
+        ? questions[currentCard + 1].tagalog
+        : questions[currentCard + 1].question;
+
+    speech.speak(text, language);
+  };
+
+  const handlePlayNextPrev = () => {
+    const text =
+      language === "Tagalog"
+        ? questions[currentCard - 1].tagalog
+        : questions[currentCard - 1].question;
+    speech.speak(text, language);
+  };
+
+  const handleNavigation = (direction) => {
+    if (direction === 1 && currentCard < questions.length - 1) {
+      setDirection(1);
+      handlePlayNext();
+      setCurrentCard((prev) => prev + 1);
+    } else if (direction === -1 && currentCard > 0) {
+      setDirection(-1);
+      handlePlayNextPrev;
+      setCurrentCard((prev) => prev - 1);
+    }
+  };
 
   return (
-    <Box sx={{ maxWidth: 1200, margin: "auto", marginTop: 5 }}>
-      <Card sx={{ minWidth: 275, boxShadow: 3 }}>
-        <CardContent>
-          <Typography
-            variant="h3"
-            component="div"
-            sx={{
-              marginTop: 2,
-              marginBottom: 2,
-              textAlign: "center",
-              fontFamily: "'Poppins', sans-serif", // Apply Poppins font
-            }}
-          >
-            Post-Service Feedback
-          </Typography>
+    <div className="p-4 flex flex-col items-center">
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1, type: "spring" }}
+        className="bg-white my-2 p-4 py-8 w-3/4 rounded-lg shadow-lg 
+text-2xl text-center"
+      >
+        Post-Service Feedback
+      </motion.div>
 
-          <form>
-            {/* General Questions */}
-            <Question
-              question="1. How would you describe your overall experience with our service today?"
-              value={answers.question1}
-              onChange={handleChange}
-              name="question1"
-              sx={{ textAlign: "center", fontFamily: "'Poppins', sans-serif" }}
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, delay: 0.5, type: "spring" }}
+        className="relative h-72 w-3/4 overflow-hidden"
+      >
+        <AnimatePresence mode="popLayout" initial={false}>
+          <CardAnimation currentCard={currentCard} direction={direction}>
+            <QuestionCard
+              question={questions[currentCard].question}
+              onNext={() => handleNavigation(1)}
+              onPrev={() => handleNavigation(-1)}
+              isFirst={currentCard === 0}
+              isLast={currentCard === questions.length - 1}
+              currentQuestion={currentCard}
+              totalQuestions={questions.length}
+              start={start}
+              setStart={setStart}
+              handlePlay={handlePlay}
+              language={language}
+              handleLanguage={handleLanguage}
+              handleStop={speech.stop}
+              isListening={isListening}
+              stopListening={stopListening}
+              startListening={startListening}
+              transcript={transcript}
             />
-            <Question
-              question="2. What did you think about the service staff's politeness and accommodation?"
-              value={answers.question2}
-              onChange={handleChange}
-              name="question2"
-              sx={{ textAlign: "center", fontFamily: "'Poppins', sans-serif" }}
-            />
-            <Question
-              question="3. Were the instructions clear? If not, what part was unclear?"
-              value={answers.question3}
-              onChange={handleChange}
-              name="question3"
-              sx={{ textAlign: "center", fontFamily: "'Poppins', sans-serif" }}
-            />
-            <Question
-              question="4. Did you encounter any difficulties? Please describe them."
-              value={answers.question4}
-              onChange={handleChange}
-              name="question4"
-              sx={{ textAlign: "center", fontFamily: "'Poppins', sans-serif" }}
-            />
-            <Question
-              question="5. What aspects of the service process did you find most helpful?"
-              value={answers.question5}
-              onChange={handleChange}
-              name="question5"
-              sx={{ textAlign: "center", fontFamily: "'Poppins', sans-serif" }}
-            />
+          </CardAnimation>
+        </AnimatePresence>
+      </motion.div>
 
-            <Typography
-              variant="h3"
-              sx={{
-                marginTop: 2,
-                marginBottom: 2,
-                textAlign: "center",
-                fontFamily: "'Poppins', sans-serif", // Apply Poppins font
-              }}
-            >
-              Specific to the Waiting Process
-            </Typography>
-
-            {/* Waiting Process Questions */}
-            <Question
-              question="6. What was your overall impression of the waiting area?"
-              value={answers.question6}
-              onChange={handleChange}
-              name="question6"
-              sx={{ textAlign: "center", fontFamily: "'Poppins', sans-serif" }}
-            />
-            <Question
-              question="7. How would you describe your mood during the waiting process?"
-              value={answers.question7}
-              onChange={handleChange}
-              name="question7"
-              sx={{ textAlign: "center", fontFamily: "'Poppins', sans-serif" }}
-            />
-            <Question
-              question="8. How did you feel about the time it took to resolve your issue?"
-              value={answers.question8}
-              onChange={handleChange}
-              name="question8"
-              sx={{ textAlign: "center", fontFamily: "'Poppins', sans-serif" }}
-            />
-            <Question
-              question="9. How would you describe the cleanliness and maintenance of the waiting area?"
-              value={answers.question9}
-              onChange={handleChange}
-              name="question9"
-              sx={{ textAlign: "center", fontFamily: "'Poppins', sans-serif" }}
-            />
-            <Question
-              question="10. Were there any distractions in the waiting area that affected your experience?"
-              value={answers.question10}
-              onChange={handleChange}
-              name="question10"
-              sx={{ textAlign: "center", fontFamily: "'Poppins', sans-serif" }}
-            />
-
-            <CardActions>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                disabled={!isFormComplete}
-                sx={{
-                  width: "100%",
-                  fontFamily: "'Poppins', sans-serif", // Apply Poppins font
-                }}
-              >
-                Submit Feedback
-              </Button>
-            </CardActions>
-          </form>
-        </CardContent>
-      </Card>
-    </Box>
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, delay: 0.5, type: "spring" }}
+        className="my-4 w-3/4"
+      >
+        <LinearProgress
+          determinate
+          value={(currentCard / questions.length) * 100}
+        />
+      </motion.div>
+    </div>
   );
 }
 
-export default Services;
+const CardAnimation = ({ children, currentCard, direction }) => (
+  <motion.div
+    key={currentCard}
+    initial={{
+      x: direction * 100,
+      y: direction * 100,
+      opacity: 0,
+      zIndex: 0,
+    }}
+    animate={{
+      x: 0,
+      y: 0,
+      opacity: 1,
+      zIndex: 1,
+    }}
+    exit={{
+      x: direction * -100,
+      y: direction * -100,
+      opacity: 0,
+      zIndex: 0,
+    }}
+    transition={{
+      type: "spring",
+      stiffness: 300,
+      damping: 30,
+    }}
+    className="absolute inset-0"
+  >
+    {children}
+  </motion.div>
+);
