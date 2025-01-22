@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import home from "../assets/home.png";
+import "../App.css";
 
 function Home() {
   return (
@@ -20,8 +21,8 @@ function Home() {
           </button>
         </Link>
       </div>
-      <div className="w-full flex justify-center gap-2 items-center">
-        <img src={home} alt="Home" className="w-full h-full" />
+      <div className="homepageimg w-full flex justify-center gap-2 items-center">
+        <img src={home} alt="Home" />
       </div>
     </div>
   );
