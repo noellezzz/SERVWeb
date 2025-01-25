@@ -25,25 +25,22 @@ export const QuestionCard = ({
   transcript,
 }) => {
   return (
-    <div
-      className="flex flex-col bg-white h-full w-full rounded-lg 
-shadow-lg p-4"
-    >
+    <div className="flex flex-col bg-white h-full w-full rounded-lg  p-4">
       <div className="text-sm text-gray-500 mb-2">
-        Question {currentQuestion} of {totalQuestions}
+        Question {currentQuestion + 1} of {totalQuestions}
       </div>
       <p className="text-xl mb-4">{question}</p>
 
       <Textarea
         value={transcript}
-        className="h-full flex-grow"
+        className="opacity-0 h-full flex-grow"
         minRows={2}
         size="md"
         variant="outlined"
         placeholder="Say something..."
       />
 
-      <div className="mt-4 flex justify-between">
+      <div className="opacity-0 mt-4 flex justify-between">
         <Button onClick={onPrev} disabled={isFirst} variant="outlined">
           Previous
         </Button>
@@ -89,6 +86,7 @@ const LanguageButtons = ({ language, handleLanguage }) => (
 
 const ActionButtons = ({
   start,
+
   setStart,
   handlePlay,
   handleStop,

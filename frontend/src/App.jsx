@@ -1,10 +1,10 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home.jsx";
-import Services from "./pages/Services.jsx";
-import About from "./pages/About.jsx";
-import Contact from "./pages/Contact.jsx";
-import Login from "./pages/Login.jsx";
+import Home from "././pages/users/Home.jsx";
+import Services from "./pages/users/Services.jsx";
+import About from "./pages/users/About.jsx";
+import Contact from "./pages/users/Contact.jsx";
+import Login from "./pages/users/Login.jsx";
 import Layout from "./layouts/Layout.jsx";
 
 function App() {
