@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="m-2"><h4>face_recognition</h4></div>
+<div class="m-2"><a class="btn btn-light" href="{% url 'face_recognition_EmotionData_list' %}">EmotionData Listing</a></div>
+<div class="m-2"><h4>feedbacks</h4></div>
+<div class="m-2"><a class="btn btn-light" href="{% url 'feedbacks_Feedback_list' %}">Feedback Listing</a></div>
+<div class="m-2"><h4>queues</h4></div>
+<div class="m-2"><a class="btn btn-light" href="{% url 'queues_Queue_list' %}">Queue Listing</a></div>
+<div class="m-2"><h4>users</h4></div>
+<div class="m-2"><a class="btn btn-light" href="{% url 'users_User_list' %}">User Listing</a></div>
+<div class="m-2"><h4>sentiment_tests</h4></div>
+<div class="m-2"><a class="btn btn-light" href="{% url 'sentiment_tests_SentimentResult_list' %}">SentimentResult Listing</a></div>
+<div class="m-2"><a class="btn btn-light" href="{% url 'sentiment_tests_SentimentTest_list' %}">SentimentTest Listing</a></div>
+<div class="m-2"><h4>dashboard</h4></div>
+{% endblock %}
