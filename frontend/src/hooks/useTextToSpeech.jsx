@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 export const useTextToSpeech = () => {
   const [voices, setVoices] = useState([]);
   const [voice, setVoice] = useState(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {
     const loadVoices = () => {
@@ -21,10 +22,17 @@ export const useTextToSpeech = () => {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.voice = language === "Tagalog" ? voices[11] : voices[1];
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+
     speechSynthesis.speak(utterance);
   };
 
-  const stop = () => speechSynthesis.cancel();
+  const stop = () => {
+    speechSynthesis.cancel();
+    setIsSpeaking(false);
+  };
 
-  return { speak, stop };
+  return { speak, stop, isSpeaking };
 };

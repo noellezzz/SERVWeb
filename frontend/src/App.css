@@ -1,14 +1,135 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
 :root {
-    --primary-color: #FFFFDB;
-    --secondary-color: #FCEA96;
-    --tertiary-color: #F8D65B;
-    --quaternary-color: #F2AB7F;
-    --quinary-color: #EF84AE;
+  --primary-color: #ffffdb;
+  --secondary-color: #fcea96;
+  --tertiary-color: #f8d65b;
+  --quaternary-color: #f2ab7f;
+  --quinary-color: #ef84ae;
 }
 
-.homepageimg{
-    width: 100%;
-    height: 100%;
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f191b6;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ef4081;
+}
+
+.transparent-custom {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.homepageimg {
+  width: 100%;
+  height: 100%;
+}
+
+.radial-button {
+  z-index: 5;
+  background: rgb(252, 234, 150) !important;
+  background: radial-gradient(
+    circle,
+    rgba(252, 234, 150, 1) 0%,
+    rgba(239, 132, 174, 1) 100%
+  ) !important;
+}
+
+.circle {
+  z-index: 4;
+  position: relative;
+  width: 250px;
+  height: 250px;
+  margin: 40px auto;
+}
+
+.circle .circle__container {
+  width: 100%;
+  height: 100%;
+  border: 10px solid transparent;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  background-image: linear-gradient(to right, white, white),
+    radial-gradient(
+      circle,
+      rgba(252, 234, 150, 1) 0%,
+      rgba(239, 132, 174, 1) 100%
+    );
+}
+
+.mask-top-container,
+.mask-bottom-container {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 101%;
+  height: 51%;
+  overflow: hidden;
+}
+
+.mask-bottom-container {
+  top: 50%;
+}
+
+.mask-top,
+.mask-bottom {
+  width: 100%;
+  height: 100%;
+  background: white;
+  transition: all 0.5s ease;
+  transform-origin: 50% 100%;
+  backface-visibility: hidden;
+}
+
+.mask-bottom {
+  transform-origin: 50% 0%;
+}
+
+.mask-top {
+  animation: revealTop 0.5s ease forwards;
+  animation-delay: 1s;
+}
+
+.mask-bottom {
+  animation: revealBottom 0.5s ease forwards;
+  animation-delay: 1s;
+}
+
+@keyframes revealTop {
+  to {
+    transform: rotate(180deg);
+  }
+}
+
+@keyframes revealBottom {
+  to {
+    transform: rotate(-180deg);
+  }
+}
+
+.adminnav:hover {
+  background-color: var(--secondary-color);
+  border-radius: 50px; 
+}
+
+.navbar {
+  background-color: rgba(255, 255, 219, 0.4); 
+}
+
+.header {
+  background-color: rgba(255, 255, 219, 0.4); 
 }
