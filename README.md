@@ -13,6 +13,7 @@ ___
 cd backend
 python -m virtualenv .venv
 .venv\Scripts\activate        # in windows
+# .venv\bin\activate.ps1        # in windows
 # source .venv/bin/activate     # in linux
 pip install -r requirements.txt
 

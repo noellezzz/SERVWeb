@@ -9,6 +9,8 @@ class Feedback(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    content = models.TextField()
+    author = models.CharField(max_length=255)
 
     class Meta:
         pass
