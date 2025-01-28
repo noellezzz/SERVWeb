@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 class BasicInformation(models.Model):
     """Model for storing basic information"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     date_of_birth = models.DateField()
     gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')])
     contact_number = models.CharField(max_length=20)

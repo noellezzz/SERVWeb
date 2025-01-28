@@ -20,8 +20,11 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('v1/', include([
+    # path('accounts/', include('django.contrib.auth.urls')),
+    path('api/v1/', include([
+        path('auth/', include('dj_rest_auth.urls')),
+        path('auth/registration/', include('dj_rest_auth.registration.urls')),
+        path('accounts/', include('allauth.urls')),
         path('', include('dashboard.urls')),
         path('', include('face_recognition.urls')),
         path('', include('feedbacks.urls')),

@@ -7,9 +7,4 @@ class FaceDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.FaceData
-        fields = [
-            "last_updated",
-            "id",
-            "user_id",
-            "created",
-        ]
+        fields = '__all__'
