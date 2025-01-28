@@ -4,6 +4,8 @@ import { FileText, Users, FileBarChart, BarChartHorizontalBig } from "lucide-rea
 import StatCard from "../../layouts/admin/StatCard";
 import SeniorAsses from "../../layouts/admin/SeniorAsses";
 import TotalAsses from "../../layouts/admin/TotalAsses";
+import Actlog from "../../layouts/admin/Actlog";
+import SeniorFiles from "../../layouts/admin/SeniorFiles";
 
 const Dashboard = () => {
   return (
@@ -27,7 +29,8 @@ const Dashboard = () => {
 				<div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
 					<SeniorAsses />
 					<TotalAsses />
-				
+          <Actlog />
+          <SeniorFiles />
 				</div>
       </main>
     </div>
