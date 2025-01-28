@@ -4,11 +4,13 @@ from django.urls import reverse
 from django.conf import settings
 
 class Feedback(models.Model):
-    created = models.DateTimeField(auto_now_add=True, editable=False)
-    last_updated = models.DateTimeField(auto_now=True, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     content = models.TextField(blank=True, null=True)
     user_nid = models.TextField(blank=True, null=True)
+    
+        
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    last_updated = models.DateTimeField(auto_now=True, editable=False)
     
     class Meta:
         pass

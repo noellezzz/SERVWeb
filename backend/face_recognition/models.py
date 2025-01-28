@@ -3,12 +3,18 @@ from django.db import models
 from django.urls import reverse
 
 
-class EmotionData(models.Model):
+class FaceData(models.Model):
 
     # Fields
     last_updated = models.DateTimeField(auto_now=True, editable=False)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_id = models.UUIDField()
+    age_detected = models.IntegerField()
+    gender_detected = models.CharField(max_length=10)
+    emotion_detected = models.CharField(max_length=20)
+    confidence_score = models.FloatField()
+    captured_at = models.DateTimeField(auto_now_add=True)
+
     created = models.DateTimeField(auto_now_add=True, editable=False)
 
     class Meta:

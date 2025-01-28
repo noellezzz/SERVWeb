@@ -3,10 +3,10 @@ from rest_framework import serializers
 from . import models
 
 
-class EmotionDataSerializer(serializers.ModelSerializer):
+class FaceDataSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = models.EmotionData
+        model = models.FaceData
         fields = [
             "last_updated",
             "id",

@@ -6,7 +6,7 @@ from . import views
 
 
 router = routers.DefaultRouter()
-router.register("emotion-data", api.EmotionDataViewSet)
+router.register("face-data", api.FaceDataViewSet)
 
 urlpatterns = (
     path("", include(router.urls)),

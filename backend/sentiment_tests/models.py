@@ -4,10 +4,14 @@ from django.urls import reverse
 
 
 class SentimentTest(models.Model):
-
-    # Fields
-    created = models.DateTimeField(auto_now_add=True, editable=False)
+    """Model for managing sentiment test questions"""
+    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    question_text = models.TextField()
+    category = models.CharField(max_length=50)
+    is_active = models.BooleanField(default=True)
+    
+    created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
@@ -25,15 +29,21 @@ class SentimentTest(models.Model):
 
 class SentimentResult(models.Model):
 
-    # Fields
+    """Model for storing sentiment analysis results"""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)    
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
     
     # Content Fields
+    # TODO: REMOVE NULL VALUES
     label = models.TextField(blank=True, null=True)
     score = models.FloatField(blank=True, null=True)
     
+    positive_words = models.JSONField(default=list)
+    negative_words = models.JSONField(default=list)
+    emotion_detected = models.CharField(max_length=20)
+
     
     # Relationship Fields    
     sentiment_test = models.ForeignKey(
@@ -47,8 +57,6 @@ class SentimentResult(models.Model):
         on_delete=models.CASCADE, related_name="sentiment_results",
         blank=True, null=True, default=None
     )
-    
-    
 
     class Meta:
         pass

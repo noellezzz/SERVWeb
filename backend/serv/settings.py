@@ -45,11 +45,13 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'channels',
+    
+    # Local Apps
+    'dashboard',
     'face_recognition',
+    'sentiment_tests',
     'feedbacks',
     'queues',
-    'sentiment_tests',
-    'dashboard',
 ]
 
 
