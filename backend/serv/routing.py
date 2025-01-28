@@ -19,7 +19,6 @@ application = ProtocolTypeRouter({
     "websocket": AuthMiddlewareStack(
         URLRouter([
             url(r"^ws/$", serv_WebSocketConsumer.as_asgi()),
-            url(r"^ws/face_recognition/$", face_recognitionConsumer.as_asgi()),
         ])
     ),
     "channel": ChannelNameRouter({
