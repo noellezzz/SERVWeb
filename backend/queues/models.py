@@ -20,8 +20,8 @@ class Queue(models.Model):
         ('WAITING', 'Waiting'),
         ('SERVING', 'Serving'),
         ('COMPLETED', 'Completed'),
-        ('CANCELLED', 'Cancelled')
-    ])
+        ('CANCELLED', 'Cancelled'),
+    ], default='WAITING')
     entry_time = models.DateTimeField(auto_now_add=False, editable=True, null=True, blank=True)
     service_start_time = models.DateTimeField(null=True, blank=True)
     service_end_time = models.DateTimeField(null=True, blank=True)
