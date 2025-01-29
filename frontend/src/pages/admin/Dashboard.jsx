@@ -1,11 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FileText, Users, FileBarChart, BarChartHorizontalBig } from "lucide-react";
-import StatCard from "../../layouts/admin/StatCard";
-import SeniorAsses from "../../layouts/admin/SeniorAsses";
-import TotalAsses from "../../layouts/admin/TotalAsses";
-import Actlog from "../../layouts/admin/Actlog";
-import SeniorFiles from "../../layouts/admin/SeniorFiles";
+import StatCard from "../../layouts/admin/DashBocharts/StatCard";
+import TotalAsses from "../../layouts/admin/DashBocharts/TotalAsses";
+import Moods from "../../layouts/admin/DashBocharts/Moods";
+import Demographics from "../../layouts/admin/DashBocharts/Demographics";
+import TopFB from "../../layouts/admin/DashBocharts/TopFB";
 
 const Dashboard = () => {
   return (
@@ -25,13 +25,21 @@ const Dashboard = () => {
         </motion.div>
 
         {/* CHARTS */}
+        <div className='grid grid-cols-1 gap-6'>
+          {/* Full-width Demographics */}
+          <div className='col-span-1'>
+            <Demographics />   
+          </div>
 
-				<div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-					<SeniorAsses />
-					<TotalAsses />
-          <Actlog />
-          <SeniorFiles />
-				</div>
+          {/* Two-column layout for other charts */}
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+            <Moods />
+            <TotalAsses />
+          </div>
+
+          <TopFB />
+
+        </div>
       </main>
     </div>
   );
