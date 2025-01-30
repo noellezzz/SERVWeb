@@ -36,30 +36,27 @@ class SentimentResult(models.Model):
     last_updated = models.DateTimeField(auto_now=True, editable=False)
     
     # Content Fields
-    # TODO: REMOVE NULL VALUES
     label = models.TextField(blank=True, null=True)
     score = models.FloatField(blank=True, null=True)
-    
     positive_words = models.JSONField(default=list, blank=True, null=True)
     negative_words = models.JSONField(default=list, blank=True, null=True)
-    emotion_detected = models.CharField(max_length=20, blank=True, null=True)
 
     
     # Relationship Fields    
     sentiment_test = models.ForeignKey(
         "sentiment_tests.SentimentTest",
-        on_delete=models.CASCADE, related_name="sentiment_results",
-        blank=True, null=True, default=None
+        on_delete=models.CASCADE,
+        related_name="sentiment_results"
     )    
     
     feedback = models.ForeignKey(
         "feedbacks.Feedback",
-        on_delete=models.CASCADE, related_name="sentiment_results",
-        blank=True, null=True, default=None
+        on_delete=models.CASCADE,
+        related_name="sentiment_results"
     )
 
     class Meta:
-        pass
+        unique_together = ('sentiment_test', 'feedback')
 
     def __str__(self):
         return str(self.pk)

@@ -11,12 +11,12 @@ const COLORS = ["#34D399", "#EF4444"];
 const TotalAsses = () => {
   return (
     <motion.div
-      className="bg-gradient-to-r from-[#ff92ad] to-[#faf2cb] bg-opacity-30 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
+      className="bg-gradient-to-r from-white to-[#ffccd5] bg-opacity-80 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-300 mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <h2 className="text-xl font-semibold text-gray-100 mb-4">Total Assessment of Seniors</h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">Total Assessment of Seniors</h2>
 
       <div style={{ width: "100%", height: 300 }}>
         <ResponsiveContainer>
@@ -49,13 +49,9 @@ const TotalAsses = () => {
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-6 flex justify-between items-center text-gray-100">
-        <div className="flex items-center">
-          <span className="text-lg font-semibold text-green-300">Positive: 60%</span> {/* Softer green */}
-        </div>
-        <div className="flex items-center">
-          <span className="text-lg font-semibold text-red-300">Negative: 40%</span> {/* Softer red */}
-        </div>
+      <div className="mt-6 flex justify-between items-center text-gray-800">
+        <span className="text-lg font-semibold text-green-600">Positive: 60%</span>
+        <span className="text-lg font-semibold text-red-600">Negative: 40%</span>
       </div>
     </motion.div>
   );
