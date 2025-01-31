@@ -7,6 +7,4 @@ from . import api
 router = routers.DefaultRouter()
 router.register("feedbacks", api.FeedbackViewSet)
 
-urlpatterns = (
-    path("", include(router.urls)),
-)
+urlpatterns = router.urls

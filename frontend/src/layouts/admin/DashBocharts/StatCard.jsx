@@ -3,12 +3,10 @@ import { motion } from "framer-motion";
 const StatCard = ({ name, icon: Icon, value, color = "#f9ebc4" }) => {
   return (
     <motion.div
-      className="backdrop-blur-md overflow-hidden shadow-lg rounded-xl border mb-6"
-      whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}
+      className="bg-white shadow-lg rounded-xl border mb-6"
+      whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.2)" }}
       style={{
-        background:
-          "linear-gradient(135deg, rgba(255, 146, 173, 0.3), rgba(250, 242, 203, 0.15))",
-        borderColor: "#000000", 
+        borderColor: "#000000",
       }}
     >
       <div className="px-4 py-5 sm:p-6 flex items-center">

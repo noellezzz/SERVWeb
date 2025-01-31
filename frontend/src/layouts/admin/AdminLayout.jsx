@@ -10,6 +10,7 @@ import ReportIcon from "@mui/icons-material/Description";
 import logo from "../../assets/logo.png";
 import { Card, CardContent } from "@mui/material";
 import AdminHeader from "./AdminHeader";
+import useFeedback from "../../states/services/useFeedback";
 
 const NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
@@ -27,7 +28,7 @@ const AdminLayout = () => {
     <div>
       {/* Gradient Background */}
       <div className="fixed top-0 left-0 w-full h-full -z-10">
-        <Gradient />
+        {/* <Gradient /> */}
       </div>
 
       {/* Sidebar */}

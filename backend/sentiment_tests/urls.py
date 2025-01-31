@@ -6,6 +6,4 @@ router = routers.DefaultRouter()
 router.register("sentiment-results", api.SentimentResultViewSet)
 router.register("sentiment-tests", api.SentimentTestViewSet)
 
-urlpatterns = (
-    path("", include(router.urls)),
-)
+urlpatterns = router.urls
