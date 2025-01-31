@@ -1,20 +1,26 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-import Home from "././pages/users/Home.jsx";
-import Services from "./pages/users/Services.jsx";
-import About from "./pages/users/About.jsx";
-import Contact from "./pages/users/Contact.jsx";
-import Login from "./pages/users/Login.jsx";
-import Layout from "./layouts/user/Layout.jsx";
-import AdminLayout from "./layouts/admin/AdminLayout.jsx";
-import Dashboard from "./pages/admin/Dashboard.jsx";
-import Assessments from "./pages/admin/Assessments.jsx";
-import Users from "./pages/admin/Users.jsx";
-import Reports from "./pages/admin/Reports.jsx";
-import Analytics from "./pages/admin/Analytics.jsx";
-import Settings from "./pages/admin/Settings.jsx";
-import Notifications from "./pages/admin/Notifications.jsx";
-import Profile from "./pages/admin/Profile.jsx";
+
+// Layouts
+import Layout from "./layouts/user/Layout";
+import AdminLayout from "./layouts/admin/AdminLayout";
+
+// USER PAGES
+import Home from "././pages/users/Home";
+import Services from "./pages/users/Services";
+import About from "./pages/users/About";
+import Contact from "./pages/users/Contact";
+import Login from "./pages/users/Login";
+
+// ADMIN PAGES
+import Dashboard from "./pages/admin/Dashboard";
+import Assessments from "./pages/admin/Assessments";
+import Users from "./pages/admin/Users";
+import Reports from "./pages/admin/Reports";
+import Analytics from "./pages/admin/Analytics";
+import Settings from "./pages/admin/Settings";
+import Notifications from "./pages/admin/Notifications";
+import Profile from "./pages/admin/Profile";
 
 function App() {
   return (
