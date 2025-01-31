@@ -5,7 +5,6 @@ import { QuestionCard } from "../../components/QuestionCard";
 import { useSpeechToText } from "../../hooks/useSpeechToText";
 import { useTextToSpeech } from "../../hooks/useTextToSpeech";
 import CircleButton from "../../components/buttons/CircleButton";
-import { use } from "react";
 import home from "../../assets/home.png";
 
 const questions = [
@@ -63,41 +62,47 @@ const questions = [
 ];
 
 export default function Services() {
+  const isListeningDelay = 500;
+  const micAutoOffTimeout = 1500;
+
   const [currentCard, setCurrentCard] = useState(0);
   const [direction, setDirection] = useState(1);
+
   const [start, setStart] = useState(false);
-  const [language, setLanguage] = useState("Not Set");
+  const [requestResponse, setRequestResponse] = useState(false);
   const [textPlaceholder, setTextPlaceholder] = useState("");
   const [languagePlaceholder, setLanguagePlaceholder] = useState("");
   const [askingFor, setAskingFor] = useState("");
-  const [requestResponse, setRequestResponse] = useState(false);
-
-  const speech = useTextToSpeech();
-  const { isListening, startListening, stopListening, transcript } =
-    useSpeechToText();
+  const [language, setLanguage] = useState("Not Set");
+  const [duration, setDuration] = useState(0);
 
   const [lastTranscript, setLastTranscript] = useState("");
+  const speech = useTextToSpeech();
+  const {
+    isListening,
+    startListening,
+    stopListening,
+    transcript,
+    volumeLevel,
+  } = useSpeechToText();
 
-  const handleLanguage = (newLanguage) => {
-    setLanguage(newLanguage);
-  };
-
+  // On Start
   useEffect(() => {
     if (start === true) {
-      speech.speak("What language would you prefer", "English");
-      setRequestResponse(true);
-      setAskingFor("Language");
+      requestLanguage();
     }
   }, [start]);
 
+  // Turn on Microphone after speech; has Condition for if requesting a response
   useEffect(() => {
     setTimeout(() => {
       if (requestResponse && speech.isSpeaking === false) {
         isListening ? stopListening() : startListening();
       }
-    }, 500);
+    }, isListeningDelay);
   }, [speech.isSpeaking]);
 
+  // Automatically turns of Microphone when no speech input is detected; has Configuration for the timeout
   useEffect(() => {
     const timer = setTimeout(() => {
       if (transcript === lastTranscript && transcript !== "") {
@@ -105,108 +110,152 @@ export default function Services() {
         setTextPlaceholder(lastTranscript);
       }
       setLastTranscript(transcript);
-    }, 1500);
+    }, micAutoOffTimeout);
     return () => clearTimeout(timer);
   }, [transcript, lastTranscript]);
 
-  useEffect(() => {
-    const trimmedTranscript = transcript.trim().toLowerCase();
-
-    if (!isListening) {
-      if (trimmedTranscript == "repeat") {
-        handlePlay();
-      } else if (trimmedTranscript.includes("language")) {
-        speech.speak("What language would you prefer", "English");
-        setRequestResponse(true);
-        setAskingFor("Language");
-        setLanguage("Not Set");
-        setCurrentCard(0);
-      } else {
-        if (askingFor == "Language") {
-          if (trimmedTranscript === "tagalog") {
-            setTextPlaceholder("Tagalog");
-            setLanguagePlaceholder("Tagalog");
-            speech.speak(
-              "Ang pinili mong salita ay Tagalog. Nais mo na ba magpatuloy?",
-              "Tagalog"
-            );
-            setRequestResponse(true);
-            setAskingFor("Language Confirmation");
-          }
-          if (trimmedTranscript === "english") {
-            setTextPlaceholder("English");
-            setLanguagePlaceholder("English");
-            speech.speak(
-              "You have chosen English. Would you like to continue?",
-              "English"
-            );
-            setRequestResponse(true);
-            setAskingFor("Language Confirmation");
-
-            setTextPlaceholder("English");
-            setLanguagePlaceholder("English");
-          }
-        } else if (askingFor == "Language Confirmation") {
-          if (
-            trimmedTranscript == "yes" ||
-            trimmedTranscript == "oo" ||
-            trimmedTranscript == "oh oh"
-          ) {
-            setLanguage(languagePlaceholder);
-            setRequestResponse(true);
-            setAskingFor("Questioning");
-          } else if (
-            trimmedTranscript == "no" ||
-            trimmedTranscript == "hindi"
-          ) {
-            setTextPlaceholder("");
-            setAskingFor("Language");
-            speech.speak("What language would you prefer", "English");
-          }
-        } else if (askingFor == "Questioning") {
-          if (language == "Tagalog") {
-            speech.speak(
-              "Nairecord na ang iyong sagot. Nais mo na ba magpatuloy?",
-              "Tagalog"
-            );
-            setAskingFor("Questioning Confirmation");
-          } else {
-            speech.speak(
-              "Your answer has been recorded. Would you like to continue?",
-              "English"
-            );
-            setAskingFor("Questioning Confirmation");
-          }
-        } else if (askingFor == "Questioning Confirmation") {
-          if (
-            trimmedTranscript == "yes" ||
-            trimmedTranscript == "oo" ||
-            trimmedTranscript == "oh oh"
-          ) {
-            setRequestResponse(true);
-            setAskingFor("Questioning");
-            handleNavigation(1);
-            // speech.speak(questions[currentCard].question, language);
-          } else if (
-            trimmedTranscript == "no" ||
-            trimmedTranscript == "hindi"
-          ) {
-            setTextPlaceholder("");
-            setAskingFor("Language");
-            speech.speak("What would you like to do?", "English");
-          }
-        }
-      }
-    }
-  }, [isListening]);
-
-  useEffect(() => console.log(transcript), [transcript]);
-
+  // Starts asking questions; Only starts if start is true & language has been set
   useEffect(() => {
     if (start && !(language == "Not Set")) {
       handlePlay();
     }
   }, [language]);
+
+  // Conversation Logic
+  useEffect(() => {
+    const trimmedTranscript = transcript.trim().toLowerCase();
+
+    if (isListening) return;
+
+    if (
+      trimmedTranscript === "repeat" ||
+      trimmedTranscript === "paulit ng tanong" ||
+      trimmedTranscript === "pakiulit ng tanong"
+    ) {
+      handlePlay();
+      return;
+    }
+
+    if (trimmedTranscript.includes("language")) {
+      requestLanguage();
+      return;
+    }
+
+    if (askingFor === "Language") {
+      if (trimmedTranscript === "tagalog") {
+        setTextPlaceholder("Tagalog");
+        setLanguagePlaceholder("Tagalog");
+        speech.speak(
+          "Ang pinili mong salita ay Tagalog. Nais mo na ba magpatuloy? Oo kung magpapatuloy na at Hindi kung nais mo ulitin ang tanong.",
+          "Tagalog"
+        );
+        setRequestResponse(true);
+        setAskingFor("Language Confirmation");
+        return;
+      }
+
+      if (trimmedTranscript === "english") {
+        setTextPlaceholder("English");
+        setLanguagePlaceholder("English");
+        speech.speak(
+          "You have chosen English. Would you like to continue? Yes to continue and No to repeat the Question",
+          "English"
+        );
+        setRequestResponse(true);
+        setAskingFor("Language Confirmation");
+        return;
+      }
+
+      if (
+        !(trimmedTranscript == "tagalog") &&
+        !(trimmedTranscript == "english")
+      ) {
+        speech.speak(
+          "Sorry. I cannot recognize what language that is. I can only understand English and Tagalog as of the moment.",
+          "English"
+        );
+
+        setTimeout(() => {
+          requestLanguage();
+        }, 7000);
+      }
+    }
+
+    if (askingFor === "Language Confirmation") {
+      const isConfirmation = ["yes", "oo", "oh oh"].includes(trimmedTranscript);
+      const isDenial = ["no", "hindi"].includes(trimmedTranscript);
+
+      if (isConfirmation) {
+        setLanguage(languagePlaceholder);
+        setRequestResponse(true);
+        setAskingFor("Questioning");
+        return;
+      }
+
+      if (isDenial) {
+        setTextPlaceholder("");
+        setAskingFor("Language");
+        speech.speak("What language would you prefer", "English");
+        return;
+      }
+    }
+
+    if (askingFor === "Questioning") {
+      const speechText =
+        language === "Tagalog"
+          ? "Nairecord na ang iyong sagot. Nais mo na ba magpatuloy? Oo kung magpapatuloy na at Hindi kung nais mo ulitin ang tanong."
+          : "Your answer has been recorded. Would you like to continue? Yes to continue and No to repeat the Question";
+
+      speech.speak(speechText, language);
+      setAskingFor("Questioning Confirmation");
+    }
+
+    if (askingFor === "Questioning Confirmation") {
+      const isConfirmation = ["yes", "oo", "oh oh"].includes(trimmedTranscript);
+      const isDenial = ["no", "hindi"].includes(trimmedTranscript);
+
+      if (isConfirmation) {
+        setRequestResponse(true);
+        setAskingFor("Questioning");
+        handleNavigation(1);
+        return;
+      }
+
+      if (isDenial) {
+        setTextPlaceholder("");
+        handlePlay();
+        return;
+      }
+    }
+  }, [isListening]);
+
+  // Duration Tracker
+  useEffect(() => {
+    let interval;
+    if (start) {
+      interval = setInterval(() => {
+        setDuration((prevDuration) => prevDuration + 1);
+      }, 1000);
+    } else {
+      setDuration(0);
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [start]);
+
+  const handleLanguage = (newLanguage) => {
+    setLanguage(newLanguage);
+  };
+
+  const requestLanguage = () => {
+    speech.speak("What language would you prefer", "English");
+    setRequestResponse(true);
+    setAskingFor("Language");
+    setLanguage("Not Set");
+    setCurrentCard(0);
+  };
 
   const handlePlay = () => {
     const text =
@@ -241,7 +290,6 @@ export default function Services() {
     } else if (direction === -1 && currentCard > 0) {
       setDirection(-1);
       handlePlayNextPrev;
-
       setCurrentCard((prev) => prev - 1);
     }
   };
@@ -257,25 +305,6 @@ export default function Services() {
           start ? "w-full" : "w-1/4"
         } relative bg-white my-2 p-4 py-8 rounded-lg shadow-lg text-2xl text-center`}
       >
-        {start && (
-          <div className="absolute -bottom-8 z-10 w-full flex justify-evenly items-center">
-            <motion.div className="transparent-custom w-1/4 h-20 rounded-lg p-1 transition-opacity">
-              <motion.div
-                className="h-full w-full rounded-lg flex justify-center items-center border-4 border-white text-sm"
-                animate={{
-                  backgroundColor: isListening
-                    ? "rgb(248, 113, 113)"
-                    : "rgb(229, 231, 235)", // bg-red-400 and bg-gray-200
-                  color: isListening ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)", // text-white and default black
-                }}
-                transition={{ duration: 0.5 }}
-              >
-                {isListening ? <p>Speak</p> : <p>Wait</p>}
-              </motion.div>
-            </motion.div>
-          </div>
-        )}
-
         <div>
           <AnimatePresence mode="popLayout">
             {!start && (
@@ -285,10 +314,7 @@ export default function Services() {
             )}
           </AnimatePresence>
           {start && language == "Not Set" && (
-            <div
-              className="h-72 flex flex-col justify-center 
-items-center"
-            >
+            <div className="h-56 flex flex-col justify-center items-center">
               <p>What language would you prefer?</p>
               <br /> <br />
               <p>{textPlaceholder}</p>
@@ -299,7 +325,7 @@ items-center"
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 1, delay: 0.5, type: "spring" }}
-              className="relative h-72 w-full overflow-hidden"
+              className="relative h-56 w-full overflow-hidden"
             >
               <AnimatePresence mode="popLayout" initial={false}>
                 <CardAnimation currentCard={currentCard} direction={direction}>
@@ -325,21 +351,62 @@ items-center"
                 </CardAnimation>
               </AnimatePresence>
               <LinearProgress
+                className="z-40"
                 determinate
                 value={(currentCard / questions.length) * 100}
+                color="danger"
               />
             </motion.div>
           )}
         </div>
+        {start && (
+          <motion.div
+            className="relative z-10 w-full flex justify-evenly items-center"
+            style={{ height: isListening ? "300px" : "auto" }}
+          >
+            <motion.div
+              className={`${
+                isListening
+                  ? "w-56 h-56 rounded-full border-2 border-[#f87171]"
+                  : "w-1/4 h-20 rounded-lg"
+              } transparent-custom p-1 transition-opacity `}
+              animate={{
+                width: isListening
+                  ? `${Math.max(150, volumeLevel * 300)}px`
+                  : "25%",
+                height: isListening
+                  ? `${Math.max(150, volumeLevel * 300)}px`
+                  : "5rem",
+              }}
+              transition={{ type: "spring" }}
+            >
+              <motion.div
+                className={`${
+                  isListening ? "rounded-full" : "rounded-lg"
+                } h-full w-full flex justify-center items-center border-4 border-white text-sm `}
+                animate={{
+                  backgroundColor: isListening
+                    ? "rgb(248, 113, 113)"
+                    : "rgb(229, 231, 235)",
+                  color: isListening ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)",
+                }}
+                transition={{ duration: 0.5 }}
+              >
+                {isListening ? <p>Listening</p> : <p>Wait</p>}
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {start && (
+          <div className="absolute z-50 top-10 right-10 text-sm">
+            Duration: {duration}
+          </div>
+        )}
       </motion.div>
-      <div
-        className="bg white rounded-lg shadow-lg my-8 w-1/4 p-4 flex 
-flex-row justify-center items-center gap-2"
-      >
+      <div className="bg white rounded-lg shadow-lg my-8 w-1/4 p-4 flex flex-row justify-center items-center gap-2">
         <img className="w-8 h-8" src={home} alt="" />
-        <p className="font-bold text-xl text-red-400">
-          SERV Sentiment Analysis
-        </p>
+        <p className="font-bold text-xl text-white">SERV Sentiment Analysis</p>
       </div>
     </div>
   );

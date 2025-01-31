@@ -11,10 +11,10 @@
     }
 
     #gradient-canvas {
-        --gradient-color-1: var(--quinary-color);
-        --gradient-color-2: var(--primary-color);
-        --gradient-color-3: var(--tertiary-color);
-        --gradient-color-4: var(--quaternary-color);
+        --gradient-color-1: #FFB3C1;        
+        --gradient-color-2: #660708;
+        --gradient-color-3: #E5383B;
+        --gradient-color-4: #A4161A;
 
         position: absolute;
         top:0;
