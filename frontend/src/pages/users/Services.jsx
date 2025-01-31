@@ -127,7 +127,11 @@ export default function Services() {
 
     if (isListening) return;
 
-    if (trimmedTranscript === "repeat") {
+    if (
+      trimmedTranscript === "repeat" ||
+      trimmedTranscript === "paulit ng tanong" ||
+      trimmedTranscript === "pakiulit ng tanong"
+    ) {
       handlePlay();
       return;
     }
@@ -142,7 +146,7 @@ export default function Services() {
         setTextPlaceholder("Tagalog");
         setLanguagePlaceholder("Tagalog");
         speech.speak(
-          "Ang pinili mong salita ay Tagalog. Nais mo na ba magpatuloy?",
+          "Ang pinili mong salita ay Tagalog. Nais mo na ba magpatuloy? Oo kung magpapatuloy na at Hindi kung nais mo ulitin ang tanong.",
           "Tagalog"
         );
         setRequestResponse(true);
@@ -154,7 +158,7 @@ export default function Services() {
         setTextPlaceholder("English");
         setLanguagePlaceholder("English");
         speech.speak(
-          "You have chosen English. Would you like to continue?",
+          "You have chosen English. Would you like to continue? Yes to continue and No to repeat the Question",
           "English"
         );
         setRequestResponse(true);
@@ -199,8 +203,8 @@ export default function Services() {
     if (askingFor === "Questioning") {
       const speechText =
         language === "Tagalog"
-          ? "Nairecord na ang iyong sagot. Nais mo na ba magpatuloy?"
-          : "Your answer has been recorded. Would you like to continue?";
+          ? "Nairecord na ang iyong sagot. Nais mo na ba magpatuloy? Oo kung magpapatuloy na at Hindi kung nais mo ulitin ang tanong."
+          : "Your answer has been recorded. Would you like to continue? Yes to continue and No to repeat the Question";
 
       speech.speak(speechText, language);
       setAskingFor("Questioning Confirmation");
@@ -219,8 +223,7 @@ export default function Services() {
 
       if (isDenial) {
         setTextPlaceholder("");
-        setAskingFor("Language");
-        speech.speak("What would you like to do?", "English");
+        handlePlay();
         return;
       }
     }

@@ -33,7 +33,7 @@ export const QuestionCard = ({
 
       <Textarea
         value={transcript}
-        className="opacity-0 h-0 flex-grow"
+        className="h-32 flex-grow"
         minRows={2}
         size="md"
         variant="outlined"
