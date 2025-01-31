@@ -1,7 +1,6 @@
 import { apiSlice } from './index.js';
-import viewsets from '../base/viewsets.js';
 
-const resource = 'sentiment-tests';
+const resource = 'dashboard';
 const apiUrl = `/${resource}`;
 export const dashUrl = `/${resource}`;
 const tags = [resource];
@@ -10,8 +9,10 @@ const headers = {
     tags,
 };
 
-const testApi = apiSlice.injectEndpoints({
-    endpoints: viewsets(resource),
+const feedbackApi = apiSlice.injectEndpoints({
+    endpoints: (build) => ({
+        // CHARTS API
+    }),
 });
 
-export { testApi };
+export { feedbackApi };
