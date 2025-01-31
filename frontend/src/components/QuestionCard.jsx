@@ -33,14 +33,14 @@ export const QuestionCard = ({
 
       <Textarea
         value={transcript}
-        className="opacity-0 h-full flex-grow"
+        className="opacity-0 h-0 flex-grow"
         minRows={2}
         size="md"
         variant="outlined"
         placeholder="Say something..."
       />
 
-      <div className="opacity-0 mt-4 flex justify-between">
+      <div className="opacity-0 h-0 mt-4 flex justify-between">
         <Button onClick={onPrev} disabled={isFirst} variant="outlined">
           Previous
         </Button>
