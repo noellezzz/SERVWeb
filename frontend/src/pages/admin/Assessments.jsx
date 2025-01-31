@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { FaUser, FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaUser, FaEdit, FaTrashAlt, FaSearch } from "react-icons/fa";
 
 // Sample user assessment data
 const assessments = [
@@ -37,31 +37,43 @@ const Assessments = () => {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
-        <h2 className="text-2xl font-semibold text-gray-100 mb-4">User Assessments</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-black">User Assessments</h2>
+
+          {/* Search Box */}
+          <div className="relative w-72">
+            <input
+              type="text"
+              placeholder="Search assessments..."
+              className="w-full pl-10 pr-4 py-2 border-2 border-black rounded-xl focus:border-red-500 focus:outline-none transition-colors bg-white"
+            />
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          </div>
+        </div>
 
         {/* Card Layout with Enhanced Animations */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {assessments.map((user) => (
             <motion.div
               key={user.id}
-              className="bg-gradient-to-r from-[#ff92ad] to-[#faf2cb] bg-opacity-30 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
+              className="bg-white border-2 border-black rounded-lg p-6 hover:border-red-500"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               whileHover={{
-                scale: 1.05, // Scale-up effect
-                boxShadow: "0 10px 20px rgba(0, 0, 0, 0.15)", // Shadow effect
-                transition: { duration: 0.3 }, // Smooth transition
+                scale: 1.05,
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                borderColor: "#ef4444" // red-500
               }}
             >
               {/* User Info */}
               <div className="flex items-center mb-3">
-                <FaUser size={24} className="text-gray-100 mr-3" />
-                <h3 className="text-lg font-semibold text-gray-100">{user.user}</h3>
+                <FaUser size={24} className="text-red-500 mr-3" />
+                <h3 className="text-lg font-semibold text-black">{user.user}</h3>
               </div>
 
               {/* Assessment Details */}
-              <div className="bg-gray-900 bg-opacity-20 p-4 rounded-lg shadow-md text-gray-100 space-y-2">
+              <div className="p-4 rounded-lg bg-gray-50 text-black space-y-2">
                 <p><strong>Responses:</strong> {user.responses}</p>
                 <p><strong>Age:</strong> {user.age}</p>
                 <p><strong>Gender:</strong> {user.gender}</p>
@@ -75,15 +87,15 @@ const Assessments = () => {
                     {user.score}
                   </span>
                 </p>
-                <p className="text-gray-300"><strong>Feedback:</strong> {user.feedback}</p>
+                <p className="text-gray-700"><strong>Feedback:</strong> {user.feedback}</p>
               </div>
 
               {/* Actions */}
               <div className="mt-4 flex justify-end space-x-3">
-                <button className="flex items-center px-3 py-1 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-all">
+                <button className="flex items-center px-3 py-2 border-2 border-black text-black rounded-lg hover:bg-gray-100 transition-all">
                   <FaEdit className="mr-2" /> Edit
                 </button>
-                <button className="flex items-center px-3 py-1 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-all">
+                <button className="flex items-center px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all">
                   <FaTrashAlt className="mr-2" /> Delete
                 </button>
               </div>
