@@ -1,7 +1,7 @@
 import { apiSlice } from './index.js';
 import viewsets from '../base/viewsets.js';
 
-const resource = 'feedback';
+const resource = 'feedbacks';
 const apiUrl = `/${resource}`;
 export const dashUrl = `/${resource}`;
 const tags = [resource];
@@ -10,7 +10,7 @@ const headers = {
     tags,
 };
 
-const feedbackApi = apiSlice.injectEndpoints({
+const feedbacksApi = apiSlice.injectEndpoints({
     endpoints: viewsets(resource, (build) => ({
         getSentimentResults: build.mutation({
             query: (id) => ({
@@ -22,4 +22,4 @@ const feedbackApi = apiSlice.injectEndpoints({
     })),
 });
 
-export { feedbackApi };
+export { feedbacksApi };
