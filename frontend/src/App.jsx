@@ -7,10 +7,10 @@ import AdminLayout from "./layouts/admin/AdminLayout";
 
 // USER PAGES
 import Home from "././pages/users/Home";
+import Evaluation from "./pages/users/Evaluation";
 import Services from "./pages/users/Services";
 import About from "./pages/users/About";
 import Contact from "./pages/users/Contact";
-import Login from "./pages/users/Login";
 
 // ADMIN PAGES
 import Dashboard from "./pages/admin/Dashboard";
@@ -29,10 +29,10 @@ function App() {
       {/* User Routes */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
+        <Route path="evaluation" element={<Evaluation />} />
         <Route path="services" element={<Services />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
-        <Route path="login" element={<Login />} />
       </Route>
 
       {/* Admin Routes */}
