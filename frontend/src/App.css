@@ -28,6 +28,11 @@ html {
   background: #ef4081;
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 .ignore__x-scroll {
   overflow-x:hidden !important;
 }

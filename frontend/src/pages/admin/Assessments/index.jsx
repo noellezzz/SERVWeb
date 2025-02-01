@@ -1,23 +1,36 @@
 import React from 'react'
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import AssesmentList from './AssesmentList'
 import AssessmentTable from './AssessmentTable'
+import AssessmentSummary from './AssessmentSummary'
 
 
 export default function AssessmentPage() {
     return (
-        <Box className="flex-1 overflow-auto relative z-10 p-8">
+        <div className="flex-1 overflow-auto relative z-10 p-8 h-screen">
 
-            <Typography variant="h4" gutterBottom className="text-gray-600">
+            <h1 className="text-4xl text-gray-600 font-bold">
                 Manage Assessments
-            </Typography>
+            </h1>
+            <hr className="my-4" />
 
-            <hr className="mb-4" />
-            <AssessmentTable />
+            <AssessmentSummary />
 
 
+            <div className='min-h-full flex my-8 p-4 border rounded-lg bg-white shadow-md'>
+                <div className='w-3/4 mr-4'>
+                    <h4 className="text-xl text-gray-600 font-semibold">
+                        Manage Questions
+                    </h4>
 
-        </Box>
+                </div>
+
+                <div className='w-1/4 border'>
+
+                </div>
+
+            </div>
+            <hr className="my-4" />
+
+
+        </div>
     )
 }

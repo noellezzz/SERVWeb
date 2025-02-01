@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import home from "../../assets/home.png";
-import "../../App.css";
+import home from "@/assets/home.png";
+import "@/App.css";
 import { AnimatePresence, motion, transform } from "framer-motion";
 
-import mobileui from "../../assets/mobile-ui.png";
-import qr from "../../assets/qr.png";
-import webui from "../../assets/webui.png";
-import spinner from "../../assets/loading.gif";
+import mobileui from "@/assets/mobile-ui.png";
+import qr from "@/assets/qr.png";
+import webui from "@/assets/webui.png";
+import spinner from "@/assets/loading.gif";
 
 import { FaAngleRight } from "react-icons/fa6";
 import { RiUserVoiceFill } from "react-icons/ri";
 import { LuBrainCircuit } from "react-icons/lu";
-import IconLink from "../../components/buttons/IconLink";
+import IconLink from "@/components/buttons/IconLink";
 
-import InformationCard from "../../components/cards/InformationCard";
+import InformationCard from "@/components/cards/InformationCard";
+import SplashScreen from "@/components/splash-screen";
 
 function Home() {
   const [loading, setLoading] = useState(true);
@@ -54,17 +55,8 @@ function Home() {
 
   return (
     <div>
-      <AnimatePresence>
-        {loading && (
-          <motion.div
-            exit={{ y: 2000 }}
-            transition={{ duration: 1, ease: "easeInOut" }}
-            className="absolute top-0 left-0 h-full w-full bg-white z-50 flex flex-col justify-center items-center"
-          >
-            <img src={spinner} className="w-52" placeholder="loading" />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <SplashScreen loading={loading} />
+
       {!loading && (
         <div
           className="ignore__x-scroll top-0 left-0 w-full h-screen p-5 flex gap-2 
