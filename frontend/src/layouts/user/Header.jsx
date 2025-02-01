@@ -15,6 +15,9 @@ function Header() {
           <Link className="text-white" to="/">
             Home
           </Link>
+          <Link className="text-white" to="/evaluation">
+            Evaluation
+          </Link>
           <Link className="text-white" to="/services">
             Services
           </Link>
@@ -23,9 +26,6 @@ function Header() {
           </Link>
           <Link className="text-white" to="/contact">
             Contact
-          </Link>
-          <Link className="text-white" to="/login">
-            Login
           </Link>
         </div>
       </div>
