@@ -1,32 +1,32 @@
 import React from "react";
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import ReportsTable from "./ReportsTable";
 import ReportsSummary from "./ReportsSummary";
 
 const Reports = () => {
     return (
-        <Box className="flex-1 overflow-auto relative z-10 p-8">
+        <div className="flex-1 overflow-auto relative z-10 p-8">
 
-            <Typography variant="h4" gutterBottom className="text-gray-600">
+            <h1 className="text-4xl text-gray-600 font-bold">
                 Manage Reports
-            </Typography>
+            </h1>
 
-            <Typography variant="h6" gutterBottom className="text-gray-600">
+            <h1 className="text-xl text-gray-600 font-semibold mt-4">
                 Summary
-            </Typography>
+            </h1>
+
+
             <hr className="mb-4" />
             <ReportsSummary />
 
 
-            <Typography variant="h6" gutterBottom className="text-gray-600">
+            <h1 className="text-xl text-gray-600 font-semibold mt-4">
                 Sentiment Results
-            </Typography>
+            </h1>
             <hr className="mb-4" />
             <ReportsTable />
 
 
-        </Box>
+        </div>
     );
 };
 

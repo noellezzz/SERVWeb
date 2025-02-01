@@ -1,21 +1,19 @@
 import React from 'react'
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import FeedbackTable from './FeedbackTable'
 
 export default function FeedbacksPage() {
     return (
-        <Box className="flex-1 overflow-auto relative z-10 p-8">
+        <div className="flex-1 overflow-auto relative z-10 p-8">
 
-            <Typography variant="h4" gutterBottom className="text-gray-600">
+            <h1 className="text-4xl text-gray-600 font-bold">
                 Manage Feedbacks
-            </Typography>
+            </h1>
 
             <hr className="mb-4" />
 
             <FeedbackTable />
 
 
-        </Box>
+        </div>
     )
 }
