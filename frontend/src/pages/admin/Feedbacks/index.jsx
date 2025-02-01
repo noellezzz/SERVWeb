@@ -1,21 +1,19 @@
 import React from 'react'
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import AssesmentList from './AssesmentList'
-import AssessmentTable from './AssessmentTable'
+import FeedbackTable from './FeedbackTable'
 
-
-export default function AssessmentPage() {
+export default function FeedbacksPage() {
     return (
         <Box className="flex-1 overflow-auto relative z-10 p-8">
 
             <Typography variant="h4" gutterBottom className="text-gray-600">
-                Manage Assessments
+                Manage Feedbacks
             </Typography>
 
             <hr className="mb-4" />
-            <AssessmentTable />
 
+            <FeedbackTable />
 
 
         </Box>
