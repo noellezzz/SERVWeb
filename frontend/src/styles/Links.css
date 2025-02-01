@@ -1,0 +1,40 @@
+.icon-link {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  /* align-items: center; */
+  background-color: #ffffff;
+  color: black;
+  padding: 1em 2em;
+  font-size: 18px;
+  text-decoration: none;
+  border-radius: 8px;
+  box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.7);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+}
+
+.icon-link .icon {
+  position: relative;
+  width: 0;
+  margin-left: 0;
+  opacity: 0;
+  bottom: -3em;
+  transition: 0.5s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-link:hover {
+  padding-right: 1em;
+}
+
+.icon-link:hover .icon {
+  /* border: 1px solid red; */
+  width: 2.5em;
+  opacity: 1;
+  bottom: 0;
+}
