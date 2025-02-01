@@ -1,15 +1,14 @@
+import React from 'react'
 import DashboardTable from '@/components/tables';
 
-const ReportsTable = () => {
+export default function FeedbackTable() {
     const columns = [
         { field: 'id', headerName: 'ID', width: "70" },
-        { field: 'user_id', headerName: 'USER_ID', width: "150" },
-        { field: 'positive_score', headerName: 'POSITIVE SCORE', width: "150" },
-        { field: 'negative_score', headerName: 'NEGATIVE SCORE', width: "150" },
-        { field: 'score', headerName: 'COMPOUND SCORE', width: "150" },
-        { field: 'sentiment', headerName: 'SENTIMENT', width: "150" },
+        { field: 'content', headerName: 'Content', width: "150" },
+        { field: 'result_id', headerName: 'Result', width: "150" },
+        { field: 'assessment_id', headerName: 'Assessment', width: "150" },
+        { field: 'sentiment', headerName: 'Sentiment', width: "150" },
         { field: 'actions', headerName: '', width: "150" },
-
     ];
 
     const rows = [
@@ -27,6 +26,4 @@ const ReportsTable = () => {
             }}
         />
     );
-};
-
-export default ReportsTable;
+}

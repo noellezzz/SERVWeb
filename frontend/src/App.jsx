@@ -14,9 +14,10 @@ import Login from "./pages/users/Login";
 
 // ADMIN PAGES
 import Dashboard from "./pages/admin/Dashboard";
-import Assessments from "./pages/admin/Assessments";
+import AssessmenstPage from "./pages/admin/Assessments";
 import Users from "./pages/admin/Users";
-import Reports from "./pages/admin/Reports";
+import ReportsPage from "./pages/admin/Reports";
+import FeedbacksPage from "./pages/admin/Feedbacks";
 import Analytics from "./pages/admin/Analytics";
 import Settings from "./pages/admin/Settings";
 import Notifications from "./pages/admin/Notifications";
@@ -37,11 +38,15 @@ function App() {
       {/* Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
-        <Route path="assessments" element={<Assessments />} />
+
         <Route path="users" element={<Users />} />
-        <Route path="reports" element={<Reports />} />
+        <Route path="assessments" element={<AssessmenstPage />} />
+        <Route path="feedbacks" element={<FeedbacksPage />} />
+        <Route path="reports" element={<ReportsPage />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="settings" element={<Settings />} />
+
+
         <Route path="notifications" element={<Notifications />} />
         <Route path="profile" element={<Profile />} />
       </Route>
