@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import logo from "../../assets/logo.png";
-import { UNSAFE_createClientRoutesWithHMRRevalidationOptOut, useNavigate } from "react-router-dom";
+import { UNSAFE_createClientRoutesWithHMRRevalidationOptOut, useLocation, useNavigate } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
@@ -12,16 +12,17 @@ import ReportIcon from "@mui/icons-material/Description";
 const NAVIGATION = [
   { segment: "", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "reports", title: "Reports", icon: <ReportIcon /> },
-  { segment: "users", title: "Users", icon: <GroupIcon /> },
   { segment: "analytics", title: "Analytics", icon: <BarChartIcon /> },
   { segment: "assessments", title: "Assessments", icon: <NoteAltIcon /> },
+  { segment: "users", title: "Manage Users", icon: <GroupIcon /> },
   { segment: "settings", title: "Settings", icon: <SettingsIcon /> },
 ];
 
 function Sidebar() {
   const navigate = useNavigate();
+  const loc = useLocation();
   const [navItems, setNavItems] = useState(NAVIGATION);
-  const [current, setCurrent] = useState("");
+  const [current, setCurrent] = useState(loc.pathname.split("admin/")[1]);
   const active = "bg-primary text-white rounded-l-full";
 
 
