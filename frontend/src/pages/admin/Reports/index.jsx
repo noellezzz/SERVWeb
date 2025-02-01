@@ -7,23 +7,17 @@ const Reports = () => {
         <div className="flex-1 overflow-auto relative z-10 p-8 h-screen">
 
             <h1 className="text-4xl text-gray-600 font-bold">
-                Manage Reports
+                Manage Assessments
             </h1>
             <hr className="my-4" />
 
-            <h4 className="text-xl text-gray-600 font-semibold">
-                Summary
-            </h4>
-            <hr className="my-4" />
-            <div className='min-h-[200px] border'>
+            <ReportsSummary />
 
-            </div>
 
-            <hr className="my-4" />
-            <div className='flex mb-4 border  h-full'>
+            <div className='min-h-full flex my-8 p-4 border rounded-lg bg-white shadow-md'>
                 <div className='w-3/4 mr-4'>
                     <h4 className="text-xl text-gray-600 font-semibold">
-                        Evaluation Results
+                        Results
                     </h4>
 
                 </div>

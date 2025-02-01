@@ -1,5 +1,9 @@
 import React from 'react'
 import FeedbackTable from './FeedbackTable'
+import FeedbacksSummary from './FeedbacksSummary'
+import EvaluationTable from './EvaluationTable'
+import FeedbacksRank from './FeedbacksRank'
+import FeedbacksDaily from './FeedbacksDaily'
 
 export default function FeedbacksPage() {
     return (
@@ -10,31 +14,23 @@ export default function FeedbacksPage() {
             </h1>
             <hr className="my-4" />
 
-            <h4 className="text-xl text-gray-600 font-semibold">
-                Summary
-            </h4>
-            <hr className="my-4" />
-            <div className='min-h-[200px] border'>
+            <FeedbacksSummary />
 
-            </div>
 
-            <hr className="my-4" />
-            <div className='flex mb-4 border  h-full'>
-                <div className='w-3/4 mr-4'>
-                    <h4 className="text-xl text-gray-600 font-semibold">
-                        User Evaluations
-                    </h4>
+            <div className='min-h-full flex my-8 p-4 border rounded-lg bg-white shadow-md'>
+                <div className='w-full mr-4 flex flex-col gap-8'>
+                    <EvaluationTable />
 
+
+                    <FeedbackTable />
                 </div>
 
-                <div className='w-1/4 border'>
+                <div className='w-1/4 display flex flex-col gap-8'>
+                    <FeedbacksRank />
+                    <FeedbacksDaily />
 
                 </div>
-
-            </div>
-            <hr className="my-4" />
-
-
+            </div >
         </div>
     )
 }

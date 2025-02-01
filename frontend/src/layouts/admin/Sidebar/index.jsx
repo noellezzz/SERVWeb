@@ -27,7 +27,7 @@ export default function Sidebar() {
                     <span>S.E.R.V</span>
                 </div>
             </div>
-            <nav className="mt-8 space-y-2 pl-7">
+            <nav className="mt-8 space-y-2 pl-7 overflow-y-auto h-5/6 pb-24 no-scrollbar">
                 {navItems.map((item, idx) => {
                     if (item.type === "menu") {
                         item.isActive = item.segment === current;
@@ -42,6 +42,18 @@ export default function Sidebar() {
                     }
                 })}
             </nav>
+            {/* Logout Button */}
+            <div className="absolute bottom-0 w-full p-5">
+                <button
+                    className="w-full py-2 bg-red-500 text-white rounded-md"
+                    onClick={() => {
+                        localStorage.removeItem("token");
+                        navigate("/login");
+                    }}
+                >
+                    Logout
+                </button>
+            </div>
         </aside>
     );
 }

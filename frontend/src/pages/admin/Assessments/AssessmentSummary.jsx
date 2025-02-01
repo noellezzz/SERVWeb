@@ -27,7 +27,8 @@ const summaryExample = {
         label: 'Daily Score'
     }
 }
-export default function ReportsSummary() {
+
+export default function AssessmentSummary() {
     return (
         <Summary data={summaryExample}
             chart={<div className=''>

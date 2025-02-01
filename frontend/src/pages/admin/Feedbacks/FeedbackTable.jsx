@@ -23,15 +23,22 @@ export default function FeedbackTable() {
     if (loading) return <SplashScreen loading={loading} />;
 
     return (
-        <DashboardTable
-            columns={columns}
-            rows={rows}
-            checkboxSelection
-            onRowClick={(params) => console.log(params.row)}
-            sx={{
-                paper: { boxShadow: 3 },
-                grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
-            }}
-        />
+        <div>
+
+            <h4 className="text-xl text-gray-600 font-semibold">
+                Feedbacks
+            </h4>
+            <DashboardTable
+                columns={columns}
+                rows={rows}
+                checkboxSelection
+                onRowClick={(params) => console.log(params.row)}
+                sx={{
+                    paper: { boxShadow: 3 },
+                    grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
+                }}
+            />
+
+        </div>
     );
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import AssessmentTable from './AssessmentTable'
+import AssessmentSummary from './AssessmentSummary'
 
 
 export default function AssessmentPage() {
@@ -11,16 +12,10 @@ export default function AssessmentPage() {
             </h1>
             <hr className="my-4" />
 
-            <h4 className="text-xl text-gray-600 font-semibold">
-                Summary
-            </h4>
-            <hr className="my-4" />
-            <div className='min-h-[200px] border'>
+            <AssessmentSummary />
 
-            </div>
 
-            <hr className="my-4" />
-            <div className='flex mb-4 border  h-full'>
+            <div className='min-h-full flex my-8 p-4 border rounded-lg bg-white shadow-md'>
                 <div className='w-3/4 mr-4'>
                     <h4 className="text-xl text-gray-600 font-semibold">
                         Manage Questions
