@@ -12,7 +12,8 @@ const DashboardTable = ({
     checkboxSelection = false,
     loading = false,
     height = 400,
-    sx = {}
+    sx = {},
+    ...rest
 }) => {
     return (
         <Paper sx={{ height: height, width: '100%', ...sx?.paper }}>
@@ -27,6 +28,7 @@ const DashboardTable = ({
                 onRowClick={onRowClick}
                 loading={loading}
                 sx={{ border: 0, ...sx?.grid }}
+                {...rest}
             />
         </Paper>
     );

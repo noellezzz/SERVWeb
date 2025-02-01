@@ -17,7 +17,7 @@ export default function Summary({ data = {}, chart }) {
                     {
                         Object.keys(summary).map((key, index) => {
                             return (
-                                <div className='h-full'>
+                                <div className='h-full' key={index}>
                                     <p className="text-gray-500">
                                         {summary[key].label}
                                     </p>

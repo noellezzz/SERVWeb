@@ -1,6 +1,7 @@
 import React from 'react'
-import AssessmentTable from './AssessmentTable'
 import AssessmentSummary from './AssessmentSummary'
+import AssessmentQuestions from './AssessmentQuestions'
+import AssessmentTable from './AssessmentTable'
 
 
 export default function AssessmentPage() {
@@ -20,6 +21,12 @@ export default function AssessmentPage() {
                     <h4 className="text-xl text-gray-600 font-semibold">
                         Manage Questions
                     </h4>
+                    <AssessmentQuestions />
+
+                    <h4 className="text-xl text-gray-600 font-semibold">
+                        Manage Assessments
+                    </h4>
+                    <AssessmentTable />
 
                 </div>
 

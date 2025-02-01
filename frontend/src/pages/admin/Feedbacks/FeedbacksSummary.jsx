@@ -3,27 +3,27 @@ import Summary from '@/components/summary'
 
 const summaryExample = {
     totalEvaluations: {
-        value: 120,
+        value: (Math.ceil(Math.random() * 1000) + 1),
         label: 'Total Evaluations'
     },
     avgDailyEvaluations: {
-        value: 120,
+        value: (Math.ceil(Math.random() * 1000) + 1),
         label: 'Avg Daily Evaluations'
     },
     dailyEvaluations: {
-        value: 120,
+        value: (Math.ceil(Math.random() * 1000) + 1),
         label: 'Daily Evaluations'
     },
     avgTimePerEvaluation: {
-        value: 120,
+        value: (Math.ceil(Math.random() * 1000) + 1),
         label: 'Avg Time Per Evaluation'
     },
     feedbacksCount: {
-        value: 120,
+        value: (Math.ceil(Math.random() * 1000) + 1),
         label: 'Feedbacks Count'
     },
     avgDailyFeedbacks: {
-        value: 120,
+        value: (Math.ceil(Math.random() * 1000) + 1),
         label: 'Avg Daily Feedbacks'
     }
 }

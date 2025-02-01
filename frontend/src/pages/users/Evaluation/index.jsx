@@ -17,10 +17,6 @@ import { QUESTIONS } from "./question-sample";
 
 export default function Evaluation() {
     const [questions, setQuestions] = useState(QUESTIONS);
-
-    // TODO: Save answers to state
-    const [answers, setAnswers] = useState([]);
-
     const isListeningDelay = 500;
     const micAutoOffTimeout = 1500;
 

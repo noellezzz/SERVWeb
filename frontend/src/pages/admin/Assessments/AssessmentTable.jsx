@@ -1,19 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import DashboardTable from '@/components/tables';
+import { resultColumns as headers } from './schema';
 
 export default function AssessmentTable() {
-    const columns = [
-        { field: 'id', headerName: 'ID', width: "70" },
-        { field: 'content', headerName: 'Content', width: "150" },
-        { field: 'category', headerName: 'Result', width: "150" },
-    ];
-
-    const rows = [
-    ];
+    const [rows, setRows] = useState([]);
 
     return (
         <DashboardTable
-            columns={columns}
+            columns={headers}
             rows={rows}
             checkboxSelection
             onRowClick={(params) => console.log(params.row)}

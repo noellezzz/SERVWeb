@@ -42,6 +42,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
                 score=sentiment_result['score'],
                 positive_words=sentiment_result['positive_words'],
                 negative_words=sentiment_result['negative_words'],
+                detailed_results=sentiment_result['sentiment'],
                 feedback=feedback,
                 sentiment_test=test
             )
