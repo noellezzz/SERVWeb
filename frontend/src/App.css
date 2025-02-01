@@ -38,7 +38,7 @@ html {
   box-shadow: 0px 0px 10px 5px rgba(197, 38, 38, 1) inset;
 }
 
-.pseudo__web {
+.pseudo__qr {
   background-color: rgba(255,255,255,.5);
   height: 70%;
   width: 30rem;
@@ -199,4 +199,14 @@ html {
 
 .textdiv h1,p{
   color: var(--quinary-color);
+}
+
+.textdiv h1{
+  font-size: 4rem;
+}
+
+.cardsectioncontainer{
+  background-color: var(--primary-color);
+  height: 90vh;
+  font-family: 'Poppins', sans-serif;
 }
