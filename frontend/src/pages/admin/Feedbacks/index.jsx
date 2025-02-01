@@ -3,15 +3,36 @@ import FeedbackTable from './FeedbackTable'
 
 export default function FeedbacksPage() {
     return (
-        <div className="flex-1 overflow-auto relative z-10 p-8">
+        <div className="flex-1 overflow-auto relative z-10 p-8 h-screen">
 
             <h1 className="text-4xl text-gray-600 font-bold">
                 Manage Feedbacks
             </h1>
+            <hr className="my-4" />
 
-            <hr className="mb-4" />
+            <h4 className="text-xl text-gray-600 font-semibold">
+                Summary
+            </h4>
+            <hr className="my-4" />
+            <div className='min-h-[200px] border'>
 
-            <FeedbackTable />
+            </div>
+
+            <hr className="my-4" />
+            <div className='flex mb-4 border  h-full'>
+                <div className='w-3/4 mr-4'>
+                    <h4 className="text-xl text-gray-600 font-semibold">
+                        User Evaluations
+                    </h4>
+
+                </div>
+
+                <div className='w-1/4 border'>
+
+                </div>
+
+            </div>
+            <hr className="my-4" />
 
 
         </div>
