@@ -1,6 +1,7 @@
 import ActionButtons from "@/components/actions";
 import Switch from '@mui/material/Switch';
-export const questionColumns = [
+
+export const getQuestionColumns = (onEdit, onDelete) => [
     {
         field: 'question',
         headerName: 'Questions',
@@ -9,29 +10,29 @@ export const questionColumns = [
     {
         field: 'category',
         headerName: 'Category',
-
     },
     {
         field: 'is_active',
         headerName: 'Active',
-
-        renderCell: (params) => {
-            return (<Switch defaultChecked={params.value} />);
-
-        },
+        renderCell: (params) => (
+            <Switch defaultChecked={params.value} />
+        ),
     },
     {
         field: 'actions',
         headerName: '',
         sortable: false,
         width: 150,
-        renderCell: (params) => {
-            return (<ActionButtons />);
-
-        },
+        renderCell: (params) => (
+            <ActionButtons 
+                onEdit={() => onEdit(params.row)}
+                onDelete={() => onDelete(params.row)}
+            />
+        ),
     }
-]
-export const resultColumns = [
+];
+
+export const getResultColumns = (onView, onDelete) => [
     {
         field: 'id',
         headerName: 'ID',
@@ -39,35 +40,34 @@ export const resultColumns = [
     },
     {
         field: 'score',
-        headerName: 'score',
+        headerName: 'Score',
         flex: 1,
     },
     {
         field: 'positivity',
-        headerName: 'positivity',
+        headerName: 'Positivity',
         flex: 1,
     },
     {
         field: 'negativity',
-        headerName: 'negativity',
+        headerName: 'Negativity',
         flex: 1,
     },
     {
         field: 'sentiment',
-        headerName: 'sentiment',
+        headerName: 'Sentiment',
         flex: 1,
     },
-
     {
         field: 'actions',
         headerName: '',
         sortable: false,
         width: 150,
-        renderCell: (params) => {
-            return (<>
-                <ActionButtons />
-            </>);
-
-        },
+        renderCell: (params) => (
+            <ActionButtons 
+                onView={() => onView(params.row)}
+                onDelete={() => onDelete(params.row)}
+            />
+        ),
     }
-]
+];

@@ -29,7 +29,7 @@ export default (resourceName, fn = () => { }) => (build) => ({
         }),
     }),
     update: build.mutation({
-        query: (id, data) => ({
+        query: ({ id, data }) => ({
             url: `/${resourceName}/${id}/`,
             method: 'PATCH',
             body: data,

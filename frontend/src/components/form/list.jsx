@@ -1,14 +1,18 @@
-import React, { useState } from 'react'
-import { Field, FieldArray } from 'formik'
-import { TextField, IconButton, Button } from '@mui/material'
-import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material'
+import React, { useState, useEffect } from 'react';
+import { Field, FieldArray } from 'formik';
+import { TextField, IconButton, Button } from '@mui/material';
+import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
+import { array } from 'yup';
 
 export default function FieldList({
     name,
     label,
+    formik,
     allowNone = true,
 }) {
     const [errors, setErrors] = useState({});
+
+
 
     const isDuplicate = (values, index, newValue) => {
         return values[name].some((item, i) =>
@@ -16,15 +20,35 @@ export default function FieldList({
         );
     };
 
+    const initializeValues = (values) => {
+        if (!values[name]) {
+            return [];
+        }
+
+        // if values[name][0] is not in the form { text: '', value: 1 } format
+        if (typeof values[name][0] !== 'object') {
+            return values[name].map((item, index) => ({
+                text: item,
+                value: index + 1
+            }));
+        }
+
+        return values[name];
+    };
+
+    useEffect(() => {
+        formik.setFieldValue(name, initializeValues(formik.values));
+    }, []);
+
     return (
         <FieldArray name={name}>
-            {({ push, remove, form: { values } }) => (
+            {({ push, remove, form: { values, setFieldValue } }) => (
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">
                         <h3 className="font-semibold">{label}</h3>
                         <Button
                             startIcon={<AddIcon />}
-                            onClick={() => push({ text: '', value: '' })}
+                            onClick={() => push({ text: '', value: values[name].length + 1 })}
                         >
                             Add Option
                         </Button>
@@ -40,7 +64,7 @@ export default function FieldList({
                                 variant="outlined"
                             />
                             <Field name={`${name}.${index}.value`}>
-                                {({ field, form }) => (
+                                {({ field }) => (
                                     <TextField
                                         {...field}
                                         type="number"
@@ -62,7 +86,7 @@ export default function FieldList({
                                                 delete newErrors[index];
                                                 return newErrors;
                                             });
-                                            form.setFieldValue(`${name}.${index}.value`, newValue);
+                                            setFieldValue(`${name}.${index}.value`, newValue);
                                         }}
                                     />
                                 )}
@@ -83,5 +107,5 @@ export default function FieldList({
                 </div>
             )}
         </FieldArray>
-    )
+    );
 }

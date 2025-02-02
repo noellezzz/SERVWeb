@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import CustomModal from '@/components/modals';
 import swal from 'sweetalert';
 import QuestionForm from './QuestionForm';
@@ -7,13 +7,14 @@ import {toggleRefresh} from '@/states/slices/resource.slice';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function QuestionFormModal({ 
+    current = null,
     open = false, 
     setOpen = () => { }, 
 }) {
     const formRef = useRef();
     const dispatch = useDispatch();
 
-    const { createTest } = useTest();
+    const { createTest, updateTest } = useTest();
     const [initialValues, setInitialValues] = useState({
         title: '',
         description: '',
@@ -24,8 +25,23 @@ export default function QuestionFormModal({
         options: [],
     });
 
+
+
     const handleSave = (values, actions) => {
         if (values && actions){
+            if (current.id) {
+                return updateTest(current.id, values).then((data) => {
+                    dispatch(toggleRefresh(true));
+                }).catch((error) => {
+                    actions.setSubmitting(false);
+                    actions.setErrors(error);
+                    swal({
+                        title: 'Error',
+                        text: 'An error occurred. Please try again.',
+                        icon: 'error',
+                    });
+                });
+            }
             return createTest(values).then((res) => {
                 swal({
                     title: 'Question added',
@@ -85,6 +101,12 @@ export default function QuestionFormModal({
             variant: 'contained'
         }
     ];
+
+    useEffect(() => {
+        if (current) {
+            setInitialValues(current);
+        }
+    }, [current])
 
 
     return (

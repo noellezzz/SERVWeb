@@ -19,6 +19,8 @@ export default function InputField({
                     <FieldList
                         name={name}
                         label={label}
+                        formik={formik}
+                        {...props}
                     />
                 );
 

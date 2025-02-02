@@ -25,7 +25,6 @@ export default function SmartSelect({
         );
     };
 
-
     const handleChange = (_, newValue) => {
         if (newValue) {
             if (typeof newValue === 'string') {
@@ -68,9 +67,22 @@ export default function SmartSelect({
         const currentValue = formik.values[name];
         if (currentValue) {
             const option = localOptions.find(opt => opt.value === currentValue);
-            setValue(option);
+            // If option is not found, add it to the local options
+            if (!option) {
+                const newOption = {
+                    label: currentValue.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                    value: currentValue
+                };
+                setLocalOptions(prev => [...prev, newOption]);
+                setValue(newOption);
+            } else {
+                setValue(option);
+            }
+        } else {
+            setValue(null);
         }
-    }, []);
+    }, [formik.values[name], localOptions]);
+
     return (
         <Autocomplete
             value={value}
@@ -83,7 +95,7 @@ export default function SmartSelect({
             isOptionEqualToValue={(option, value) => option?.value === value?.value}
             renderOption={(props, option) => (
                 <li {...props} className="flex justify-between items-center p-3" key={option.value}>
-                    <span>{option.label}</span>
+                    <span className='capitalize'>{option.label}</span>
                     <IconButton
                         size="small"
                         onClick={(e) => {
@@ -100,8 +112,8 @@ export default function SmartSelect({
                     {...params}
                     label={label}
                     variant="outlined"
-                    error={Boolean(error) || (formik.touched[name] && Boolean(formik.errors[name]))}
-                // helperText={error || (formik.touched[name] && formik.errors[name])}b
+                    error={Boolean(error)}
+                    helperText={error}
                 />
             )}
             {...props}
