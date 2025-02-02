@@ -3,12 +3,16 @@ import CustomModal from '@/components/modals';
 import swal from 'sweetalert';
 import QuestionForm from './QuestionForm';
 import useTest from '@/states/services/useTest';
+import {toggleRefresh} from '@/states/slices/resource.slice';
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function QuestionFormModal({ 
     open = false, 
     setOpen = () => { }, 
 }) {
     const formRef = useRef();
+    const dispatch = useDispatch();
+
     const { createTest } = useTest();
     const [initialValues, setInitialValues] = useState({
         title: '',
@@ -23,16 +27,22 @@ export default function QuestionFormModal({
     const handleSave = (values, actions) => {
         if (values && actions){
             return createTest(values).then((res) => {
-                console.log(res)
-                actions.setSubmitting(false);
-                actions.resetForm();
-                setOpen(false);
-
                 swal({
-                    title: 'Success',
-                    text: 'Question has been created.',
+                    title: 'Question added',
+                    text: 'Do you want to add another question?',
                     icon: 'success',
-                })
+                    buttons: ['No', 'Yes'],
+                }).then((addAnother) => {
+                    if (!addAnother) {
+                        setOpen(false);
+                        dispatch(toggleRefresh(true));
+
+                    } else {
+                        actions.resetForm();
+                        actions.setSubmitting(false);
+                    }
+                });
+                
 
 
             }).catch((error) => {

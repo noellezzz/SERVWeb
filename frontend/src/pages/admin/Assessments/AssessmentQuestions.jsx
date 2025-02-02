@@ -5,22 +5,33 @@ import useTest from '@/states/services/useTest';
 import { Plus } from 'lucide-react';
 import { Button } from '@mui/material';
 import QuestionFormModal from './QuestionFormModal';
+import {toggleRefresh} from '@/states/slices/resource.slice';
+import { useDispatch,useSelector } from 'react-redux';
 
 export default function AssessmentQuestions() {
+    const dispatch = useDispatch();
+    const refresh = useSelector((state) => state.resources.refresh);
+
     const [rows, setRows] = useState([]);
     const { listTest } = useTest();
     const [formOpen, setFormOpen] = useState(false);
 
+    useEffect(() => {
+      !refresh && dispatch(toggleRefresh(true))
+    }, [])
 
     useEffect(() => {
-        listTest().then((data) => {
+        refresh && listTest().then((data) => {
             const results = data.results?.map((item) => ({
                 ...item,
                 question: item.question_text_en,
             })) || [];
             setRows(results)
+            dispatch(toggleRefresh(false))
         })
-    }, [])
+    }, [refresh])
+
+
 
     return (
         <div>
@@ -37,10 +48,12 @@ export default function AssessmentQuestions() {
                     Add
                 </Button>
 
-                <QuestionFormModal 
-                    open={formOpen} 
-                    setOpen={setFormOpen} 
-                />
+                {!refresh  &&
+                    <QuestionFormModal 
+                        open={formOpen} 
+                        setOpen={setFormOpen} 
+                    />
+                }
 
             </div>
 

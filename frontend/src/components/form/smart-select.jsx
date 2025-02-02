@@ -82,7 +82,7 @@ export default function SmartSelect({
             freeSolo={allowNew}
             isOptionEqualToValue={(option, value) => option?.value === value?.value}
             renderOption={(props, option) => (
-                <li {...props} className="flex justify-between items-center p-3">
+                <li {...props} className="flex justify-between items-center p-3" key={option.value}>
                     <span>{option.label}</span>
                     <IconButton
                         size="small"
