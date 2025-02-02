@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import DashboardTable from '@/components/tables';
-import { resultColumns as headers } from './table-data';
+import { getResultColumns as headers } from './table-data';
 
 export default function AssessmentTable() {
     const [rows, setRows] = useState([]);
@@ -11,7 +11,7 @@ export default function AssessmentTable() {
                 Manage Assessments
             </h4>
             <DashboardTable
-                columns={headers}
+                columns={headers()}
                 rows={rows}
                 checkboxSelection
                 onRowClick={(params) => console.log(params.row)}

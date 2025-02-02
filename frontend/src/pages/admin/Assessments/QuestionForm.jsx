@@ -1,7 +1,6 @@
 import React, { useRef, forwardRef } from 'react'
 import FormikForm from '@/components/form';
 import * as yup from 'yup';
-import swal from 'sweetalert';
 
 const validationSchema = yup.object().shape({
     title: yup.string(),
@@ -60,7 +59,6 @@ const fields = [
 
 const QuestionForm = forwardRef(({
     onSave = () => { },
-    isEdit = false,
     initialValues = {}
 }, ref) => {
     return (
@@ -68,16 +66,7 @@ const QuestionForm = forwardRef(({
             <FormikForm
                 ref={ref}
                 fields={fields}
-                initialValues={{
-                    title: '',
-                    description: '',
-                    question_text_en: '',
-                    question_text_tl: '',
-                    category: '',
-                    options: [{ text: '', value: '' }],
-                    is_active: true,
-                    ...initialValues,
-                }}
+                initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={onSave}
             />

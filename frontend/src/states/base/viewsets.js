@@ -17,7 +17,7 @@ export default (resourceName, fn = () => { }) => (build) => ({
     }),
     create: build.mutation({
         query: (data) => ({
-            url: `/${resourceName}`,
+            url: `/${resourceName}/`,
             method: 'POST',
             body: data,
         }),
@@ -29,21 +29,27 @@ export default (resourceName, fn = () => { }) => (build) => ({
         }),
     }),
     update: build.mutation({
-        query: (id, data) => ({
-            url: `/${resourceName}/${id}`,
+        query: ({ id, data }) => ({
+            url: `/${resourceName}/${id}/`,
             method: 'PATCH',
             body: data,
         }),
     }),
     destroy: build.mutation({
         query: (id) => ({
-            url: `/${resourceName}/${id}`,
-            method: 'DELETE',
+            url: `/${resourceName}/${id}/delete/`,
+            method: 'PATCH',
+        }),
+    }),
+    restore: build.mutation({
+        query: (id) => ({
+            url: `/${resourceName}/${id}/restore/`,
+            method: 'PATCH',
         }),
     }),
     force_destroy: build.mutation({
         query: (id) => ({
-            url: `/${resourceName}/${id}`,
+            url: `/${resourceName}/${id}/`,
             method: 'DELETE',
         }),
     }),
