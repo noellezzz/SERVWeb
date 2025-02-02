@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo.png";
-import wordmark from "../../assets/servwordmark2.png";
+import logo from "../../assets/SERV_Logo.png";
+import wordmark from "../../assets/Wordmark.png";
 
 function Header() {
   return (
