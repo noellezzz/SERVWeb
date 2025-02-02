@@ -1,15 +1,24 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
 :root {
-  --primary-color: #fff0f3;
-  --secondary-color: #ff758f;
-  --tertiary-color: #e5383b;
-  --quaternary-color: #a4161a;
-  --quinary-color: #0b090a;
+  --base-color: #f1f1f1;
+  --primary-color: #f1f1f1;
+  --secondary-color: #FF758F;
+  --tertiary-color: #E5383B;
+  --quaternary-color: #A4161A;
+  --quinary-color: #0B090A;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--base-color);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 ::-webkit-scrollbar {
@@ -26,6 +35,11 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #ef4081;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .ignore__x-scroll {

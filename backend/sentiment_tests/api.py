@@ -7,6 +7,9 @@ from . import models
 from feedbacks.models import Feedback
 from serv.utils.vader import VaderSentimentAnalyzer
 import logging
+from django.utils import timezone
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,6 +45,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
                 score=sentiment_result['score'],
                 positive_words=sentiment_result['positive_words'],
                 negative_words=sentiment_result['negative_words'],
+                detailed_results=sentiment_result['sentiment'],
                 feedback=feedback,
                 sentiment_test=test
             )
@@ -62,6 +66,17 @@ class SentimentTestViewSet(viewsets.ModelViewSet):
     # permission_classes = [permissions.IsAuthenticated]
     queryset = models.SentimentTest.objects.all()
     serializer_class = serializers.SentimentTestSerializer
+
+    def list(self, request):
+        queryset = models.SentimentTest.objects.filter(deleted_at=None)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = serializers.SentimentTestSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = serializers.SentimentTestSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
     
     @action(detail=True, methods=['get'])
     def results(self, request, pk=None):
@@ -69,3 +84,17 @@ class SentimentTestViewSet(viewsets.ModelViewSet):
         results = test.sentiment_results.all()
         serializer = serializers.SentimentResultSerializer(results, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['patch'])
+    def delete(self, request, pk=None):
+        test = self.get_object()
+        test.deleted_at = timezone.now()
+        test.save()
+        return Response({'status': 'deleted'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['delete'])
+    def force_delete(self, request, pk=None):
+        test = self.get_object()
+        test.delete()
+        return Response({'status': 'deleted'}, status=status.HTTP_200_OK)
+
