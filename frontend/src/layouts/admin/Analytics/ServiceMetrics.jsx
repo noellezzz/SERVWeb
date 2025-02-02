@@ -28,7 +28,7 @@ const ServiceMetrics = () => {
 			transition={{ delay: 0.6 }}
 		>
 			<h2 className='text-xl font-semibold text-gray-900 mb-4 text-center'>Service Metrics Overview</h2>
-			<div className='w-full h-80'>
+			<div className='w-full h-full'>
 				<ResponsiveContainer width="100%" height="100%">
 					<RadarChart cx='50%' cy='50%' outerRadius='80%' data={serviceMetricsData}>
 						<PolarGrid stroke='#E5E7EB' />

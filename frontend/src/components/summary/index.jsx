@@ -4,7 +4,7 @@ export default function Summary({ data = {}, chart }) {
     const [summary, setSummary] = React.useState(data)
 
     return (
-        <>
+        <div>
             <h4 className="text-xl text-gray-600 font-semibold">
                 Summary
             </h4>
@@ -39,6 +39,6 @@ export default function Summary({ data = {}, chart }) {
 
                 </div>
             </div>
-        </>
+        </div>
     )
 }

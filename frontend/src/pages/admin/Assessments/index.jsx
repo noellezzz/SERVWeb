@@ -2,7 +2,7 @@ import React from 'react'
 import AssessmentSummary from './AssessmentSummary'
 import AssessmentQuestions from './AssessmentQuestions'
 import AssessmentTable from './AssessmentTable'
-
+import AssessmentLists from './AssessmentLists'
 
 export default function AssessmentPage() {
     return (
@@ -16,7 +16,7 @@ export default function AssessmentPage() {
             <AssessmentSummary />
 
 
-            <div className='min-h-full flex my-8 p-4 border rounded-lg bg-white shadow-md'>
+            <div className='min-h-full flex my-4 p-4 rounded-lg bg-white shadow-md'>
                 <div className='w-3/4 mr-4 flex flex-col gap-8'>
                     <AssessmentQuestions />
 
@@ -24,7 +24,8 @@ export default function AssessmentPage() {
 
                 </div>
 
-                <div className='w-1/4 border'>
+                <div className='w-1/4'>
+                    <AssessmentLists />
 
                 </div>
 

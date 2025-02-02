@@ -2,8 +2,7 @@ import React from 'react'
 import FeedbackTable from './FeedbackTable'
 import FeedbacksSummary from './FeedbacksSummary'
 import EvaluationTable from './EvaluationTable'
-import FeedbacksRank from './FeedbacksRank'
-import FeedbacksDaily from './FeedbacksDaily'
+import FeedbacksLists from './FeedbacksLists'
 
 export default function FeedbacksPage() {
     return (
@@ -17,17 +16,16 @@ export default function FeedbacksPage() {
             <FeedbacksSummary />
 
 
-            <div className='min-h-full flex my-8 p-4 border rounded-lg bg-white shadow-md'>
-                <div className='w-full mr-4 flex flex-col gap-8'>
+            <div className='min-h-full flex my-4 p-4 border rounded-lg bg-white shadow-md'>
+                <div className='w-3/4 mr-4 flex flex-col gap-8'>
                     <EvaluationTable />
 
 
                     <FeedbackTable />
                 </div>
 
-                <div className='w-1/4 display flex flex-col gap-8'>
-                    <FeedbacksRank />
-                    <FeedbacksDaily />
+                <div className='w-1/4'>
+                    <FeedbacksLists />
 
                 </div>
             </div >
