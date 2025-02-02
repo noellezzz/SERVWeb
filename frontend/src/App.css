@@ -223,6 +223,19 @@ p {
 }
 
 .footer {
+  background-color: var(--primary-color);
   color: var(--primary-color);
+  font-family: "Poppins", sans-serif;
+}
+
+.footer h2,h3{
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--quaternary-color);
+}
+
+.servicecard {
+  width: 100%;
+  height: 20vh;
   font-family: "Poppins", sans-serif;
 }
