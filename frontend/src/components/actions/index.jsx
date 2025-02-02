@@ -1,6 +1,6 @@
 import React from 'react';
 import { IconButton, Tooltip, Stack } from '@mui/material';
-import { Edit, Delete, Visibility } from '@mui/icons-material';
+import { Edit, Archive, Visibility } from '@mui/icons-material';
 
 const ActionButtons = ({
     actions = [],
@@ -18,8 +18,8 @@ const ActionButtons = ({
             color: 'primary',
         },
         delete: {
-            icon: <Delete />,
-            label: 'Delete',
+            icon: <Archive />,
+            label: 'Archive',
             color: 'error',
         },
         view: {

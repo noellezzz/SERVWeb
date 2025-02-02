@@ -17,15 +17,9 @@ export default function AssessmentPage() {
 
 
             <div className='min-h-full flex my-8 p-4 border rounded-lg bg-white shadow-md'>
-                <div className='w-3/4 mr-4'>
-                    <h4 className="text-xl text-gray-600 font-semibold">
-                        Manage Questions
-                    </h4>
+                <div className='w-3/4 mr-4 flex flex-col gap-8'>
                     <AssessmentQuestions />
 
-                    <h4 className="text-xl text-gray-600 font-semibold">
-                        Manage Assessments
-                    </h4>
                     <AssessmentTable />
 
                 </div>
