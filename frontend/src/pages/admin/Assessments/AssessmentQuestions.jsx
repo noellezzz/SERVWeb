@@ -3,10 +3,13 @@ import DashboardTable from '@/components/tables';
 import { questionColumns as headers } from './table-data'
 import useTest from '@/states/services/useTest';
 import { Plus } from 'lucide-react';
+import { Button } from '@mui/material';
+import { QuestionFormModal } from './QuestionForm';
 
 export default function AssessmentQuestions() {
     const [rows, setRows] = useState([]);
-    const { listTest } = useTest()
+    const { listTest } = useTest();
+    const [formOpen, setFormOpen] = useState(false);
 
 
     useEffect(() => {
@@ -22,18 +25,24 @@ export default function AssessmentQuestions() {
 
 
 
-
     return (
         <div>
+
+
             <div className="flex items-center justify-between my-2">
                 <h4 className="text-xl text-gray-600 font-semibold">
                     Manage Questions
                 </h4>
-                <button className="bg-primary p-1 px-2 text-white rounded-full flex items-center gap-2">
-                    <Plus />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<Plus />}
+                    onClick={() => setFormOpen(true)}
+                >
                     Add
-                </button>
+                </Button>
 
+                <QuestionFormModal open={formOpen} setOpen={setFormOpen} />
 
             </div>
 
