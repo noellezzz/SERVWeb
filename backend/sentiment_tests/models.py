@@ -11,6 +11,7 @@ class SentimentCategory(models.Model):
     
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         pass
@@ -41,6 +42,7 @@ class SentimentTest(models.Model):
     
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
+    deleted_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         pass
@@ -62,6 +64,7 @@ class SentimentResult(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)    
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
+    deleted_at = models.DateTimeField(blank=True, null=True)
     
     # Content Fields
     label = models.TextField(blank=True, null=True)

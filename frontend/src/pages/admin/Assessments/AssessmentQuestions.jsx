@@ -14,7 +14,7 @@ export default function AssessmentQuestions() {
     const refresh = useSelector((state) => state.resources.refresh);
     const [rows, setRows] = useState([]);
     const [currentRow, setCurrentRow] = useState(null);
-    const { listTest, destroyTest } = useTest();
+    const { listTest, destroyTest, loading, error } = useTest();
     const [formOpen, setFormOpen] = useState(false);
 
 
@@ -46,7 +46,6 @@ export default function AssessmentQuestions() {
 
     useEffect(() => {
       !refresh && dispatch(toggleRefresh(true))
-      setCurrentRow(null)
     }, [])
 
     useEffect(() => {
@@ -57,11 +56,8 @@ export default function AssessmentQuestions() {
             })) || [];
             setRows(results)
             dispatch(toggleRefresh(false))
-            setCurrentRow(null)
         })
     }, [refresh])
-
-
 
     return (
         <div>
@@ -80,6 +76,7 @@ export default function AssessmentQuestions() {
 
                 <QuestionFormModal 
                     current={currentRow}
+                    setCurrent={setCurrentRow}
                     open={formOpen} 
                     setOpen={setFormOpen} 
                 />
@@ -89,7 +86,6 @@ export default function AssessmentQuestions() {
             <DashboardTable
                 columns={headers(onEditClick, onDeleteClick)}
                 rows={rows}
-                checkboxSelection
                 sx={{
                     paper: { boxShadow: 3 },
                     grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }

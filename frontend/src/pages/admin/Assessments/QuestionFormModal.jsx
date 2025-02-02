@@ -8,8 +8,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export default function QuestionFormModal({ 
     current = null,
+    setCurrent = () => { },
     open = false, 
     setOpen = () => { }, 
+
 }) {
     const formRef = useRef();
     const dispatch = useDispatch();
@@ -31,6 +33,7 @@ export default function QuestionFormModal({
         if (values && actions){
             if (current.id) {
                 return updateTest(current.id, values).then((data) => {
+                    setCurrent(data);
                     dispatch(toggleRefresh(true));
                 }).catch((error) => {
                     actions.setSubmitting(false);
@@ -108,6 +111,7 @@ export default function QuestionFormModal({
         }
     }, [current])
 
+    console.log('refresh +1')
 
     return (
         <CustomModal

@@ -15,7 +15,7 @@ export const getQuestionColumns = (onEdit, onDelete) => [
         field: 'is_active',
         headerName: 'Active',
         renderCell: (params) => (
-            <Switch defaultChecked={params.value} />
+            <Switch checked={params.value || false} />
         ),
     },
     {

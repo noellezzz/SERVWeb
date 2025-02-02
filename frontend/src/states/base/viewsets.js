@@ -37,7 +37,7 @@ export default (resourceName, fn = () => { }) => (build) => ({
     }),
     destroy: build.mutation({
         query: (id) => ({
-            url: `/${resourceName}/${id}/`,
+            url: `/${resourceName}/${id}/delete/`,
             method: 'PATCH',
         }),
     }),

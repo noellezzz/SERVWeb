@@ -24,7 +24,7 @@ export default function CustomModal({
     width = 400,
     showCloseButton = true,
     customStyles = {},
-    animate = true,
+    animate = false,
     className = "",
     children
 }) {
@@ -34,7 +34,7 @@ export default function CustomModal({
         ...customStyles
     };
 
-    const MotionBox = animate ? motion(Box) : Box;
+    const MotionBox = animate ? motion.create(Box) : Box;
 
     return (
         <Modal
