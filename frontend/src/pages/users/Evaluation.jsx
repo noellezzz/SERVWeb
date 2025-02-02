@@ -8,8 +8,11 @@ import CircleButton from "../../components/buttons/CircleButton";
 import home from "../../assets/home.png";
 import ElevButton from "../../components/buttons/ElevButton";
 import CardAnimation from "../../components/anims/CardAnimation";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function Evaluation() {
+
+
   const [questions, setQuestions] = useState([
     {
       question:
@@ -336,6 +339,18 @@ export default function Evaluation() {
 
     console.log(questions);
   };
+
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000); // Simulating loading for 3 seconds
+  }, []);
+  
+  if (loading) {
+    return <LoadingScreen loading={loading} />;
+  }
 
   return (
     <div className="p-4 flex flex-col items-center">
