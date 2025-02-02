@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Gradient from "../../components/Gradient";
+import Footer from "./Footer";
 
 const Layout = () => {
   return (
@@ -11,6 +12,7 @@ const Layout = () => {
       </div>
       <Header className="relative z-10" />
       <Outlet className="relative z-10" />
+      <Footer className="relative z-10" />
     </>
   );
 };

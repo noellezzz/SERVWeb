@@ -221,3 +221,8 @@ p {
   height: 130vh;
   font-family: "Poppins", sans-serif;
 }
+
+.footer {
+  color: var(--primary-color);
+  font-family: "Poppins", sans-serif;
+}
