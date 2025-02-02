@@ -16,15 +16,15 @@ export default function AssessmentPage() {
             <AssessmentSummary />
 
 
-            <div className='min-h-full flex my-4 p-4 rounded-lg bg-white shadow-md'>
-                <div className='w-3/4 mr-4 flex flex-col gap-8'>
+            <div className='min-h-full flex flex-col lg:flex-row my-4 p-4 rounded-lg bg-white shadow-md'>
+                <div className='lg:w-3/4 lg:mr-4 flex flex-col gap-8'>
                     <AssessmentQuestions />
 
                     <AssessmentTable />
 
                 </div>
 
-                <div className='w-1/4'>
+                <div className='lg:w-1/4'>
                     <AssessmentLists />
 
                 </div>

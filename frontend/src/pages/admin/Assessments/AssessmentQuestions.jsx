@@ -4,7 +4,7 @@ import { questionColumns as headers } from './table-data'
 import useTest from '@/states/services/useTest';
 import { Plus } from 'lucide-react';
 import { Button } from '@mui/material';
-import { QuestionFormModal } from './QuestionForm';
+import QuestionFormModal from './QuestionFormModal';
 
 export default function AssessmentQuestions() {
     const [rows, setRows] = useState([]);
@@ -20,10 +20,7 @@ export default function AssessmentQuestions() {
             })) || [];
             setRows(results)
         })
-
     }, [])
-
-
 
     return (
         <div>
@@ -40,7 +37,10 @@ export default function AssessmentQuestions() {
                     Add
                 </Button>
 
-                <QuestionFormModal open={formOpen} setOpen={setFormOpen} />
+                <QuestionFormModal 
+                    open={formOpen} 
+                    setOpen={setFormOpen} 
+                />
 
             </div>
 

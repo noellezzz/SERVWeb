@@ -15,6 +15,8 @@ const FormikForm = forwardRef(({
             initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={onSubmit}
+            enableReinitialize
+            
         >
             {formikProps => {
                 useImperativeHandle(ref, () => ({
@@ -23,9 +25,9 @@ const FormikForm = forwardRef(({
 
                 return (
                     <Form className={`space-y-4 ${className}`}>
-                        {fields.map(field => (
+                        {fields.map((field, idx) => (
                             <InputField
-                                key={field.name}
+                                key={`${field.name}_${idx}`}
                                 {...field}
                                 formik={formikProps}
                             />

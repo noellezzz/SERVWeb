@@ -8,9 +8,9 @@ export default function Summary({ data = {}, chart }) {
             <h4 className="text-xl text-gray-600 font-semibold">
                 Summary
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-                <div className='col-span-2 h-[200px] border p-8 rounded-lg bg-white shadow-md grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                <div className='md:col-span-2 lg:h-[200px] border p-8 rounded-lg bg-white shadow-md grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
 
 
 
@@ -36,7 +36,6 @@ export default function Summary({ data = {}, chart }) {
                 <div className="col-span-1 flex flex-col justify-between gap-4 w-full items-start h-full rounded-lg bg-white shadow-md">
                     {/* Chart here */}
                     {chart}
-
                 </div>
             </div>
         </div>

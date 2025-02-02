@@ -53,6 +53,7 @@ export default function InputField({
                                 as={Switch}
                                 name={name}
                                 color="primary"
+                                checked={formik.values[name]}
                             />
                         }
                         label={label}
