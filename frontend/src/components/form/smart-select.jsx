@@ -101,7 +101,7 @@ export default function SmartSelect({
                     label={label}
                     variant="outlined"
                     error={Boolean(error) || (formik.touched[name] && Boolean(formik.errors[name]))}
-                    helperText={error || (formik.touched[name] && formik.errors[name])}
+                // helperText={error || (formik.touched[name] && formik.errors[name])}b
                 />
             )}
             {...props}

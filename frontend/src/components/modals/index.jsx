@@ -49,6 +49,7 @@ export default function CustomModal({
                 initial={animate ? { opacity: 0, y: -50 } : {}}
                 animate={animate ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.3 }}
+                className='no-scrollbar'
             >
                 {/* Header */}
                 {title && (

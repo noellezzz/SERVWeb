@@ -1,40 +1,41 @@
-import React from 'react';
 import { Formik, Form } from 'formik';
 import * as yup from 'yup';
 import InputField from './field';
+import React, { forwardRef, useImperativeHandle } from 'react';
 
-export default function FormikForm({
+const FormikForm = forwardRef(({
     fields = [],
     initialValues = {},
     onSubmit = () => { },
     validationSchema,
     className = ""
-}) {
-    // Generate schema from fields if not provided
-    const generatedSchema = !validationSchema && yup.object().shape(
-        fields.reduce((acc, field) => ({
-            ...acc,
-            [field.name]: field.validation || yup.string()
-        }), {})
-    );
-
+}, ref) => {
     return (
         <Formik
             initialValues={initialValues}
-            validationSchema={validationSchema || generatedSchema}
+            validationSchema={validationSchema}
             onSubmit={onSubmit}
         >
-            {formikProps => (
-                <Form className={`space-y-4 ${className}`}>
-                    {fields.map(field => (
-                        <InputField
-                            key={field.name}
-                            {...field}
-                            formik={formikProps}
-                        />
-                    ))}
-                </Form>
-            )}
+            {formikProps => {
+                useImperativeHandle(ref, () => ({
+                    handleSubmit: formikProps.handleSubmit
+                }));
+
+                return (
+                    <Form className={`space-y-4 ${className}`}>
+                        {fields.map(field => (
+                            <InputField
+                                key={field.name}
+                                {...field}
+                                formik={formikProps}
+                            />
+                        ))}
+                    </Form>
+                );
+            }}
         </Formik>
     );
-}
+});
+
+FormikForm.displayName = 'FormikForm';
+export default FormikForm;

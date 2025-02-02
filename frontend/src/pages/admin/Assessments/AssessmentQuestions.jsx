@@ -27,8 +27,6 @@ export default function AssessmentQuestions() {
 
     return (
         <div>
-
-
             <div className="flex items-center justify-between my-2">
                 <h4 className="text-xl text-gray-600 font-semibold">
                     Manage Questions
