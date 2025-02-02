@@ -8,7 +8,7 @@
 // force_destroy: DELETE /api/v1/{resource}/{id}/
 
 
-export default (resourceName, fn) => (build) => ({
+export default (resourceName, fn = () => { }) => (build) => ({
     list: build.mutation({
         query: () => ({
             url: `/${resourceName}`,

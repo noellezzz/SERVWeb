@@ -1,10 +1,20 @@
 import { useEffect, useState } from 'react'
 import DashboardTable from '@/components/tables';
-import { columns as headers } from './schema';
+import { evaluationColumns as headers } from './table-data';
 
 export default function EvaluationTable() {
     const [columns, setColumns] = useState(headers || []);
-    const [rows, setRows] = useState([]);
+    const [rows, setRows] = useState([
+        {
+            id: 1,
+            content: 'This is a sample evaluation',
+            positivity: 0.5,
+            negativity: 0.5,
+            score: 0.5,
+            sentiment: 'Neutral',
+            actions: ''
+        }
+    ]);
 
     return (
         <div>

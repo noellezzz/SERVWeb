@@ -1,31 +1,27 @@
 import DashboardTable from '@/components/tables';
+import { useState } from 'react';
+import { resultColumns as headers } from './table-data'
 
 const ReportsTable = () => {
-    const columns = [
-        { field: 'id', headerName: 'ID', width: "70" },
-        { field: 'user_id', headerName: 'User', width: "150" },
-        { field: 'positive_score', headerName: 'Positive', width: "150" },
-        { field: 'negative_score', headerName: 'Negative', width: "150" },
-        { field: 'score', headerName: 'Score', width: "150" },
-        { field: 'sentiment', headerName: 'Sentiment', width: "150" },
-        { field: 'actions', headerName: '', width: "150" },
 
-    ];
-
-    const rows = [
-    ];
+    const [rows, setRows] = useState([]);
 
     return (
-        <DashboardTable
-            columns={columns}
-            rows={rows}
-            checkboxSelection
-            onRowClick={(params) => console.log(params.row)}
-            sx={{
-                paper: { boxShadow: 3 },
-                grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
-            }}
-        />
+        <div>
+            <h4 className="text-xl text-gray-600 font-semibold">
+                Results
+            </h4>
+            <DashboardTable
+                columns={headers}
+                rows={rows}
+                checkboxSelection
+                onRowClick={(params) => console.log(params.row)}
+                sx={{
+                    paper: { boxShadow: 3 },
+                    grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
+                }}
+            />
+        </div>
     );
 };
 

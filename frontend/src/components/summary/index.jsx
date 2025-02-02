@@ -4,7 +4,7 @@ export default function Summary({ data = {}, chart }) {
     const [summary, setSummary] = React.useState(data)
 
     return (
-        <>
+        <div>
             <h4 className="text-xl text-gray-600 font-semibold">
                 Summary
             </h4>
@@ -17,7 +17,7 @@ export default function Summary({ data = {}, chart }) {
                     {
                         Object.keys(summary).map((key, index) => {
                             return (
-                                <div className='h-full'>
+                                <div className='h-full' key={index}>
                                     <p className="text-gray-500">
                                         {summary[key].label}
                                     </p>
@@ -39,6 +39,6 @@ export default function Summary({ data = {}, chart }) {
 
                 </div>
             </div>
-        </>
+        </div>
     )
 }

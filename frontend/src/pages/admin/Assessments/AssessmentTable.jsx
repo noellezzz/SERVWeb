@@ -1,26 +1,26 @@
-import React from 'react'
+import React, { useState } from 'react'
 import DashboardTable from '@/components/tables';
+import { resultColumns as headers } from './table-data';
 
 export default function AssessmentTable() {
-    const columns = [
-        { field: 'id', headerName: 'ID', width: "70" },
-        { field: 'content', headerName: 'Content', width: "150" },
-        { field: 'category', headerName: 'Result', width: "150" },
-    ];
-
-    const rows = [
-    ];
-
+    const [rows, setRows] = useState([]);
     return (
-        <DashboardTable
-            columns={columns}
-            rows={rows}
-            checkboxSelection
-            onRowClick={(params) => console.log(params.row)}
-            sx={{
-                paper: { boxShadow: 3 },
-                grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
-            }}
-        />
+        <div>
+
+            <h4 className="text-xl text-gray-600 font-semibold">
+                Manage Assessments
+            </h4>
+            <DashboardTable
+                columns={headers}
+                rows={rows}
+                checkboxSelection
+                onRowClick={(params) => console.log(params.row)}
+                sx={{
+                    paper: { boxShadow: 3 },
+                    grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
+                }}
+            />
+
+        </div>
     );
 }
