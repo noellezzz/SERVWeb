@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import DashboardTable from '@/components/tables';
-import { evaluationColumns as headers } from './schema';
+import { evaluationColumns as headers } from './table-data';
 
 export default function EvaluationTable() {
     const [columns, setColumns] = useState(headers || []);

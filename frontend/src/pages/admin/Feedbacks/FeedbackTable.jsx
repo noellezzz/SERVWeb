@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import DashboardTable from '@/components/tables';
 
-import { feedbackColumns as headers } from './schema';
+import { feedbackColumns as headers } from './table-data';
 import useFeedback from '@/states/services/useFeedback';
 import SplashScreen from '@/components/splash-screen';
 

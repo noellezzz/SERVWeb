@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import DashboardTable from '@/components/tables';
-import { questionColumns as headers } from './schema'
+import { questionColumns as headers } from './table-data'
 import useTest from '@/states/services/useTest';
 import { Plus } from 'lucide-react';
 

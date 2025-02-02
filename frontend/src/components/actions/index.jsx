@@ -30,27 +30,29 @@ const ActionButtons = ({
     };
 
     return (
-        <Stack direction="row" spacing={spacing}>
-            {actionList.map((action) => (
-                actionConfig[action] && (
-                    <Tooltip key={action} title={actionConfig[action].label}>
-                        <IconButton
-                            size={size}
-                            color={actionConfig[action].color}
-                            onClick={() => onActionClick?.(action)}
-                            sx={{
-                                '&:hover': {
-                                    transform: 'scale(1.1)',
-                                    transition: 'transform 0.2s'
-                                }
-                            }}
-                        >
-                            {actionConfig[action].icon}
-                        </IconButton>
-                    </Tooltip>
-                )
-            ))}
-        </Stack>
+        <div className='flex items-center justify-center h-full w-full'>
+            <Stack direction="row" spacing={spacing}>
+                {actionList.map((action) => (
+                    actionConfig[action] && (
+                        <Tooltip key={action} title={actionConfig[action].label}>
+                            <IconButton
+                                size={size}
+                                color={actionConfig[action].color}
+                                onClick={() => onActionClick?.(action)}
+                                sx={{
+                                    '&:hover': {
+                                        transform: 'scale(1.1)',
+                                        transition: 'transform 0.2s'
+                                    }
+                                }}
+                            >
+                                {actionConfig[action].icon}
+                            </IconButton>
+                        </Tooltip>
+                    )
+                ))}
+            </Stack>
+        </div>
     );
 };
 

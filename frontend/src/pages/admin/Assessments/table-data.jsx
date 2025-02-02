@@ -4,19 +4,17 @@ export const questionColumns = [
     {
         field: 'question',
         headerName: 'Questions',
-        width: 150,
+        flex: 1,
     },
     {
         field: 'category',
         headerName: 'Category',
-        flex: 1,
-        width: 150,
+
     },
     {
         field: 'is_active',
         headerName: 'Active',
-        flex: 1,
-        width: 150,
+
         renderCell: (params) => {
             return (<Switch defaultChecked={params.value} />);
 
@@ -25,8 +23,8 @@ export const questionColumns = [
     {
         field: 'actions',
         headerName: '',
+        sortable: false,
         width: 150,
-
         renderCell: (params) => {
             return (<ActionButtons />);
 
@@ -37,34 +35,34 @@ export const resultColumns = [
     {
         field: 'id',
         headerName: 'ID',
-        width: 150,
+        flex: 1,
     },
     {
         field: 'score',
         headerName: 'score',
-        width: 150,
+        flex: 1,
     },
     {
         field: 'positivity',
         headerName: 'positivity',
-        width: 150,
+        flex: 1,
     },
     {
         field: 'negativity',
         headerName: 'negativity',
-        width: 150,
+        flex: 1,
     },
     {
         field: 'sentiment',
         headerName: 'sentiment',
-        width: 150,
+        flex: 1,
     },
 
     {
         field: 'actions',
         headerName: '',
-        width: 150,
         sortable: false,
+        width: 150,
         renderCell: (params) => {
             return (<>
                 <ActionButtons />

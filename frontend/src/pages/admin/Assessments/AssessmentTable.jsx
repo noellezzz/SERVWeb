@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import DashboardTable from '@/components/tables';
-import { resultColumns as headers } from './schema';
+import { resultColumns as headers } from './table-data';
 
 export default function AssessmentTable() {
     const [rows, setRows] = useState([]);
