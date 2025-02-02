@@ -56,7 +56,10 @@ export default function CustomModal({
                         id="modal-title"
                         variant="h6"
                         component="h2"
-                        className="mb-4"
+                        style={{
+                            fontWeight: 600
+                        }}
+                        className="text-gray-600"
                     >
                         {title}
                     </Typography>
