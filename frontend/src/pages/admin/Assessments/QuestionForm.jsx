@@ -1,5 +1,4 @@
 import React, { useRef, forwardRef } from 'react'
-import CustomModal from '@/components/modals';
 import FormikForm from '@/components/form';
 import * as yup from 'yup';
 import swal from 'sweetalert';
@@ -61,6 +60,8 @@ const fields = [
 
 const QuestionForm = forwardRef(({
     onSave = () => { },
+    isEdit = false,
+    initialValues = {}
 }, ref) => {
     return (
         <div className="p-4">
@@ -74,7 +75,8 @@ const QuestionForm = forwardRef(({
                     question_text_tl: '',
                     category: '',
                     options: [{ text: '', value: '' }],
-                    is_active: true
+                    is_active: true,
+                    ...initialValues,
                 }}
                 validationSchema={validationSchema}
                 onSubmit={onSave}
@@ -86,56 +88,3 @@ const QuestionForm = forwardRef(({
 QuestionForm.displayName = 'QuestionForm';
 export default QuestionForm;
 
-
-export function QuestionFormModal({ open = false, setOpen = () => { }, ...props }) {
-    const formRef = useRef();
-
-    const handleSave = () => {
-        if (formRef.current) {
-            formRef.current.handleSubmit();
-        }
-    };
-
-    const actions = [
-        {
-            label: 'Save',
-            onClick: handleSave,
-            color: 'primary',
-            variant: 'contained'
-        }
-    ];
-
-
-
-    return (
-        <CustomModal
-            open={open}
-            onClose={() => {
-                // Confirm
-                swal({
-                    title: 'Are you sure?',
-                    text: 'Any unsaved changes will be lost.',
-                    icon: 'warning',
-                    buttons: ['No', 'Yes'],
-                    dangerMode: true,
-                }).then((willCancel) => {
-                    if (willCancel) {
-                        setOpen(false);
-                    }
-                });
-            }}
-            title="Create Question"
-            actions={actions}
-            width={600}
-            {...props}
-        >
-            <QuestionForm
-                ref={formRef}
-                onSave={(values) => {
-                    console.log(values);
-                    setOpen(false);
-                }}
-            />
-        </CustomModal>
-    )
-}
