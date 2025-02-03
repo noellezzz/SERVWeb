@@ -7,22 +7,27 @@ import Sidebar from "./Sidebar";
 
 const AdminLayout = () => {
 
+
   return (
-    <div>
-      {/* Gradient Background */}
+    <>
       <div className="fixed top-0 left-0 w-full h-full -z-10">
         {/* <Gradient /> */}
       </div>
 
-      {/* Sidebar */}
-      <Sidebar />
+      <div className="flex h-screen font-poppins">
 
-      {/* Main Content */}
-      <main className="ml-64">
-        <AdminHeader />
-        <Outlet />
-      </main>
-    </div>
+        {/* Sidebar */}
+        <Sidebar />
+
+
+
+        {/* Main Content */}
+        <main className="flex-1 bg-gray-100 overflow-y-auto no-scrollbar">
+          <AdminHeader />
+          <Outlet />
+        </main>
+      </div>
+    </>
   );
 };
 

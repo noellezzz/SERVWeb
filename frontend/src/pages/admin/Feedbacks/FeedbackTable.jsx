@@ -1,29 +1,44 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
 import DashboardTable from '@/components/tables';
 
-export default function FeedbackTable() {
-    const columns = [
-        { field: 'id', headerName: 'ID', width: "70" },
-        { field: 'content', headerName: 'Content', width: "150" },
-        { field: 'result_id', headerName: 'Result', width: "150" },
-        { field: 'assessment_id', headerName: 'Assessment', width: "150" },
-        { field: 'sentiment', headerName: 'Sentiment', width: "150" },
-        { field: 'actions', headerName: '', width: "150" },
-    ];
+import { feedbackColumns as headers } from './table-data';
+import useFeedback from '@/states/services/useFeedback';
+import SplashScreen from '@/components/splash-screen';
 
-    const rows = [
-    ];
+export default function FeedbackTable() {
+    const [columns, setColumns] = useState(headers || []);
+    const [rows, setRows] = useState([]);
+    const { listFeedback, loading, error } = useFeedback();
+
+    useEffect(() => {
+        listFeedback()
+            .then((data) => {
+                setRows(data.results);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }, []);
+
+    if (loading) return <SplashScreen loading={loading} />;
 
     return (
-        <DashboardTable
-            columns={columns}
-            rows={rows}
-            checkboxSelection
-            onRowClick={(params) => console.log(params.row)}
-            sx={{
-                paper: { boxShadow: 3 },
-                grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
-            }}
-        />
+        <div>
+
+            <h4 className="text-xl text-gray-600 font-semibold">
+                Feedbacks
+            </h4>
+            <DashboardTable
+                columns={columns}
+                rows={rows}
+                checkboxSelection
+                onRowClick={(params) => console.log(params.row)}
+                sx={{
+                    paper: { boxShadow: 3 },
+                    grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
+                }}
+            />
+
+        </div>
     );
 }

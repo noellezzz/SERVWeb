@@ -4,12 +4,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { NAVIGATION } from "./navigations";
 import NavTitle from "./NavTitle";
 import NavLink from "./NavLink";
-
+import { useDispatch, useSelector } from "react-redux";
+import { toggleSidebar } from "@/states/slices/theme.slice";
+import { ChevronLeft } from "@mui/icons-material";
 
 export default function Sidebar() {
-    const [navItems, setNavItems] = useState([]);
     const navigate = useNavigate();
     const loc = useLocation();
+    const dispatch = useDispatch();
+    const { isSidebarOpen } = useSelector((state) => state.theme);
+
+    const [navItems, setNavItems] = useState([]);
     const [current, setCurrent] = useState(loc.pathname.split("admin/")[1]);
 
     useEffect(() => {
@@ -17,17 +22,24 @@ export default function Sidebar() {
     }, []);
 
 
-    return (
-
-        <aside className="navbar fixed top-0 left-0 h-full w-64 shadow-2xl font-poppins">
-            <div className="w-full p-5 flex gap-2 ">
+    return isSidebarOpen && (
+        <aside className="navbar relative w-64 font-poppins">
+            <div className="w-full p-5 flex items-center gap-2 ">
                 {/* Logo Section */}
                 <div className="w-full text-2xl flex items-center gap-2 pl-7 pt-4">
                     <img src={logo} alt="Logo" className="w-12 h-12" />
                     <span>S.E.R.V</span>
                 </div>
+                {/* Sidebar Toggle Button */}
+                <button
+                    className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-md"
+                    onClick={() => dispatch(toggleSidebar())}
+                >
+                    <ChevronLeft />
+                </button>
+
             </div>
-            <nav className="mt-8 space-y-2 pl-7">
+            <nav className="pl-7 overflow-y-auto h-5/6 pb-20">
                 {navItems.map((item, idx) => {
                     if (item.type === "menu") {
                         item.isActive = item.segment === current;
@@ -42,6 +54,18 @@ export default function Sidebar() {
                     }
                 })}
             </nav>
+            {/* Logout Button */}
+            <div className="absolute bottom-0 w-full p-5">
+                <button
+                    className="w-full py-2 bg-red-500 text-white rounded-md"
+                    onClick={() => {
+                        localStorage.removeItem("token");
+                        navigate("/login");
+                    }}
+                >
+                    Logout
+                </button>
+            </div>
         </aside>
     );
 }
