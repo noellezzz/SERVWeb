@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import LoadingScreen from "../../components/LoadingScreen";
-import HeroSection from "../../components/homepage/HeroSection";
-import CardSection from "../../components/homepage/CardSection";
-import AboutSection from "../../components/homepage/AboutSection";
-import TeamSection from "../../components/homepage/TeamSection";
-import trynow from "../../assets/trynow.png";
-import afterverification from "../../assets/afterverification.png";
-import evaluationprocess from "../../assets/evaluationprocess.png";
-import dacumos from "../../assets/SERV_Dacumos.png";
+import LoadingScreen from "@/components/LoadingScreen";
+import HeroSection from "@/components/homepage/HeroSection";
+import CardSection from "@/components/homepage/CardSection";
+import AboutSection from "@/components/homepage/AboutSection";
+import TeamSection from "@/components/homepage/TeamSection";
+import trynow from "@/assets/trynow.png";
+import afterverification from "@/assets/afterverification.png";
+import evaluationprocess from "@/assets/evaluationprocess.png";
+import dacumos from "@/assets/SERV_Dacumos.png";
 
 function Home() {
   const [loading, setLoading] = useState(true);
