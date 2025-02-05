@@ -5,7 +5,7 @@ env
 *.sqlite3
 .logs
 __pycache__/*
-
+.c-python*
 # Logs
 logs
 *.log
