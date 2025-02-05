@@ -2,11 +2,10 @@
 venv
 env
 .env
-.pyvenv
 *.sqlite3
-db.sqlite3
 .logs
-__pycache__
+__pycache__/**.*
+__pycache__/
 
 # Logs
 logs
@@ -32,3 +31,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+node_modules/
+insomnia
+.pyc
+.cpython
