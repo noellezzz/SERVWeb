@@ -19,31 +19,29 @@ const axisLabels = [
   { xValue: 0, yValue: 100, content: 'Active' },
   { xValue: 0, yValue: -100, content: 'Subdued' },
 ];
-
 const quadrantLabels = [
+  { q:1, xValue: 25, yValue: 90, content: 'Alert' },
+  { q:1, xValue: 50, yValue: 75, content: 'Excited' },
+  { q:1, xValue: 75, yValue: 50, content: 'Elated' },
+  { q:1, xValue: 90, yValue: 25, content: 'Happy' },
 
-  { xValue: 25, yValue: 90, content: 'Alert' },
-  { xValue: 50, yValue: 75, content: 'Excited' },
-  { xValue: 75, yValue: 50, content: 'Elated' },
-  { xValue: 90, yValue: 25, content: 'Happy' },
-
-  { xValue: 90, yValue: -25, content: 'Contented' },
-  { xValue: 75, yValue: -50, content: 'Serene' },
-  { xValue: 50, yValue: -75, content: 'Relaxed' },
-  { xValue: 25, yValue: -90, content: 'Calm' },
-
-  { xValue: -25, yValue: -90, content: 'Bored' },
-  { xValue: -50, yValue: -75, content: 'Depressed' },
-  { xValue: -75, yValue: -50, content: 'Unhappy' },
-  { xValue: -90, yValue: -25, content: 'Sad' },
-
-  { xValue: -90, yValue: 25, content: 'Upset' },
-  { xValue: -75, yValue: 50, content: 'Stressed' },
-  { xValue: -50, yValue: 75, content: 'Nervous' },
-  { xValue: -25, yValue: 90, content: 'Tensed' },
+  { q:2, xValue: 90, yValue: -25, content: 'Contented' },
+  { q:2, xValue: 75, yValue: -50, content: 'Serene' },
+  { q:2, xValue: 50, yValue: -75, content: 'Relaxed' },
+  { q:2, xValue: 25, yValue: -90, content: 'Calm' },
+  
+  { q:3, xValue: -25, yValue: -90, content: 'Bored' },
+  { q:3, xValue: -50, yValue: -75, content: 'Depressed' },
+  { q:3, xValue: -75, yValue: -50, content: 'Unhappy' },
+  { q:3, xValue: -90, yValue: -25, content: 'Sad' },
+  
+  { q:4, xValue: -90, yValue: 25, content: 'Upset' },
+  { q:4, xValue: -75, yValue: 50, content: 'Stressed' },
+  { q:4, xValue: -50, yValue: 75, content: 'Nervous' },
+  { q:4, xValue: -25, yValue: 90, content: 'Tensed' },
 ];
 
-const generateAnnotations = (axisLabels=[], quadrantLabels=[]) => {
+const generateAnnotations = (axisLabels=[], quadrantLabels=[], scaleX, scaleY) => {
   const annotations = {};
 
   axisLabels.forEach((label, index) => {
@@ -121,7 +119,12 @@ const SentimentScatterChart = ({
             borderColor: 'gray',
             borderWidth: 1,
           },
-          ...generateAnnotations(axisLabels, quadrantLabels),
+          ...generateAnnotations(
+            axisLabels, 
+            quadrantLabels,
+            (xMax - xMin) / 100,
+            (yMax - yMin) / 100
+          ),
         },
       },
     },
