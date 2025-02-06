@@ -1,286 +1,40 @@
 import React from 'react';
-import {
-  Chart as ChartJS,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Scatter } from 'react-chartjs-2';
-import annotationPlugin from 'chartjs-plugin-annotation';
+import SentimentScatterChart from '@/components/charts/sentiment-scatter';
 import faker from 'faker';
 
-ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend, annotationPlugin);
+const axisLabels = [
+  { xValue: -100, yValue: 0, content: 'Unpleasant' },
+  { xValue: 100, yValue: 0, content: 'Pleasant' },
+  { xValue: 0, yValue: 100, content: 'Active' },
+  { xValue: 0, yValue: -100, content: 'Subdued' },
+];
 
-export const options = {
-  responsive: true,
-  layout: {
-    padding: {
-      left: 30,
-      right: 30,
-      top: 30,
-      bottom: 30,
-    }
-  },
+const quadrantLabels = [
+  { xValue: 25, yValue: 90, content: 'Alert' },
+  { xValue: 50, yValue: 75, content: 'Excited' },
+  { xValue: 75, yValue: 50, content: 'Elated' },
+  { xValue: 90, yValue: 25, content: 'Happy' },
+  { xValue: 90, yValue: -25, content: 'Contented' },
+  { xValue: 75, yValue: -50, content: 'Serene' },
+  { xValue: 50, yValue: -75, content: 'Relaxed' },
+  { xValue: 25, yValue: -90, content: 'Calm' },
+  { xValue: -25, yValue: -90, content: 'Bored' },
+  { xValue: -50, yValue: -75, content: 'Depressed' },
+  { xValue: -75, yValue: -50, content: 'Unhappy' },
+  { xValue: -90, yValue: -25, content: 'Sad' },
+  { xValue: -90, yValue: 25, content: 'Upset' },
+  { xValue: -75, yValue: 50, content: 'Stressed' },
+  { xValue: -50, yValue: 75, content: 'Nervous' },
+  { xValue: -25, yValue: 90, content: 'Tensed' },
+];
 
-  plugins: {
-    legend: {
-      position: 'bottom',
-    },
-
-    title: {
-      display: true,
-      text: 'Chart.js Scatter Multi Axis Chart',
-    },
-    annotation: {
-      clip: false,
-      annotations: {
-        xCenterLine: {
-          type: 'line',
-          xMin: 0,
-          xMax: 0,
-          borderColor: 'gray',
-          borderWidth: 1,
-        },
-        yCenterLine: {
-          type: 'line',
-          yMin: 0,
-          yMax: 0,
-          borderColor: 'gray',
-          borderWidth: 1,
-        },
-        unpleasantLabel: {
-          type: 'label',
-          xValue: -100,
-          yValue: 0,
-          content: 'Unpleasant',
-          font: {
-            size: 12,
-            weight: 'bold',
-          },
-          color: 'black',
-        },
-        pleasantLabel: {
-          type: 'label',
-          xValue: 100,
-          yValue: 0,
-          content: 'Pleasant',
-          font: {
-            size: 12,
-            weight: 'bold',
-          },
-          color: 'black',
-        },
-        activeLabel: {
-          type: 'label',
-          xValue: 0,
-          yValue: 100,
-          content: 'Active',
-          font: {
-            size: 12,
-            weight: 'bold',
-          },
-          color: 'black',
-        },
-        subduedLabel: {
-          type: 'label',
-          xValue: 0,
-          yValue: -100,
-          content: 'Subdued',
-          font: {
-            size: 12,
-            weight: 'bold',
-          },
-          color: 'black',
-        },
-        // Quadrant labels
-        upsetLabel: {
-          type: 'label',
-          xValue: -90,
-          yValue: 25,
-          content: 'Upset',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        stressedLabel: {
-          type: 'label',
-          xValue: -75,
-          yValue: 50,
-          content: 'Stressed',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        nervousLabel: {
-          type: 'label',
-          xValue: -50,
-          yValue: 75,
-          content: 'Nervous',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        tensedLabel: {
-          type: 'label',
-          xValue: -25,
-          yValue: 90,
-          content: 'Tensed',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        alertLabel: {
-          type: 'label',
-          xValue: 25,
-          yValue: 90,
-          content: 'Alert',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        excitedLabel: {
-          type: 'label',
-          xValue: 50,
-          yValue: 75,
-          content: 'Excited',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        elatedLabel: {
-          type: 'label',
-          xValue: 75,
-          yValue: 50,
-          content: 'Elated',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        happyLabel: {
-          type: 'label',
-          xValue: 90,
-          yValue: 25,
-          content: 'Happy',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        contentedLabel: {
-          type: 'label',
-          xValue: 90,
-          yValue: -25,
-          content: 'Contented',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        sereneLabel: {
-          type: 'label',
-          xValue: 75,
-          yValue: -50,
-          content: 'Serene',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        relaxedLabel: {
-          type: 'label',
-          xValue: 50,
-          yValue: -75,
-          content: 'Relaxed',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        calmLabel: {
-          type: 'label',
-          xValue: 25,
-          yValue: -90,
-          content: 'Calm',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        boredLabel: {
-          type: 'label',
-          xValue: -25,
-          yValue: -90,
-          content: 'Bored',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        depressedLabel: {
-          type: 'label',
-          xValue: -50,
-          yValue: -75,
-          content: 'Depressed',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        unhappyLabel: {
-          type: 'label',
-          xValue: -75,
-          yValue: -50,
-          content: 'Unhappy',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-        sadLabel: {
-          type: 'label',
-          xValue: -90,
-          yValue: -25,
-          content: 'Sad',
-          font: {
-            size: 10,
-          },
-          color: 'black',
-        },
-      },
-    },
-  },
-  scales: {
-    x: {
-      type: 'linear',
-      position: 'bottom',
-      min: -100,
-      max: 100,
-    },
-    y: {
-      type: 'linear',
-      position: 'left',
-      min: -100,
-      max: 100,
-    },
-  },
-};
-
-export const data = {
+const data = {
   datasets: [
     {
       label: 'A dataset',
       data: Array.from({ length: 100 }, () => ({
-        x: faker.datatype.number({ min: Math.random()*100, max: Math.random()*50 }),
-        y: faker.datatype.number({ min: Math.random()*100, max: Math.random()*100-50 }),
+        x: faker.datatype.number({ min: Math.random() * 100, max: Math.random() * 50 }),
+        y: faker.datatype.number({ min: Math.random() * 100, max: Math.random() * 100 - 50 }),
       })),
       backgroundColor: 'rgba(255, 99, 132, 0.8)',
     },
@@ -288,5 +42,12 @@ export const data = {
 };
 
 export default function () {
-  return <Scatter options={options} data={data} />;
+  return (
+    <SentimentScatterChart
+      data={data}
+      axisLabels={axisLabels}
+      quadrantLabels={quadrantLabels}
+      title="Sentiment ANalysis Visualizer"
+    />
+  );
 }
