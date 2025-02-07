@@ -3,14 +3,14 @@ import CustomModal from '@/components/modals';
 import swal from 'sweetalert';
 import QuestionForm from './QuestionForm';
 import useTest from '@/states/services/useTest';
-import {toggleRefresh} from '@/states/slices/resource.slice';
+import { toggleRefresh } from '@/states/slices/resource.slice';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function QuestionFormModal({ 
+export default function QuestionFormModal({
     current = null,
     setCurrent = () => { },
-    open = false, 
-    setOpen = () => { }, 
+    open = false,
+    setOpen = () => { },
 
 }) {
     const formRef = useRef();
@@ -30,8 +30,8 @@ export default function QuestionFormModal({
 
 
     const handleSave = (values, actions) => {
-        if (values && actions){
-            if (current.id) {
+        if (values && actions) {
+            if (current?.id) {
                 return updateTest(current.id, values).then((data) => {
                     setCurrent(data);
                     dispatch(toggleRefresh(true));
@@ -55,13 +55,12 @@ export default function QuestionFormModal({
                     if (!addAnother) {
                         setOpen(false);
                         dispatch(toggleRefresh(true));
-
                     } else {
                         actions.resetForm();
                         actions.setSubmitting(false);
                     }
                 });
-                
+
 
 
             }).catch((error) => {
@@ -74,7 +73,7 @@ export default function QuestionFormModal({
                 });
             });
 
-            
+
         }
 
         if (formRef.current) {
