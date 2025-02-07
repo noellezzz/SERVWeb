@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = getEnv('SECRET', 'django-insecure-#&^l)7d*%h&db4uft@dk%h-w&nup#pu%)a!d)c7jwgoixo5_hm0$')
 DEBUG = bool(getEnv('DEBUG', True))
-ALLOWED_HOSTS = getEnv('ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS = getEnv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
