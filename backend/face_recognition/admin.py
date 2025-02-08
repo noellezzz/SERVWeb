@@ -4,15 +4,15 @@ from django import forms
 from . import models
 
 
-class EmotionDataAdminForm(forms.ModelForm):
+class FaceDataAdminForm(forms.ModelForm):
 
     class Meta:
-        model = models.EmotionData
+        model = models.FaceData
         fields = "__all__"
 
 
-class EmotionDataAdmin(admin.ModelAdmin):
-    form = EmotionDataAdminForm
+class FaceDataAdmin(admin.ModelAdmin):
+    form = FaceDataAdminForm
     list_display = [
         "last_updated",
         "id",
@@ -27,4 +27,4 @@ class EmotionDataAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(models.EmotionData, EmotionDataAdmin)
+admin.site.register(models.FaceData, FaceDataAdmin)

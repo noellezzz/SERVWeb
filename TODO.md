@@ -1,0 +1,3 @@
+- [ ] test redux setup
+- [ ] finish redux setup
+- [ ] complete feedbacks crud, table, ui
