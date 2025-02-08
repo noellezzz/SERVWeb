@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/SERV_Logo.png";
+import servAdmLogo from "@/assets/SERV-adm.png"; // Import custom SERV image
 import { useLocation, useNavigate } from "react-router-dom";
 import { NAVIGATION } from "./navigations";
 import NavTitle from "./NavTitle";
@@ -28,7 +29,7 @@ export default function Sidebar() {
                 {/* Logo Section */}
                 <div className="w-full text-2xl flex items-center gap-2 pl-7 pt-4">
                     <img src={logo} alt="Logo" className="w-12 h-12" />
-                    <span>S.E.R.V</span>
+                    <img src={servAdmLogo} alt="SERV Logo" className="w-auto h-5" /> {/* Use imported logo */}
                 </div>
                 {/* Sidebar Toggle Button */}
                 <button
@@ -69,4 +70,3 @@ export default function Sidebar() {
         </aside>
     );
 }
-
