@@ -26,7 +26,6 @@ SENTIMENT_MAPPING = {
 
 class ServSentimentAnalysis(SentimentIntensityAnalyzer):
     def __init__(self, text, mode='vader'):
-        # print('Initializing Sentiment Analysis....\n\n')
 
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
         self.vad_file_path = os.path.join(self.dir_path, VAD_FILE)
@@ -90,7 +89,7 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
                 valence_dict[word] = {
                     "valence": float(mean),
                     "arousal": float(a),
-                    "arousal": float(d),
+                    "dominance": float(d),
                 }
             else:
                 (word, mean, std, raw) = line.strip().split(self.delimiter)
@@ -113,7 +112,6 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
         if polarity_score is None:
             polarity, polarity_score = self.get_polarity()
 
-        # print('Making Analysis....\n\n')
 
         score = (prediction_score * MODEL_WEIGHT) + (polarity_score * POLARITY_WEIGHT)
 
@@ -131,13 +129,14 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
         self.words.append({
             'word': item,
             'sentiment': self.get_label(result[i]),
-            'score': result[i]
+            'score': result[i],
+            'valence': valence
         })
+        print("Valence:", valence)
         return result
 
 
     def get_prediction(self):
-        # print('Getting prediction....\n\n')
         classifier = pipeline(TAG, model=MODEL)
         prediction = classifier(self.text)[0]
         prediction_score = SENTIMENT_MAPPING.get(prediction['label'], 0) * prediction['score']
@@ -150,7 +149,6 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
         return prediction, prediction_score
     
     def get_polarity(self):
-        # print('Getting polarity....\n\n')
         if not self.lexicon:
             return
         self.polarity_scores(self.text)
@@ -187,6 +185,7 @@ if __name__ == "__main__":
     user_input = 'nakakainis yung staff buti nalang mabilis lang yung process'
 
     ssa = ServSentimentAnalysis(user_input)
+    ssa.set_mode('vader')
     ssa.get_polarity()
     ssa.get_prediction()
     senti = ssa.analyze()
