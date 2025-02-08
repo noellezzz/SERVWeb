@@ -1,13 +1,21 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from deep_translator import GoogleTranslator as Translator
+from deep_translator import GoogleTranslator, MyMemoryTranslator
 from transformers import pipeline
 import numpy as np
+import codecs
+import os 
 
 
-LANG_SOURCE = "tl"
-LANG_TARGET = "en"
+
+
+VAD_FILE='vad-nrc.csv'
+LANG_SOURCE = ("tl", "tagalog")
+LANG_TARGET = ("en", "english")
 MODEL = "tabularisai/multilingual-sentiment-analysis"
 TAG = "sentiment-analysis"
+MODEL_WEIGHT = 0.6
+POLARITY_WEIGHT = 0.4
+
 SENTIMENT_MAPPING = {
     'Very Negative': -1,
     'Negative': -0.5,
@@ -15,76 +23,111 @@ SENTIMENT_MAPPING = {
     'Positive': 0.5,
     'Very Positive': 1
 }
-MODEL_WEIGHT = 0.5
-polarity_WEIGHT = 0.5
+
 class ServSentimentAnalysis(SentimentIntensityAnalyzer):
-    def __init__(self, text):
-        super().__init__()
-        self.analysis = {}
-        self.text = text
+    def __init__(self, text, mode='vader'):
+        # print('Initializing Sentiment Analysis....\n\n')
+
+        self.dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.vad_file_path = os.path.join(self.dir_path, VAD_FILE)
+
+        self.lexicon, self.valence_dict = {}, {}
+        self.mode = mode
+        self.delimiter = '\t'
         self.words = []
-        self.predict = pipeline(TAG, model=MODEL)
-        self.mean = []
-        self.std = []
-        self.lexicon, self.valence_dict = self.make_lex_dict()
+        self.text = text
+        self.translated_text = self.translate(text)
+        self.analysis = {
+            'text': self.text,
+            'translated_text': self.translated_text,
+            'polarity': None,
+            'prediction': None,
+            'score': None,
+            'sentiment': None,
+        }
+        self.lexicon_full_filepath = self.vad_file_path if self.mode == 'anew' else 'vader_lexicon.txt'
+        super().__init__(lexicon_file=self.lexicon_full_filepath)
 
 
+    def set_mode(self, mode):
+        self.mode = mode.lower()
+        if self.mode == 'anew':
+            self.delimiter = ','
+            with codecs.open(self.vad_file_path, encoding='utf-8') as f:
+                self.lexicon_full_filepath = f.read()
+        self.lexicon = self.make_lex_dict()
+
+    def translate(self, text, source=LANG_SOURCE[0], target=LANG_TARGET[0], retry=3):
+        Translator = GoogleTranslator
+        if (retry == 2):
+            Translator = MyMemoryTranslator
+        
+        try:
+            translated = Translator(source, target).translate(text) 
+
+            return translated
+        except Exception as e:
+            if retry > 0:
+                return self.translate(text, source, target, retry - 1)
+            else:
+                return text
+    
 
     def make_lex_dict(self):
         """
         Convert lexicon file to a dictionary
         """
+        
         lex_dict = {}
         valence_dict = {}
+        mean = 0.0
+
         for line in self.lexicon_full_filepath.rstrip('\n').split('\n'):
             if not line:
                 continue
-            (word, measure, std, raw) = line.strip().split('\t')
-            lex_dict[word] = float(measure)
-            valence_dict[word] = {
-                "mean": float(measure),
-                "std": float(std),
-            }
-        return lex_dict, valence_dict
+            if self.mode == 'anew':
+                (word, mean, a, d) = line.strip().split(self.delimiter)
+                valence_dict[word] = {
+                    "valence": float(mean),
+                    "arousal": float(a),
+                    "arousal": float(d),
+                }
+            else:
+                (word, mean, std, raw) = line.strip().split(self.delimiter)
+                valence_dict[word] = {
+                    "mean": float(mean),
+                    "std": float(std),
+                }
 
-    def analyze(self):
-        translated_text = Translator(source=LANG_SOURCE, target=LANG_TARGET).translate(self.text)
-        self.polarity_scores(self.text)
-        prediction = self.predict(self.text)[0]
-        polarity = self.polarity_scores(translated_text)
-        polarity_score = polarity.get('compound', 0)
-        prediction_score = SENTIMENT_MAPPING.get(prediction['label'], 0) * prediction['score']
-        score = (polarity_score + prediction_score) / 2
+            lex_dict[word] = float(mean)
+        self.valence_dict = valence_dict    
+        return lex_dict
 
-        if self.mean.__len__() != 0:
-            mean_score = np.mean(self.mean)
-        
-        if self.std.__len__() != 0:
-            std_score = np.mean(self.std)
 
+
+    def analyze(self, prediction_score=None, polarity_score=None):
+        prediction_score = prediction_score or self.analysis.get('prediction_score')
+        polarity_score = polarity_score or self.analysis.get('polarity_score')
+        if prediction_score is None:
+            prediction, prediction_score = self.get_prediction()
+        if polarity_score is None:
+            polarity, polarity_score = self.get_polarity()
+
+        # print('Making Analysis....\n\n')
+
+        score = (prediction_score * MODEL_WEIGHT) + (polarity_score * POLARITY_WEIGHT)
 
         self.analysis.update({
-            'text': self.text,
-            'translated_text': translated_text,
-            'polarity': polarity,
-            'prediction': prediction,
             'score': score,
             'sentiment': self.get_label(score),
-            'mean': mean_score,
-            'std': std_score
         })
+
         return self.analysis
 
-
     def sentiment_valence(self, valence, sentitext, item, i, sentiments):
-        translated_item = Translator(source=LANG_SOURCE, target=LANG_TARGET).translate(item).replace('.', '')
+        translated_item = self.translate(item)
         result = super().sentiment_valence(valence, sentitext, translated_item, i, sentiments)
         valence = self.valence_dict.get(translated_item.lower())
-        if valence:
-            if 'mean' in valence and valence['mean'] is not None:
-                self.mean.append(valence['mean'])
-            if 'std' in valence and valence['std'] is not None:
-                self.std.append(valence['std'])
         self.words.append({
             'word': item,
             'sentiment': self.get_label(result[i]),
@@ -92,6 +135,35 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
         })
         return result
 
+
+    def get_prediction(self):
+        # print('Getting prediction....\n\n')
+        classifier = pipeline(TAG, model=MODEL)
+        prediction = classifier(self.text)[0]
+        prediction_score = SENTIMENT_MAPPING.get(prediction['label'], 0) * prediction['score']
+
+        self.analysis.update({
+            'prediction': prediction['label'],
+            'prediction_score': prediction_score
+        })
+
+        return prediction, prediction_score
+    
+    def get_polarity(self):
+        # print('Getting polarity....\n\n')
+        if not self.lexicon:
+            return
+        self.polarity_scores(self.text)
+        polarity = self.polarity_scores(self.translated_text)
+        polarity_score = polarity.get('compound', 0)
+
+        self.analysis.update({
+            'polarity': polarity,
+            'polarity_score': polarity_score
+        })
+
+        return polarity, polarity_score
+    
     def get_words(self):
         return self.words
 
@@ -102,18 +174,24 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
             label = 'positive'
         elif score < -0.05:
             label = 'negative'
-
+        elif score > 0.5:
+            label = 'very positive'
+        elif score < -0.5:
+            label = 'very negative'
         return label
 
 
 
 
 if __name__ == "__main__":
-    user_input = 'bitch ung staff pero magaling sya'
+    user_input = 'nakakainis yung staff buti nalang mabilis lang yung process'
 
     ssa = ServSentimentAnalysis(user_input)
+    ssa.get_polarity()
+    ssa.get_prediction()
     senti = ssa.analyze()
-    print("Sentiment scores:", senti)
+
+    print("VADER Sentiment:", senti)
 
 
 
