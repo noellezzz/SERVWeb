@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from "framer-motion";
-import { 
-  PieChart, 
-  Pie, 
-  Cell, 
+import {
+  PieChart,
+  Pie,
+  Cell,
   ResponsiveContainer,
   Legend,
   Tooltip,
@@ -86,7 +86,7 @@ const Demographics = () => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ backgroundColor: "white", borderRadius: "8px", color: "#000" }}
                   formatter={(value) => `${value}%`}
                 />
@@ -136,7 +136,7 @@ const Demographics = () => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ backgroundColor: "white", borderRadius: "8px", color: "#000" }}
                   formatter={(value) => `${value}%`}
                 />
@@ -149,8 +149,8 @@ const Demographics = () => {
           <div className="w-full md:w-1/2">
             <h3 className="text-lg font-semibold text-black mb-2">Civil Status Insights</h3>
             <p className="text-gray-700">
-              The majority of senior citizens are <strong>married (45%)</strong>, while <strong>30%</strong> are widowed. 
-              Single and separated individuals make up a smaller portion, at <strong>15%</strong> and <strong>10%</strong> respectively. 
+              The majority of senior citizens are <strong>married (45%)</strong>, while <strong>30%</strong> are widowed.
+              Single and separated individuals make up a smaller portion, at <strong>15%</strong> and <strong>10%</strong> respectively.
               This data provides insights into the support structures available for elderly individuals.
             </p>
           </div>

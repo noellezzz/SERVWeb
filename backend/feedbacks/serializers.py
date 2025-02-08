@@ -7,8 +7,4 @@ class FeedbackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Feedback
-        fields = [
-            "created",
-            "last_updated",
-            "id",
-        ]
+        fields = '__all__'

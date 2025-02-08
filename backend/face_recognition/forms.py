@@ -2,9 +2,9 @@ from django import forms
 from . import models
 
 
-class EmotionDataForm(forms.ModelForm):
+class FaceDataForm(forms.ModelForm):
     class Meta:
-        model = models.EmotionData
+        model = models.FaceData
         fields = [
             "user_id",
         ]

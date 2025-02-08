@@ -9,7 +9,6 @@ from serv.consumers import serv_WebSocketConsumer
 from face_recognition.consumers import face_recognitionConsumer
 from feedbacks.consumers import feedbacksConsumer
 from queues.consumers import queuesConsumer
-from users.consumers import usersConsumer
 from sentiment_tests.consumers import sentiment_testsConsumer
 from dashboard.consumers import dashboardConsumer
 
@@ -23,6 +22,10 @@ application = ProtocolTypeRouter({
         ])
     ),
     "channel": ChannelNameRouter({
-        "face_recognition": face_recognitionConsumer,    "feedbacks": feedbacksConsumer,    "queues": queuesConsumer,    "users": usersConsumer,    "sentiment_tests": sentiment_testsConsumer,    "dashboard": dashboardConsumer,
+        "face_recognition": face_recognitionConsumer,    
+        "feedbacks": feedbacksConsumer,    
+        "queues": queuesConsumer,    
+        "sentiment_tests": sentiment_testsConsumer,    
+        "dashboard": dashboardConsumer,
     })
 })

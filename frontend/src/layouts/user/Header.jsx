@@ -1,21 +1,32 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/SERV_Logo.png";
+import wordmark from "../../assets/Wordmark.png";
 
 function Header() {
   return (
-    <div className="px-4">
-      <div className="top-0 left-0 w-full border-b-4 p-5 flex gap-2 font-poppins">
+    <div className="px-4 shadow-lg">
+      <div className="top-0 left-0 w-full p-5 flex gap-2 font-poppins">
         <div className="w-full text-2xl flex items-center gap-2">
           <img src={logo} alt="Logo" className="w-12 h-12" />
-          <span>S.E.R.V</span>
+          <img src={wordmark} alt="Word Mark" className="h-12" />
         </div>
         <div className="w-full flex justify-end gap-6 items-center">
-          <Link to="/">Home</Link>
-          <Link to="/services">Services</Link>
-          <Link to="/about">About</Link>
-          <Link to="/contact">Contact</Link>
-          <Link to="/login">Login</Link>
+          <Link className="text-white" to="/">
+            Home
+          </Link>
+          <Link className="text-white" to="/evaluation">
+            Evaluation
+          </Link>
+          <Link className="text-white" to="/services">
+            Services
+          </Link>
+          <Link className="text-white" to="/about">
+            About
+          </Link>
+          <Link className="text-white" to="/contact">
+            Contact
+          </Link>
         </div>
       </div>
     </div>

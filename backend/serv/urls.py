@@ -16,16 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
 
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='index.html'), name='index'),
-    path('face_recognition/', include('face_recognition.urls')),
-    path('feedbacks/', include('feedbacks.urls')),
-    path('queues/', include('queues.urls')),
-    path('sentiment_tests/', include('sentiment_tests.urls')),
-    path('dashboard/', include('dashboard.urls')),
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
+    # path('accounts/', include('django.contrib.auth.urls')),
+    path('api/v1/', include([
+        path('auth/', include('dj_rest_auth.urls')),
+        path('auth/registration/', include('dj_rest_auth.registration.urls')),
+        path('accounts/', include('allauth.urls')),
+        path('', include('dashboard.urls')),
+        path('', include('face_recognition.urls')),
+        path('', include('feedbacks.urls')),
+        path('', include('queues.urls')),
+        path('', include('sentiment_tests.urls')),
+    ])),
 ]

@@ -7,18 +7,10 @@ class SentimentResultSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.SentimentResult
-        fields = [
-            "created",
-            "id",
-            "last_updated",
-        ]
-
+        fields = '__all__'
+        
 class SentimentTestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.SentimentTest
-        fields = [
-            "created",
-            "id",
-            "last_updated",
-        ]
+        fields = '__all__'

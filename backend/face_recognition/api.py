@@ -4,9 +4,9 @@ from . import serializers
 from . import models
 
 
-class EmotionDataViewSet(viewsets.ModelViewSet):
-    """ViewSet for the EmotionData class"""
+class FaceDataViewSet(viewsets.ModelViewSet):
+    """ViewSet for the FaceData class"""
 
-    queryset = models.EmotionData.objects.all()
-    serializer_class = serializers.EmotionDataSerializer
+    queryset = models.FaceData.objects.all()
+    serializer_class = serializers.FaceDataSerializer
     permission_classes = [permissions.IsAuthenticated]
