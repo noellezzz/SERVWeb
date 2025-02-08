@@ -23,6 +23,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         feedback_id = request.data.get('feedback_id')
         test_id = request.data.get('test_id')
+        mode = request.data.get('mode')
         
         try:
             feedback = Feedback.objects.get(id=feedback_id)
@@ -37,15 +38,25 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
             if not feedback.content:
                 return Response({'error': 'Feedback content is empty'}, status=status.HTTP_400_BAD_REQUEST)
             
-            analyzer = ServSentimentAnalysis()
-            sentiment_result = analyzer.analyze(feedback.content)
+            ssa = ServSentimentAnalysis(feedback.content)
+            analysis = ssa.analyze()
+            words = ssa.get_words()
+            positive_words = [word for word in words if word['label'] == 'positive']
+            negative_words = [word for word in words if word['label'] == 'negative']
+            mode = ssa.get_mode()
             
             result = models.SentimentResult.objects.create(
-                label=sentiment_result['label'],
-                score=sentiment_result['score'],
-                positive_words=sentiment_result['positive_words'],
-                negative_words=sentiment_result['negative_words'],
-                detailed_results=sentiment_result['sentiment'],
+                mode=mode,
+                score=analysis['score'],
+                label=analysis['sentiment'],
+                negative_words=negative_words,
+                positive_words=positive_words,
+                detailed_results={
+                    'translated_text': analysis.get('translated_text', ''),
+                    'prediction': analysis.get('prediction', {}),
+                    'polarity': analysis.get('polarity', {})
+                },
+
                 feedback=feedback,
                 sentiment_test=test
             )
@@ -81,7 +92,7 @@ class SentimentTestViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def results(self, request, pk=None):
         test = self.get_object()
-        results = test.sentiment_results.all()
+        results = test.analysiss.all()
         serializer = serializers.SentimentResultSerializer(results, many=True)
         return Response(serializer.data)
 

@@ -23,9 +23,12 @@ SENTIMENT_MAPPING = {
     'Positive': 0.5,
     'Very Positive': 1
 }
-
+ALLOWED_MODES = ('vader', 'anew')
 class ServSentimentAnalysis(SentimentIntensityAnalyzer):
     def __init__(self, text, mode='vader'):
+        if mode not in ALLOWED_MODES:
+            raise ValueError(f"Mode must be one of {ALLOWED_MODES}")
+
 
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
         self.vad_file_path = os.path.join(self.dir_path, VAD_FILE)
@@ -48,6 +51,8 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
         super().__init__(lexicon_file=self.lexicon_full_filepath)
 
 
+    def get_mode(self):
+        return self.mode
     def set_mode(self, mode):
         self.mode = mode.lower()
         if self.mode == 'anew':
