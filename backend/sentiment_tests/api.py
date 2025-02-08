@@ -38,7 +38,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
             if not feedback.content:
                 return Response({'error': 'Feedback content is empty'}, status=status.HTTP_400_BAD_REQUEST)
             
-            ssa = ServSentimentAnalysis(feedback.content)
+            ssa = ServSentimentAnalysis(feedback.content, mode=mode)
             analysis = ssa.analyze()
             words = ssa.get_words()
             mode = ssa.get_mode()
@@ -46,7 +46,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
             result = models.SentimentResult.objects.create(
                 mode=mode,
                 score=analysis['score'],
-                label=analysis['sentiment'],
+                sentiment=analysis['sentiment'],
                 words=words,
                 detailed_results={
                     'translated_text': analysis.get('translated_text', ''),

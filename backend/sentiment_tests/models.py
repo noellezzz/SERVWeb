@@ -68,7 +68,7 @@ class SentimentResult(models.Model):
     
     # Content Fields
     mode = models.CharField(max_length=50, blank=True, null=True)
-    label = models.TextField(blank=True, null=True)
+    sentiment = models.TextField(blank=True, null=True)
     score = models.FloatField(blank=True, null=True)
     words = models.JSONField(default=list, blank=True, null=True)
     details = models.JSONField(default=dict, blank=True, null=True)
