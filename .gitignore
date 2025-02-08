@@ -4,8 +4,9 @@ env
 .env
 *.sqlite3
 .logs
-__pycache__
-
+__pycache__/*
+*/__pycache__/*
+.c-python*
 # Logs
 logs
 *.log
@@ -32,3 +33,5 @@ dist-ssr
 *.sw?
 node_modules/
 insomnia
+.pyc
+.cpython

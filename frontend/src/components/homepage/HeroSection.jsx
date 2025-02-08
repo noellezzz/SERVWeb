@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 import { FaAngleRight } from "react-icons/fa6";
 import { RiUserVoiceFill } from "react-icons/ri";
 import { LuBrainCircuit } from "react-icons/lu";
-import IconLinkTryNow from "../../components/buttons/IconLinkTryNow";
-import mobileui from "../../assets/mobile-ui.png";
-import qr from "../../assets/qr.png";
+import IconLinkTryNow from "@/components/buttons/IconLinkTryNow";
+import mobileui from "@/assets/mobile-ui.png";
+import qr from "@/assets/QR.png";
 
 const HeroSection = () => (
   <div className="ignore__x-scroll top-0 left-0 w-full h-screen p-5 flex gap-2 font-poppins justify-center items-center">

@@ -33,6 +33,8 @@ safetensors==0.5.2
 setuptools==75.8.0
 sqlparse==0.5.3
 sympy==1.13.1
+translatte==0.1
 typing_extensions==4.12.2
 tzdata==2025.1
 urllib3==2.3.0
+vader-multi==3.2.2.1

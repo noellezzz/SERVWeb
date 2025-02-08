@@ -78,11 +78,10 @@ const Assessments = () => {
                 <p><strong>Age:</strong> {user.age}</p>
                 <p><strong>Gender:</strong> {user.gender}</p>
                 <p>
-                  <strong>Score:</strong> 
+                  <strong>Score:</strong>
                   <span
-                    className={`ml-2 px-2 py-1 rounded ${
-                      user.score === "Positive" ? "bg-green-500" : user.score === "Neutral" ? "bg-yellow-500" : "bg-red-500"
-                    } text-white text-sm`}
+                    className={`ml-2 px-2 py-1 rounded ${user.score === "Positive" ? "bg-green-500" : user.score === "Neutral" ? "bg-yellow-500" : "bg-red-500"
+                      } text-white text-sm`}
                   >
                     {user.score}
                   </span>
