@@ -1,70 +1,89 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from concurrent.futures import ThreadPoolExecutor
+from deep_translator import GoogleTranslator as Translator
+from transformers import pipeline
 
-class VaderSentimentAnalyzer:
-    def __init__(self):
-        self.analyzer = SentimentIntensityAnalyzer()
-        self.executor = ThreadPoolExecutor()
-        self.negative_words = []
-        self.positive_words = []
+LANG_SOURCE = "tl"
+LANG_TARGET = "en"
+MODEL = "tabularisai/multilingual-sentiment-analysis"
+SENTIMENT_MAPPING = {
+    'Very Negative': -1,
+    'Negative': -0.5,
+    'Neutral': 0,
+    'Positive': 0.5,
+    'Very Positive': 1
+}
+MODEL_WEIGHT = 0.5
+POLARITY_WEIGHT = 0.5
+class ServSentimentAnalysis(SentimentIntensityAnalyzer):
+    def __init__(self, text):
+        super().__init__()
+        self.analysis = {}
+        self.text = text
+        self.words = []
+        self.predict = pipeline("text-classification", model=MODEL)
 
-    def analyze(self, text):
-        sentiment = self.analyzer.polarity_scores(text)
-        self.classify_words(text)
-        results = {
-            'label': self.get_label(sentiment['compound']),
-            'score': sentiment['compound'],
-            'positive_words': self.get_positive_words(),
-            'negative_words': self.get_negative_words(),
-            'sentiment': sentiment,
-        }
-        return results
+    def analyze(self):
+        translated_text = Translator(source=LANG_SOURCE, target=LANG_TARGET).translate(self.text)
+        self.polarity_scores(self.text)
+        prediction = self.predict(self.text)[0]
+        polarity = self.polarity_scores(translated_text)
+        polarity_score = polarity.get('compound', 0)
+        prediction_score = SENTIMENT_MAPPING.get(prediction['label'], 0) * prediction['score']
+        score = (polarity_score + prediction_score) / 2
+
     
-    
-        
-    
-    def analyze_word(self, word):
-        sentiment_scores = self.analyzer.polarity_scores(word)
-        compound_score = sentiment_scores['compound']
-        return word, compound_score
-    
-    def classify_words(self, text):
-        words = text.split()
-        results = self.executor.map(self.analyze_word, words)
-        
-        for word, compound_score in results:
-            if compound_score >= 0.05:
-                self.positive_words.append(word)
-            elif compound_score <= -0.05:
-                self.negative_words.append(word)
-                
-    def classify_emotion(self, sentiment):
-        if sentiment['pos'] > sentiment['neg']:
-            return 'positive'
-        elif sentiment['neg'] > sentiment['pos']:
-            return 'negative'
-        return 'neutral'
+        self.analysis.update({
+            'text': self.text,
+            'translated_text': translated_text,
+            'polarity': polarity,
+            'prediction': prediction,
+            'score': score,
+            'sentiment': self.get_label(score),
+            'words': self.get_words(),
+        })
+        return self.analysis
+
+
+    def sentiment_valence(self, valence, sentitext, item, i, sentiments):
+        translated_item = Translator(source=LANG_SOURCE, target=LANG_TARGET).translate(item).replace('.', '')
+        result = super().sentiment_valence(valence, sentitext, translated_item, i, sentiments)
+        self.words.append({
+            'word': item,
+            'sentiment': self.get_label(result[i]),
+            'score': result[i]
+
+        })
+        return result
+
+    def get_words(self):
+        return self.words
     
     def get_label(self, score):
-        if score >= 0.05:
-            return 'positive'
-        elif score <= -0.05:
-            return 'negative'
-        return 'neutral'
-    
-    def get_positive_words(self):
-        return self.positive_words
-    
-    def get_negative_words(self):
-        return self.negative_words
-    
-    
+        label = 'neutral'
 
+        if score > 0.05:
+            label = 'positive'
+        elif score < -0.05:
+            label = 'negative'
+
+        return label
+
+
+
+
+if __name__ == "__main__":
+    user_input = 'hindi maayos ung service nila kase sobrang bagal at nakakainis'
     
-if __name__ == '__main__':
-    analyzer = VaderSentimentAnalyzer()
-    text = "pangit ng ugali mo"
-    results = analyzer.analyze(text)
-    print(results)
-    
-    
+    sentiment = ServSentimentAnalysis(user_input)
+    sentiment_scores = sentiment.analyze()
+    print("Sentiment scores:", sentiment_scores)
+
+
+
+
+
+
+
+
+
+

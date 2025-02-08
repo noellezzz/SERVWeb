@@ -48,7 +48,9 @@ export default function Visualizer() {
           <SampleScatter />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          Word Cloud
+          {/* Word Cloud */}
+
+          
         </TabPanel>
       </div>
     </div>

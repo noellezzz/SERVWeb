@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from . import serializers
 from . import models
 from feedbacks.models import Feedback
-from serv.utils.vader import VaderSentimentAnalyzer
+from serv.utils.vader import ServSentimentAnalysis
 import logging
 from django.utils import timezone
 
@@ -37,7 +37,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
             if not feedback.content:
                 return Response({'error': 'Feedback content is empty'}, status=status.HTTP_400_BAD_REQUEST)
             
-            analyzer = VaderSentimentAnalyzer()
+            analyzer = ServSentimentAnalysis()
             sentiment_result = analyzer.analyze(feedback.content)
             
             result = models.SentimentResult.objects.create(
