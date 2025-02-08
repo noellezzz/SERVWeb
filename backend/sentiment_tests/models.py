@@ -70,8 +70,7 @@ class SentimentResult(models.Model):
     mode = models.CharField(max_length=50, blank=True, null=True)
     label = models.TextField(blank=True, null=True)
     score = models.FloatField(blank=True, null=True)
-    positive_words = models.JSONField(default=list, blank=True, null=True)
-    negative_words = models.JSONField(default=list, blank=True, null=True)
+    words = models.JSONField(default=list, blank=True, null=True)
     details = models.JSONField(default=dict, blank=True, null=True)
     
 

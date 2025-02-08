@@ -131,13 +131,14 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
         translated_item = self.translate(item)
         result = super().sentiment_valence(valence, sentitext, translated_item, i, sentiments)
         valence = self.valence_dict.get(translated_item.lower())
-        self.words.append({
-            'word': item,
-            'sentiment': self.get_label(result[i]),
-            'score': result[i],
-            'valence': valence
-        })
-        print("Valence:", valence)
+        if result[i]:
+            self.words.append({
+                'word': item,
+                'sentiment': self.get_label(result[i]),
+                'score': result[i],
+                'datails': valence
+            })
+        
         return result
 
 
@@ -190,12 +191,13 @@ if __name__ == "__main__":
     user_input = 'nakakainis yung staff buti nalang mabilis lang yung process'
 
     ssa = ServSentimentAnalysis(user_input)
-    ssa.set_mode('vader')
+    ssa.set_mode('anew')
     ssa.get_polarity()
     ssa.get_prediction()
     senti = ssa.analyze()
 
     print("VADER Sentiment:", senti)
+    print("\n\nWords:", ssa.get_words())
 
 
 

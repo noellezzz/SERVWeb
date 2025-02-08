@@ -41,16 +41,13 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
             ssa = ServSentimentAnalysis(feedback.content)
             analysis = ssa.analyze()
             words = ssa.get_words()
-            positive_words = [word for word in words if word['label'] == 'positive']
-            negative_words = [word for word in words if word['label'] == 'negative']
             mode = ssa.get_mode()
             
             result = models.SentimentResult.objects.create(
                 mode=mode,
                 score=analysis['score'],
                 label=analysis['sentiment'],
-                negative_words=negative_words,
-                positive_words=positive_words,
+                words=words,
                 detailed_results={
                     'translated_text': analysis.get('translated_text', ''),
                     'prediction': analysis.get('prediction', {}),
