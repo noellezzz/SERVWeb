@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import DashboardTable from '@/components/tables';
 import { getQuestionColumns as headers } from './table-data'
-import useTest from '@/states/services/useTest';
 import { Plus } from 'lucide-react';
 import { Button } from '@mui/material';
-import QuestionFormModal from './QuestionFormModal';
-import {toggleRefresh} from '@/states/slices/resource.slice';
+import {toggleRefresh} from '@/states/slices/resources.slice';
 import { useDispatch,useSelector } from 'react-redux';
+
+import QuestionFormModal from './QuestionFormModal';
+
 import swal from 'sweetalert';
 
 export default function AssessmentQuestions() {
@@ -14,7 +15,6 @@ export default function AssessmentQuestions() {
     const refresh = useSelector((state) => state.resources.refresh);
     const [rows, setRows] = useState([]);
     const [currentRow, setCurrentRow] = useState(null);
-    const { listTest, destroyTest, loading, error } = useTest();
     const [formOpen, setFormOpen] = useState(false);
 
 
@@ -32,12 +32,12 @@ export default function AssessmentQuestions() {
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-                destroyTest(row.id).then(() => {
-                    dispatch(toggleRefresh(true));
-                    swal('Poof! Your question has been archived!', {
-                        icon: 'success',
-                    });
-                })
+                // destroyTest(row.id).then(() => {
+                //     dispatch(toggleRefresh(true));
+                //     swal('Poof! Your question has been archived!', {
+                //         icon: 'success',
+                //     });
+                // })
             }
         });
     }
@@ -49,14 +49,14 @@ export default function AssessmentQuestions() {
     }, [])
 
     useEffect(() => {
-        refresh && listTest().then((data) => {
-            const results = data.results?.map((item) => ({
-                ...item,
-                question: item.question_text_en,
-            })) || [];
-            setRows(results)
-            dispatch(toggleRefresh(false))
-        })
+        // refresh && listTest().then((data) => {
+        //     const results = data.results?.map((item) => ({
+        //         ...item,
+        //         question: item.question_text_en,
+        //     })) || [];
+        //     setRows(results)
+        //     dispatch(toggleRefresh(false))
+        // })
     }, [refresh])
 
     return (
