@@ -27,7 +27,6 @@ const ExamplePage = () => {
 
   const handleSearch = (keyword) => {
     setSearchKeyword(keyword);
-    // Implement search logic here
   };
 
   return (
