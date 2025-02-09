@@ -5,6 +5,7 @@ const initialState = {
     list: {},
     detail: {},
     archived: {},
+    refresh: false
 };
 
 const resourceSlice = createSlice({
