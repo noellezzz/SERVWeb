@@ -23,6 +23,9 @@ const resourceSlice = createSlice({
         },
         clear: (state) => {
             state.resources = {};
+        },
+        toggleRefresh: (state, action) => {
+            state.refresh = action.payload || !state.refresh;
         }
     },
 });
@@ -30,6 +33,7 @@ const resourceSlice = createSlice({
 export const {
     setResource,
     deleteResource,
-    clear
+    clear,
+    toggleRefresh
 } = resourceSlice.actions;
 export default resourceSlice.reducer;

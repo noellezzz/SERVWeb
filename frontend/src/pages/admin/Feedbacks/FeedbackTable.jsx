@@ -12,7 +12,7 @@ export default function FeedbackTable() {
         
     }, []);
 
-    if (loading) return <SplashScreen loading={loading} />;
+    // if (loading) return <SplashScreen loading={loading} />;
 
     return (
         <div>
