@@ -35,7 +35,7 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
 
         self.lexicon, self.valence_dict = {}, {}
         self.mode = mode
-        self.delimiter = '\t'
+        self.delimiter = ',' if mode == 'anew' else '\t'
         self.words = []
         self.text = text
         self.translated_text = self.translate(text)

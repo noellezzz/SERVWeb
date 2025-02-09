@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from "react-toastify";
 import DetailedToast from '@/components/toasts/details';
 import resourceEndpoints from '@/states/api/resources.js';
-import { setResource } from '@/states/slices/resources.js';
+import { setResource } from '@/states/slices/resources.slice.js';
+import { toggleRefresh } from '@/states/slices/resources.slice';
 
 // import useIsPermitted from '@/hooks/useIsPermitted';
 
@@ -18,7 +19,7 @@ export default function useResource(resourceName, isPublic = false) {
     const nav = useNavigate();
     const dispatch = useDispatch();
     const resources = useSelector((state) => state?.resources || {});
-    const { roles } = useSelector((state) => state.auth);
+    // const { roles } = useSelector((state) => state.auth);
 
     // MUTATIONS ########################################################
     const camelCaseName = changeCase.camelCase(resourceName);
@@ -52,62 +53,65 @@ export default function useResource(resourceName, isPublic = false) {
     const [archivedData, setArchivedData] = React.useState([]);
 
     const fetchDatas = React.useCallback(async (qStr) => {
-        if (resources.list[resourceName]) {
-            setData(resources.list[resourceName]);
+        if (resources?.list[resourceName]) {
+            setData(resources?.list[resourceName]);
         }
         setLoading(true);
         return await index(qStr).unwrap().then((response) => {
-            setData(response.data);
+            setData(response.results);
             setMeta(response.meta);
             dispatch(setResource({
                 resource: resourceName,
-                data: response.data,
+                data: response.results,
                 type: 'list'
             }));
             setLoading(false);
+            dispatch(toggleRefresh(false));
             return response;
         });
     }, [index]);
 
     const fetchArchived = React.useCallback(async (qStr) => {
-        if (resources.archived[resourceName]) {
-            setArchivedData(resources.archived[resourceName]);
+        if (resources?.archived[resourceName]) {
+            setArchivedData(resources?.archived[resourceName]);
         }
         setLoading(true);
         return await archived(qStr).unwrap().then((response) => {
-            setArchivedData(response.data);
+            setArchivedData(response.results);
             setMeta(response.meta);
             dispatch(setResource({
                 resource: resourceName,
-                data: response.data,
+                data: response.results,
                 type: 'archived'
             }));
             setLoading(false);
+            dispatch(toggleRefresh(false));
             return response;
         });
     }, [archived]);
 
     const fetchAll = React.useCallback(async (qStr) => {
-        if (resources.all[resourceName]) {
-            setData(resources.all[resourceName]);
+        if (resources?.all[resourceName]) {
+            setData(resources?.all[resourceName]);
         }
         setLoading(true);
         return await all(qStr).unwrap().then((response) => {
-            setData(response.data);
+            setData(response.results);
             setMeta(response.meta);
             dispatch(setResource({
                 resource: resourceName,
-                data: response.data,
+                data: response.results,
                 type: 'all'
             }));
             setLoading(false);
+            dispatch(toggleRefresh(false));
             return response;
         });
     }, [all]);
 
     const fetchData = React.useCallback(async (id, qStr) => {
-        if (resources.detail[resourceName]) {
-            setCurrent(resources.detail[resourceName]);
+        if (resources?.detail[resourceName]) {
+            setCurrent(resources?.detail[resourceName]);
         }
         setLoading(true);
         return await show({ id, qStr }).unwrap().then((response) => {
@@ -118,6 +122,7 @@ export default function useResource(resourceName, isPublic = false) {
                 type: 'detail'
             }));
             setLoading(false);
+            dispatch(toggleRefresh(false));
             return response;
         }).catch((error) => {
             if (error.status === 404) {
@@ -136,8 +141,9 @@ export default function useResource(resourceName, isPublic = false) {
                     message='The record has been successfully added'
                 />
             );
-            nav(`/dashboard/${kebabCaseName}/edit/${response?.data?.id}`);
+            // nav(`/dashboard/${kebabCaseName}/edit/${response?.data?.id}`);
             setLoading(false);
+            dispatch(toggleRefresh(true));
             return response;
         }).catch((e) => {
             setLoading(false);
@@ -161,6 +167,7 @@ export default function useResource(resourceName, isPublic = false) {
                 />
             );
             setLoading(false);
+            dispatch(toggleRefresh(true));
             return response;
         }).catch((e) => {
             setLoading(false);
@@ -181,7 +188,7 @@ export default function useResource(resourceName, isPublic = false) {
                 toast.info(
                     <DetailedToast
                         title='Info'
-                        message={response.message}
+                        message={response?.message}
                     />
                 );
             } else {
@@ -193,6 +200,7 @@ export default function useResource(resourceName, isPublic = false) {
                 )
             }
             setLoading(false);
+            dispatch(toggleRefresh(true));
             return response;
         });
     }, [destroy]);
@@ -217,6 +225,7 @@ export default function useResource(resourceName, isPublic = false) {
                 )
             }
             setLoading(false);
+            dispatch(toggleRefresh(true));
             return response;
         });
     }, [restore]);
@@ -291,16 +300,14 @@ export default function useResource(resourceName, isPublic = false) {
     // NAVIGATIONS ########################################################
     const toForm = (id = null) => {
         if (id) {
-            return nav(`/dashboard/${kebabCaseName}/edit/${id}`);
+            // return nav(`/dashboard/${kebabCaseName}/edit/${id}`);
         }
-        return nav(`/dashboard/${kebabCaseName}/add`);
+        // return nav(`/dashboard/${kebabCaseName}/add`);
     }
     const toView = (id) => {
-        nav(`/dashboard/${kebabCaseName}/view/${id}`);
+        // nav(`/dashboard/${kebabCaseName}/view/${id}`);
     }
     // NAVIGATIONS END ####################################################
-
-
 
     return {
         names: {
@@ -322,6 +329,7 @@ export default function useResource(resourceName, isPublic = false) {
         // STATES
         states: {
             data,
+            refresh: resources?.refresh,
             meta,
             current,
             selected,

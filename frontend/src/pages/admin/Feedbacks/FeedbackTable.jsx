@@ -2,17 +2,36 @@ import { useEffect, useState } from 'react'
 import DashboardTable from '@/components/tables';
 
 import { feedbackColumns as headers } from './table-data';
+import useResource from '@/hooks/useResource';
 import SplashScreen from '@/components/splash-screen';
 
 export default function FeedbackTable() {
     const [columns, setColumns] = useState(headers || []);
     const [rows, setRows] = useState([]);
+    const {
+        actions: {
+            fetchDatas,
+            doDestroy
+        },
+        states: {
+            data,
+            loading
+        }
+    } = useResource('feedbacks');	
+
+
 
     useEffect(() => {
-        
+        fetchDatas();
     }, []);
 
-    // if (loading) return <SplashScreen loading={loading} />;
+    useEffect(() => {
+        if (data) {
+            setRows(data)
+        }
+    }, [data])
+
+    if (loading) return <SplashScreen />
 
     return (
         <div>

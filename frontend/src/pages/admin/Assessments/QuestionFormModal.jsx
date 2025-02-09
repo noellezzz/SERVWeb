@@ -2,74 +2,61 @@ import React, { useEffect, useRef, useState } from 'react'
 import CustomModal from '@/components/modals';
 import swal from 'sweetalert';
 import QuestionForm from './QuestionForm';
-import { toggleRefresh } from '@/states/slices/resources.slice';
-import { useDispatch, useSelector } from 'react-redux';
-
+import useResource from '@/hooks/useResource';
+const _initialValues = {
+    title: '',
+    description: '',
+    question_text_en: '',
+    question_text_tl: '',
+    category: '',
+    is_active: false,
+    options: [],
+};
 export default function QuestionFormModal({
     current = null,
-    setCurrent = () => { },
     open = false,
+    setCurrent = () => { },
     setOpen = () => { },
 
 }) {
     const formRef = useRef();
-    const dispatch = useDispatch();
+    const {
+        events: {
+            onUpdate,
+            onStore
+        },
+    } = useResource('tests');	
 
-    const [initialValues, setInitialValues] = useState({
-        title: '',
-        description: '',
-        question_text_en: '',
-        question_text_tl: '',
-        category: '',
-        is_active: false,
-        options: [],
-    });
+    const [initialValues, setInitialValues] = useState(_initialValues);
 
 
 
     const handleSave = (values, actions) => {
         if (values && actions) {
             if (current?.id) {
-                // return updateTest(current.id, values).then((data) => {
-                //     setCurrent(data);swal({
-                //         title: 'Question updated',
-                //         text: 'Question has been updated.',
-                //     });
-                //     dispatch(toggleRefresh(true));
-                // }).catch((error) => {
-                //     actions.setSubmitting(false);
-                //     actions.setErrors(error);
-                //     swal({
-                //         title: 'Error',
-                //         text: 'An error occurred. Please try again.',
-                //         icon: 'error',
-                //     });
-                // });
+                return onUpdate(current.id, values).then((data) => {
+                setCurrent(data);
+                }).catch((error) => {
+                    actions.setSubmitting(false);
+                    actions.setErrors(error);
+                    swal({
+                        title: 'Error',
+                        text: 'An error occurred. Please try again.',
+                        icon: 'error',
+                    });
+                });
             }
-            // return createTest(values).then((res) => {
-            //     swal({
-            //         title: 'Question added',
-            //         text: 'Do you want to add another question?',
-            //         icon: 'success',
-            //         buttons: ['No', 'Yes'],
-            //     }).then((addAnother) => {
-            //         if (!addAnother) {
-            //             setOpen(false);
-            //             dispatch(toggleRefresh(true));
-            //         } else {
-            //             actions.resetForm();
-            //             actions.setSubmitting(false);
-            //         }
-            //     });
-            // }).catch((error) => {
-            //     actions.setSubmitting(false);
-            //     actions.setErrors(error);
-            //     swal({
-            //         title: 'Error',
-            //         text: 'An error occurred. Please try again.',
-            //         icon: 'error',
-            //     });
-            // });
+            return onStore(values).then((res) => {
+                setOpen(false);
+            }).catch((error) => {
+                actions.setSubmitting(false);
+                actions.setErrors(error);
+                swal({
+                    title: 'Error',
+                    text: 'An error occurred. Please try again.',
+                    icon: 'error',
+                });
+            });
 
 
         }
@@ -89,6 +76,7 @@ export default function QuestionFormModal({
         }).then((willCancel) => {
             if (willCancel) {
                 setOpen(false);
+                setCurrent(null);
             }
         });
     }
@@ -103,12 +91,9 @@ export default function QuestionFormModal({
     ];
 
     useEffect(() => {
-        if (current) {
-            setInitialValues(current);
-        }
+        setInitialValues(prev => current ? current : _initialValues);
     }, [current])
 
-    console.log('refresh +1')
 
     return (
         <CustomModal
