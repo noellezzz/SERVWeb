@@ -50,7 +50,14 @@ export default function AssessmentQuestions() {
         fetchDatas()
     }, [])
     
-
+    useEffect(() => {
+        if (refresh) {
+            fetchDatas({
+                doRefresh: true
+            });
+        }
+    }, [refresh]);
+    
     useEffect(() => {
         if (data) {
             setRows(data)

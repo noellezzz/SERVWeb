@@ -19,6 +19,7 @@ export default function useResource(resourceName, isPublic = false) {
     const nav = useNavigate();
     const dispatch = useDispatch();
     const resources = useSelector((state) => state?.resources || {});
+    const refresh = resources?.refresh
     // const { roles } = useSelector((state) => state.auth);
 
     // MUTATIONS ########################################################
@@ -52,7 +53,10 @@ export default function useResource(resourceName, isPublic = false) {
     const [loading, setLoading] = React.useState(false);
     const [archivedData, setArchivedData] = React.useState([]);
 
-    const fetchDatas = React.useCallback(async (qStr) => {
+    const fetchDatas = React.useCallback(async ({
+        qStr = '',
+        doRefresh = false
+    } = {}) => {
         if (resources?.list[resourceName]) {
             setData(resources?.list[resourceName]);
         }
@@ -66,7 +70,7 @@ export default function useResource(resourceName, isPublic = false) {
                 type: 'list'
             }));
             setLoading(false);
-            dispatch(toggleRefresh(false));
+            doRefresh && dispatch(toggleRefresh(false));
             return response;
         });
     }, [index]);
@@ -309,6 +313,7 @@ export default function useResource(resourceName, isPublic = false) {
     }
     // NAVIGATIONS END ####################################################
 
+
     return {
         names: {
             camelCaseName,
@@ -329,7 +334,7 @@ export default function useResource(resourceName, isPublic = false) {
         // STATES
         states: {
             data,
-            refresh: resources?.refresh,
+            refresh,
             meta,
             current,
             selected,
