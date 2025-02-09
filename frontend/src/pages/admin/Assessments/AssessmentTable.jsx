@@ -4,9 +4,12 @@ import { getResultColumns as headers } from './table-data';
 import SplashScreen from '@/components/splash-screen';
 import useResource from '@/hooks/useResource';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AssessmentTable() {
+    const nav = useNavigate();
     const [rows, setRows] = useState([]);
+    const [current, setCurrent] = useState(null);
     const {
         actions: {
             fetchDatas,
@@ -18,6 +21,10 @@ export default function AssessmentTable() {
             refresh
         }
     } = useResource('results');	
+
+    const handleView = () => {
+        nav(`/admin/assessments/${current.id}`)
+    }
 
     useEffect(() => {
         if (data) {
@@ -39,10 +46,10 @@ export default function AssessmentTable() {
                 Manage Assessments
             </h4>
             <DashboardTable
-                columns={headers()}
+                columns={headers(handleView)}
                 rows={rows}
                 checkboxSelection
-                onRowClick={(params) => console.log(params.row)}
+                onRowClick={(params) => setCurrent(params.row)}
                 sx={{
                     paper: { boxShadow: 3 },
                     grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }

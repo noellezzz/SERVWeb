@@ -113,7 +113,11 @@ export default function useResource(resourceName, isPublic = false) {
         });
     }, [all]);
 
-    const fetchData = React.useCallback(async (id, qStr) => {
+    const fetchData = React.useCallback(async ({
+        id,
+        qStr = '',
+        doRefresh = false
+    }) => {
         if (resources?.detail[resourceName]) {
             setCurrent(resources?.detail[resourceName]);
         }
