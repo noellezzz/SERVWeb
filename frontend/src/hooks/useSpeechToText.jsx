@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 export const useSpeechToText = () => {
   const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
+  const [transcript, setTranscript] = useState('');
   const [recognition, setRecognition] = useState(null);
   const [volumeLevel, setVolumeLevel] = useState(0);
   const [audioContext, setAudioContext] = useState(null);
@@ -12,13 +12,12 @@ export const useSpeechToText = () => {
 
   useEffect(() => {
     if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-      const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognitionInstance = new SpeechRecognition();
 
       recognitionInstance.continuous = true;
       recognitionInstance.interimResults = true;
-      recognitionInstance.lang = "en-US";
+      recognitionInstance.lang = 'en-US';
 
       recognitionInstance.onresult = (event) => {
         const transcriptText = event.results[event.resultIndex][0].transcript;
@@ -56,7 +55,7 @@ export const useSpeechToText = () => {
       const micSource = audioCtx.createMediaStreamSource(stream);
 
       const filter = audioCtx.createBiquadFilter();
-      filter.type = "lowpass";
+      filter.type = 'lowpass';
 
       // Clear Speech Mode
       filter.frequency.setValueAtTime(3000, audioCtx.currentTime);
@@ -88,7 +87,7 @@ export const useSpeechToText = () => {
 
       updateVolume();
     } catch (error) {
-      console.error("Error accessing microphone:", error);
+      console.error('Error accessing microphone:', error);
     }
   };
 
@@ -115,5 +114,6 @@ export const useSpeechToText = () => {
     stopListening,
     transcript,
     volumeLevel,
+    setTranscript,
   };
 };

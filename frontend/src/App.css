@@ -69,11 +69,11 @@ body {
 
 .radial-button {
   z-index: 5;
-  background: rgb(252, 234, 150) !important;
+  background: rgb(161, 61, 71) !important;
   background: radial-gradient(
     circle,
-    rgba(252, 234, 150, 1) 0%,
-    rgba(239, 132, 174, 1) 100%
+    rgb(242, 135, 144) 0%,
+    rgb(170, 26, 26) 100%
   ) !important;
 }
 
