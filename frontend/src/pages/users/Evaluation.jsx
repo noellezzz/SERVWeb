@@ -9,6 +9,7 @@ import ElevButton from '../../components/buttons/ElevButton';
 import CardAnimation from '../../components/anims/CardAnimation';
 import LoadingScreen from '../../components/LoadingScreen';
 import ToggleButton from '../../components/buttons/ToggleButton';
+import useResource from '@/hooks/useResource';
 
 export default function Evaluation() {
   const [loading, setLoading] = useState(true);
@@ -40,6 +41,16 @@ export default function Evaluation() {
     setLanguage,
   } = useConversation();
 
+  const {
+      actions: {
+          fetchDatas,
+      },
+      states: {
+          data,
+      }
+  } = useResource('tests');
+
+
   useEffect(() => {
     if (typeToAnswer) {
       setQuestions((prev) => prev.map((q, index) => (index === currentCard - 1 ? { ...q, answer: transcript } : q)));
@@ -59,6 +70,14 @@ export default function Evaluation() {
     setTimeout(() => {
       setLoading(false);
     }, 3000);
+  }, []);
+
+  useEffect(() => {
+    setQuestions(data);
+  }, [data]);
+
+  useEffect(() => {
+    fetchDatas();
   }, []);
 
   return (
@@ -94,7 +113,9 @@ export default function Evaluation() {
                   <AnimatePresence mode='popLayout' initial={false}>
                     <CardAnimation currentCard={currentCard} direction={direction}>
                       <QuestionCard
-                        question={questions[currentCard].question}
+                        question={
+                          language === 'Tagalog' ? questions[currentCard].question_text_tl : questions[currentCard].question_text_en
+                        }
                         onNext={() => handleNavigation(1)}
                         onPrev={() => handleNavigation(-1)}
                         isFirst={currentCard === 0}
