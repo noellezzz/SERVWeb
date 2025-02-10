@@ -136,7 +136,7 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
                 'word': item,
                 'sentiment': self.get_label(result[i]),
                 'score': result[i],
-                'datails': valence
+                'details': valence
             })
         
         return result

@@ -13,13 +13,13 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend, annotationPlugin);
 
 
-const axisLabels = [
+const _axisLabels = [
   { xValue: -100, yValue: 0, content: 'Unpleasant' },
   { xValue: 100, yValue: 0, content: 'Pleasant' },
   { xValue: 0, yValue: 100, content: 'Active' },
   { xValue: 0, yValue: -100, content: 'Subdued' },
 ];
-const quadrantLabels = [
+const _quadrantLabels = [
   { q:1, xValue: 25, yValue: 90, content: 'Alert' },
   { q:1, xValue: 50, yValue: 75, content: 'Excited' },
   { q:1, xValue: 75, yValue: 50, content: 'Elated' },
@@ -41,7 +41,7 @@ const quadrantLabels = [
   { q:4, xValue: -25, yValue: 90, content: 'Tensed' },
 ];
 
-const generateAnnotations = (axisLabels=[], quadrantLabels=[], scaleX, scaleY) => {
+const generateAnnotations = (axisLabels=_axisLabels, quadrantLabels=_quadrantLabels, scaleX, scaleY) => {
   const annotations = {};
 
   axisLabels.forEach((label, index) => {
@@ -148,7 +148,7 @@ const SentimentScatterChart = ({
     <Scatter 
             options={options} 
             data={data} 
-        />
+      />
   </div>;
 };
 
