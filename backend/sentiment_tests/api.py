@@ -23,13 +23,18 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         feedback_id = request.data.get('feedback_id')
         test_id = request.data.get('test_id')
-        mode = request.data.get('mode')
+        mode = request.data.get('mode') or 'vader'
         
         try:
             feedback = Feedback.objects.get(id=feedback_id)
             test = models.SentimentTest.objects.get(id=test_id)
             
-            existing_result = models.SentimentResult.objects.filter(feedback=feedback, sentiment_test=test).first()
+            existing_result = models.SentimentResult.objects.filter(
+                feedback=feedback, 
+                sentiment_test=test,
+                mode=mode,
+                deleted_at=None
+            ).first()
             
             if existing_result:
                 serializer = self.get_serializer(existing_result)
@@ -48,9 +53,12 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
                 score=analysis['score'],
                 sentiment=analysis['sentiment'],
                 words=words,
-                detailed_results={
+                details={
                     'translated_text': analysis.get('translated_text', ''),
-                    'prediction': analysis.get('prediction', {}),
+                    'prediction': {
+                        'label': analysis.get('prediction', ''),
+                        'score': analysis.get('prediction_score', 0)
+                    },
                     'polarity': analysis.get('polarity', {})
                 },
 

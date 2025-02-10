@@ -22,6 +22,7 @@ const fields = [
         name: 'description',
         label: 'Description (Optional)',
         type: 'textarea',
+        required: false
     },
     {
         name: 'question_text_en',

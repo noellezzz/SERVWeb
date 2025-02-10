@@ -18,10 +18,9 @@ export default function FeedbacksPage() {
 
             <div className='min-h-full flex flex-col lg:flex-row my-4 p-4 rounded-lg bg-white shadow-md'>
                 <div className='lg:w-3/4 lg:mr-4 flex flex-col gap-8'>
-                    <EvaluationTable />
-
-
                     <FeedbackTable />
+                    
+                    <EvaluationTable />
                 </div>
 
                 <div className='lg:w-1/4'>
