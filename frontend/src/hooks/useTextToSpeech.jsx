@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 export const useTextToSpeech = () => {
   const [voices, setVoices] = useState([]);
@@ -22,7 +22,7 @@ export const useTextToSpeech = () => {
   const speak = (text, language) => {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.voice = language === "Tagalog" ? voices[11] : voices[1];
+    utterance.voice = language === 'Tagalog' ? voices[11] : voices[1];
 
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);

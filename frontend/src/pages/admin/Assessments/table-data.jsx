@@ -3,9 +3,10 @@ import Switch from '@mui/material/Switch';
 
 export const getQuestionColumns = (onEdit, onDelete) => [
     {
-        field: 'question',
+        field: 'question_text_en',
         headerName: 'Questions',
         flex: 1,
+
     },
     {
         field: 'category',
@@ -39,18 +40,13 @@ export const getResultColumns = (onView, onDelete) => [
         flex: 1,
     },
     {
+        field: 'mode',
+        headerName: 'Mode',
+        flex: 1,
+    },
+    {
         field: 'score',
         headerName: 'Score',
-        flex: 1,
-    },
-    {
-        field: 'positivity',
-        headerName: 'Positivity',
-        flex: 1,
-    },
-    {
-        field: 'negativity',
-        headerName: 'Negativity',
         flex: 1,
     },
     {

@@ -3,7 +3,7 @@ from rest_framework import routers
 from . import api
 
 router = routers.DefaultRouter()
-router.register("sentiment-results", api.SentimentResultViewSet)
-router.register("sentiment-tests", api.SentimentTestViewSet)
+router.register("results", api.SentimentResultViewSet)
+router.register("tests", api.SentimentTestViewSet)
 
 urlpatterns = router.urls

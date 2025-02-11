@@ -6,6 +6,11 @@ export const feedbackColumns = [
         headerName: 'ID',
         width: 70,
     },
+
+    {
+        field: 'user',
+        headerName: 'user',
+    },
     {
         field: 'content',
         headerName: 'Content',
@@ -19,32 +24,23 @@ export const feedbackColumns = [
         }
     },
     {
-        field: 'positivity',
-        headerName: 'Avg Positivity',
-    },
-    {
-        field: 'negativity',
-        headerName: 'Avg Negativity',
-    },
-    {
-        field: 'score',
-        headerName: 'Avg. Score',
-    },
-    {
 
-        field: 'sentiment',
-        headerName: 'Overall Sentiment',
-    },
-    {
-
-        field: 'actions',
-        headerName: '',
-        width: 150,
-        sortable: false,
+        field: 'created',
+        headerName: 'Date',
         renderCell: (params) => {
-            return (<ActionButtons />);
-        },
+            const formattedDate = new Date(params.value).toLocaleDateString('en-US', {
+                month: 'short',
+                day: '2-digit',
+                year: 'numeric',
+            });
+            return (
+                <div className="flex items-center">
+                    <span>{formattedDate}</span>
+                </div>
+            );
+        }
     },
+
 ];
 
 export const evaluationColumns = [
@@ -53,7 +49,6 @@ export const evaluationColumns = [
         headerName: 'ID',
     },
     {
-
         field: 'content',
         headerName: 'Content',
         flex: 1,
