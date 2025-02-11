@@ -8,9 +8,9 @@ export const useTextToSpeech = () => {
   useEffect(() => {
     const loadVoices = () => {
       const availableVoices = speechSynthesis.getVoices();
-      console.log(availableVoices);
       setVoices(availableVoices);
       setVoice(availableVoices[1]);
+      console.log(availableVoices);
     };
 
     speechSynthesis.onvoiceschanged = loadVoices;
