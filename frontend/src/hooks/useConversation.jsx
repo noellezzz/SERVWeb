@@ -15,7 +15,7 @@ export const useConversation = () => {
   const [askingFor, setAskingFor] = useState('');
   const [isHoldingV, setIsHoldingV] = useState(false);
   const [pushToTalk, setPushToTalk] = useState(true);
-  const [typeToAnswer, setTypeToAnswer] = useState(true);
+  const [typeToAnswer, setTypeToAnswer] = useState(false);
 
   const [finalMessage, setFinalMessage] = useState({
     message: '',
@@ -27,7 +27,13 @@ export const useConversation = () => {
   // On Start
   useEffect(() => {
     if (start === true) {
-      requestLanguage();
+      if (language === 'Not Set') {
+        requestLanguage();
+      } else {
+        handlePlay();
+        // setRequestResponse(true);
+        setAskingFor('Questioning');
+      }
     }
   }, [start]);
 

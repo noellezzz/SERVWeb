@@ -62,6 +62,14 @@ export default function Evaluation() {
   }, []);
 
   useEffect(() => {
+    if (typeToAnswer && pushToTalk) {
+      alert('You cant have both "Push to talk" and "Type to answer" active');
+      setTypeToAnswer(false);
+      setPushToTalk(false);
+    }
+  }, [pushToTalk, typeToAnswer]);
+
+  useEffect(() => {
     console.log(questions);
   }, [questions]);
 
@@ -98,7 +106,7 @@ export default function Evaluation() {
                   <AnimatePresence mode='popLayout' initial={false}>
                     <CardAnimation currentCard={currentCard} direction={direction}>
                       <QuestionCard
-                        question={questions[currentCard].question}
+                        question={questions[currentCard]}
                         onNext={() => handleNavigation(1)}
                         onPrev={() => handleNavigation(-1)}
                         isFirst={currentCard === 0}
@@ -154,6 +162,17 @@ export default function Evaluation() {
                 <div className='flex gap-4'>
                   <ToggleButton active={pushToTalk} setActive={setPushToTalk} text='Push to Talk' />
                   <ToggleButton active={typeToAnswer} setActive={setTypeToAnswer} text='Type to Answer' />
+                  <div>
+                    <p className='text-gray-500 text-xs mb-1'>Language</p>
+                    <div className='flex border-2 rounded-lg'>
+                      <button onClick={() => setLanguage('English')} className={`${language === 'English' ? 'bg-red-500 text-white' : 'bg-white text-black'} 'border-2 rounded-lg rounded-r-none p-2 flex justify-center items-center'`}>
+                        English
+                      </button>
+                      <button onClick={() => setLanguage('Tagalog')} className={`${language === 'Tagalog' ? 'bg-red-500 text-white' : 'bg-white text-black'} 'border-2 rounded-lg rounded-l-none p-2 flex justify-center items-center'`}>
+                        Tagalog
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

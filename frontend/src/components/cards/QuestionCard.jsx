@@ -31,7 +31,7 @@ export const QuestionCard = ({
       <div className='text-sm text-gray-500 mb-2'>
         Question {currentQuestion + 1} of {totalQuestions}
       </div>
-      <p className='text-xl mb-4'>{question}</p>
+      <p className='text-xl mb-4'>{language === 'English' ? question.question : question.tagalog}</p>
 
       {typeToAnswer && (
         <div>
