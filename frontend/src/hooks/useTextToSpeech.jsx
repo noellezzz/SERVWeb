@@ -10,7 +10,6 @@ export const useTextToSpeech = () => {
       const availableVoices = speechSynthesis.getVoices();
       setVoices(availableVoices);
       setVoice(availableVoices[1]);
-      console.log(availableVoices);
     };
 
     speechSynthesis.onvoiceschanged = loadVoices;
