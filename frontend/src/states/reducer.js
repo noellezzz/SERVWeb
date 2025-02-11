@@ -1,7 +1,7 @@
 import { apiSlice } from './api';
 import { combineReducers } from '@reduxjs/toolkit';
 import themeSlice from './slices/theme.slice';
-import resourceSlice from './slices/resource.slice';
+import resourceSlice from './slices/resources.slice';
 
 const rootReducer = combineReducers({
     theme: themeSlice,

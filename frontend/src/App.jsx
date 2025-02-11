@@ -15,6 +15,7 @@ import Contact from "./pages/users/Contact";
 // ADMIN PAGES
 import Dashboard from "./pages/admin/Dashboard";
 import AssessmenstPage from "./pages/admin/Assessments";
+import AsssessmentView from "./pages/admin/Assessments/AsssessmentView";
 import Visualizer from "./pages/admin/Visualizer";
 import Users from "./pages/admin/Users";
 import ReportsPage from "./pages/admin/Reports";
@@ -42,6 +43,9 @@ function App() {
 
         <Route path="users" element={<Users />} />
         <Route path="assessments" element={<AssessmenstPage />} />
+        <Route path="assessments/:assessmentId" element={<AsssessmentView />} />
+
+        
         <Route path="feedbacks" element={<FeedbacksPage />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="analytics" element={<Analytics />} />

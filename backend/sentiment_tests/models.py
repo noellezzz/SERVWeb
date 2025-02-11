@@ -91,7 +91,7 @@ class SentimentResult(models.Model):
     )
 
     class Meta:
-        unique_together = ('sentiment_test', 'feedback')
+        unique_together = ('sentiment_test', 'feedback', 'mode')
 
     def __str__(self):
         return str(self.pk)

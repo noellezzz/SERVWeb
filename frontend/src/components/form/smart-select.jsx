@@ -113,7 +113,7 @@ export default function SmartSelect({
                     label={label}
                     variant="outlined"
                     error={Boolean(error)}
-                    helperText={error}
+                    // helperText={error}
                 />
             )}
             {...props}
