@@ -61,6 +61,10 @@ export default function Evaluation() {
     }, 3000);
   }, []);
 
+  useEffect(() => {
+    console.log(questions);
+  }, [questions]);
+
   return (
     <div className='p-4 flex flex-col items-center'>
       <LoadingScreen loading={loading} />
