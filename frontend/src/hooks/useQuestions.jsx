@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useTextToSpeech } from './useTextToSpeech';
-import questionsSample from '@/assets/data/questions_sample';
-import SplashScreen from '@/components/splash-screen';
+import swal from 'sweetalert';
+import questions_sample from '../assets/data/questions_sample';
+
 
 export const useQuestions = () => {
-
-  const speech = useTextToSpeech();
-
-  const [questions, setQuestions] = useState(questionsSample);
-
-
-
+  const [questions, setQuestions] = useState(questions_sample);
+  const [start, setStart] = useState(true);
   const [currentCard, setCurrentCard] = useState(0);
   const [direction, setDirection] = useState(1);
   const [language, setLanguage] = useState('English');
+  const speech = useTextToSpeech();
   const [requestResponse, setRequestResponse] = useState(false);
 
   const handlePlay = () => {
@@ -41,13 +38,15 @@ export const useQuestions = () => {
       setCurrentCard((prev) => prev + 1);
     } else if (direction === -1 && currentCard > 0) {
       setDirection(-1);
-      handlePlayNextPrev;
+      handlePlayNextPrev();
       setCurrentCard((prev) => prev - 1);
     } else if (direction === 1 && currentCard === questions.length - 1) {
       setCurrentCard((prev) => prev + 1);
       setStart(false);
-
       speech.speak('Congratulations! You have finished the evaluation', 'English');
+      swal('Congratulations!', 'You have finished the evaluation', 'success').then(() => {
+        window.location.reload();
+      });
     }
   };
 

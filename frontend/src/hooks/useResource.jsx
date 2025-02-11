@@ -77,7 +77,7 @@ export default function useResource(resourceName, isPublic = false) {
             toast.error(
                 <DetailedToast
                     title='Error'
-                    message={e?.data?.message || 'An error occured'}
+                    message={e?.data?.message || 'A server error occured'}
                 />
             );
         });
@@ -104,7 +104,7 @@ export default function useResource(resourceName, isPublic = false) {
             toast.error(
                 <DetailedToast
                     title='Error'
-                    message={e?.data?.message || 'An error occured'}
+                    message={e?.data?.message || 'A server error occured'}
                 />
             );
         });
@@ -131,7 +131,7 @@ export default function useResource(resourceName, isPublic = false) {
             toast.error(
                 <DetailedToast
                     title='Error'
-                    message={e?.data?.message || 'An error occured'}
+                    message={e?.data?.message || 'A server error occured'}
                 />
             );
         });
@@ -163,11 +163,11 @@ export default function useResource(resourceName, isPublic = false) {
         });
     }, [show]);
 
-    const doStore = React.useCallback(async (data) => {
+    const doStore = React.useCallback(async (data, silence=false) => {
         setLoading(true);
         return await store(data).unwrap().then((response) => {
             setCurrent(response);
-            toast.success(
+            !silence && toast.success(
                 <DetailedToast
                     title='Successfully added'
                     message='The record has been successfully added'
@@ -179,10 +179,10 @@ export default function useResource(resourceName, isPublic = false) {
             return response;
         }).catch((e) => {
             setLoading(false);
-            toast.error(
+            !silence && toast.error(
                 <DetailedToast
                     title='Error'
-                    message={e?.data?.message || 'An error occured'}
+                    message={e?.data?.message || 'A server error occured'}
                 />
             );
         });
@@ -206,7 +206,7 @@ export default function useResource(resourceName, isPublic = false) {
             toast.error(
                 <DetailedToast
                     title='Error'
-                    message={e?.data?.message || 'An error occured'}
+                    message={e?.data?.message || 'A server error occured'}
                 />
             );
         });

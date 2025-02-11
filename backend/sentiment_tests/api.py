@@ -21,12 +21,21 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.SentimentResultSerializer
     
     def create(self, request, *args, **kwargs):
+        logger.info(f"Creating sentiment result: {request.data}")
+        is_new_feedback = request.data.get('is_new_feedback', False)
         feedback_id = request.data.get('feedback_id')
         test_id = request.data.get('test_id')
         mode = request.data.get('mode') or 'vader'
-        
         try:
-            feedback = Feedback.objects.get(id=feedback_id)
+            if is_new_feedback:
+                content = request.data.get('content')
+                user_nid = request.data.get('user_nid')
+                feedback = Feedback.objects.create(
+                    content=content,
+                    user_nid=user_nid
+                )
+            else:
+                feedback = Feedback.objects.get(id=feedback_id)
             test = models.SentimentTest.objects.get(id=test_id)
             
             existing_result = models.SentimentResult.objects.filter(
