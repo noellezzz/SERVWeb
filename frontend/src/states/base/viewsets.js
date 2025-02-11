@@ -1,58 +1,64 @@
+import * as changeCase from "change-case";
 
-// Django REST Framework ViewSet Routes
-// list: GET /api/v1/{resource}/
-// create: POST /api/v1/{resource}/
-// retrieve: GET /api/v1/{resource}/{id}/
-// update: PATCH /api/v1/{resource}/{id}/
-// destroy: PATCH /api/v1/{resource}/{id}/
-// force_destroy: DELETE /api/v1/{resource}/{id}/
+export default function resourceBuilder(resource) {
+    let name = changeCase.camelCase(resource);
 
-
-export default (resourceName, fn = () => { }) => (build) => ({
-    list: build.mutation({
-        query: () => ({
-            url: `/${resourceName}`,
-            method: 'GET',
+    return (builder) => ({
+        [`${name}Index`]: builder.mutation({
+            query: (qStr) => ({
+                url: `${resource}${qStr ? `?${qStr}` : ''}`,
+                method: 'GET',
+            })
         }),
-    }),
-    create: build.mutation({
-        query: (data) => ({
-            url: `/${resourceName}/`,
-            method: 'POST',
-            body: data,
+        [`${name}Archived`]: builder.mutation({
+            query: (qStr) => ({
+                url: `${resource}/Archived${qStr ? `?${qStr}` : ''}`,
+                method: 'GET',
+            })
         }),
-    }),
-    retrieve: build.mutation({
-        query: (id) => ({
-            url: `/${resourceName}/${id}`,
-            method: 'GET',
+        [`${name}All`]: builder.mutation({
+            query: (qStr) => ({
+                url: `${resource}/all${qStr ? `?${qStr}` : ''}`,
+                method: 'GET',
+            })
         }),
-    }),
-    update: build.mutation({
-        query: ({ id, data }) => ({
-            url: `/${resourceName}/${id}/`,
-            method: 'PATCH',
-            body: data,
+        [`${name}Show`]: builder.mutation({
+            query: ({ id, qStr }) => ({
+                url: `${resource}/${id}${qStr ? `?${qStr}` : ''}`,
+                method: 'GET',
+            })
         }),
-    }),
-    destroy: build.mutation({
-        query: (id) => ({
-            url: `/${resourceName}/${id}/delete/`,
-            method: 'PATCH',
+        [`${name}Store`]: builder.mutation({
+            query: (data) => ({
+                url: `${resource}/`,
+                method: 'POST',
+                body: data
+            })
         }),
-    }),
-    restore: build.mutation({
-        query: (id) => ({
-            url: `/${resourceName}/${id}/restore/`,
-            method: 'PATCH',
+        [`${name}Update`]: builder.mutation({
+            query: ({ id, data }) => ({
+                url: `${resource}/${id}/`,
+                method: 'PUT',
+                body: data
+            })
         }),
-    }),
-    force_destroy: build.mutation({
-        query: (id) => ({
-            url: `/${resourceName}/${id}/`,
-            method: 'DELETE',
+        [`${name}Archive`]: builder.mutation({
+            query: (id) => ({
+                url: `${resource}/${id}/`,
+                method: 'PATCH',
+            })
         }),
-    }),
-    ...fn(build),
-});
-
+        [`${name}Destroy`]: builder.mutation({
+            query: (id) => ({
+                url: `${resource}/${id}/`,
+                method: 'DELETE',
+            })
+        }),
+        [`${name}Restore`]: builder.mutation({
+            query: (id) => ({
+                url: `${resource}/${id}/restore/`,
+                method: 'PATCH',
+            })
+        }),
+    });
+}

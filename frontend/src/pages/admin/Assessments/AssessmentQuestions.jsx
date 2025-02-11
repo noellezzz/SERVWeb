@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from 'react'
-import DashboardTable from '@/components/tables';
-import { getQuestionColumns as headers } from './table-data'
-import useTest from '@/states/services/useTest';
-import { Plus } from 'lucide-react';
 import { Button } from '@mui/material';
-import QuestionFormModal from './QuestionFormModal';
-import {toggleRefresh} from '@/states/slices/resource.slice';
-import { useDispatch,useSelector } from 'react-redux';
+import { Plus } from 'lucide-react';
 import swal from 'sweetalert';
 
+import useResource from '@/hooks/useResource';
+import DashboardTable from '@/components/tables';
+import SplashScreen from '@/components/splash-screen';
+import QuestionFormModal from './QuestionFormModal';
+import { getQuestionColumns as headers } from './table-data'
+
 export default function AssessmentQuestions() {
-    const dispatch = useDispatch();
-    const refresh = useSelector((state) => state.resources.refresh);
-    const [rows, setRows] = useState([]);
     const [currentRow, setCurrentRow] = useState(null);
-    const { listTest, destroyTest, loading, error } = useTest();
     const [formOpen, setFormOpen] = useState(false);
+    const [rows, setRows] = useState([]);
+    const {
+        actions: {
+            fetchDatas,
+            doDestroy
+        },
+        states: {
+            data,
+            loading,
+            refresh
+        }
+    } = useResource('tests');	
 
 
     const onEditClick = (row) => {
@@ -32,32 +40,30 @@ export default function AssessmentQuestions() {
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-                destroyTest(row.id).then(() => {
-                    dispatch(toggleRefresh(true));
-                    swal('Poof! Your question has been archived!', {
-                        icon: 'success',
-                    });
-                })
+                doDestroy(row.id)
             }
         });
     }
 
 
-
     useEffect(() => {
-      !refresh && dispatch(toggleRefresh(true))
+        fetchDatas()
     }, [])
-
+    
     useEffect(() => {
-        refresh && listTest().then((data) => {
-            const results = data.results?.map((item) => ({
-                ...item,
-                question: item.question_text_en,
-            })) || [];
-            setRows(results)
-            dispatch(toggleRefresh(false))
-        })
-    }, [refresh])
+        if (refresh) {
+            fetchDatas({
+                doRefresh: true
+            });
+        }
+    }, [refresh]);
+    
+    useEffect(() => {
+        if (data) {
+            setRows(data)
+        }
+    }, [data])
+    if (loading) return <SplashScreen />
 
     return (
         <div>

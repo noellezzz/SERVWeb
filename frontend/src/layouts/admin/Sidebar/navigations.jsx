@@ -13,6 +13,7 @@ export const NAVIGATION = [
     { type: "menu", segment: "feedbacks", title: "Feedbacks", icon: <RateReviewIcon /> },
     { type: "menu", segment: "assessments", title: "Assessments", icon: <NoteAltIcon /> },
     { type: "menu", segment: "reports", title: "Reports", icon: <ReportIcon /> },
+    { type: "menu", segment: "visualizer", title: "Visualizer", icon: <BarChartIcon /> },
     // { type: "menu", segment: "analytics", title: "Analytics", icon: <BarChartIcon /> },
 
     { type: "title", title: "Management", },
