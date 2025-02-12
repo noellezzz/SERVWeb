@@ -4,12 +4,6 @@ from django.urls import reverse
 from django.conf import settings
 
 
-class FeedbackCollection(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user_nid = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
 class Feedback(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -17,6 +11,7 @@ class Feedback(models.Model):
     
     
     content = models.TextField(blank=True, null=True)
+    user_nid = models.TextField(blank=True, null=True)
     
     class Meta:
         pass
