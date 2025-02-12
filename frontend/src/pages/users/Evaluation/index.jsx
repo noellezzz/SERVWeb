@@ -78,11 +78,18 @@ const {
   }, [currentCard]);
 
   useEffect(() => {
-    setQuestions((prev) => prev.map((q, index) => (index === finalMessage.index ? { 
-      ...q, 
-      answer: finalMessage.message,
-      userId: userId,
-    } : q)));
+    setQuestions((prev) => prev.map((q, index) => {
+      if (index === currentCard) {
+        doStore({ 
+          test_id: q.id, 
+          content: finalMessage, 
+          user_id: userId,
+          is_new_feedback: true,
+        }, true);
+        return { ...q, answer: finalMessage, userId: userId };
+      }
+      return q;
+    }));
   }, [finalMessage]);
 
   const handleLanguage = (newLanguage) => {
