@@ -6,7 +6,7 @@ import TotalAsses from "@/layouts/admin/DashBocharts/TotalAsses";
 import Moods from "@/layouts/admin/DashBocharts/Moods";
 import Demographics from "@/layouts/admin/DashBocharts/Demographics";
 import TopFB from "@/layouts/admin/DashBocharts/TopFB";
-import Tagclouds from "@/layouts/admin/DashBocharts/Tagclouds";
+
 
 const Dashboard = () => {
     return (
@@ -29,7 +29,7 @@ const Dashboard = () => {
                 <div className='grid grid-cols-1 gap-6'>
                     {/* Full-width Demographics */}
                     <div className='col-span-1'>
-                    <Tagclouds />
+                    
                     
                     </div>
 
