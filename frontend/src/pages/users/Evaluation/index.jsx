@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LinearProgress from '@mui/joy/LinearProgress';
-import { QuestionCard } from '../../components/cards/QuestionCard';
-import { useConversation } from '../../hooks/useConversation';
-import CircleButton from '../../components/buttons/CircleButton';
-import home from '../../assets/home.png';
-import ElevButton from '../../components/buttons/ElevButton';
-import CardAnimation from '../../components/anims/CardAnimation';
-import LoadingScreen from '../../components/LoadingScreen';
-import ToggleButton from '../../components/buttons/ToggleButton';
+import { QuestionCard } from '@/components/cards/QuestionCard';
+import { useConversation } from '@/hooks/useConversation';
+import CircleButton from '@/components/buttons/CircleButton';
+import home from '@/assets/home.png';
+import ElevButton from '@/components/buttons/ElevButton';
+import CardAnimation from '@/components/anims/CardAnimation';
+import LoadingScreen from '@/components/LoadingScreen';
+import ToggleButton from '@/components/buttons/ToggleButton';
+import useResource from '@/hooks/useResource';
+import swal from 'sweetalert';
+
 
 export default function Evaluation() {
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState('');
 
   const {
     speech,
@@ -40,15 +44,52 @@ export default function Evaluation() {
     setLanguage,
   } = useConversation();
 
+  const {
+    actions: {
+        fetchDatas,
+    },
+    states: {
+        data,
+        loading: fetchLoading
+    }
+} = useResource('tests');
+const {
+  actions: {
+      doStore
+  },
+} = useResource('results');
+
   useEffect(() => {
     if (typeToAnswer) {
-      setQuestions((prev) => prev.map((q, index) => (index === currentCard - 1 ? { ...q, answer: transcript } : q)));
+      setQuestions((prev) => prev.map((q, index) => {
+        if (index === currentCard) {
+          doStore({ 
+            test_id: q.id, 
+            content: transcript, 
+            user_id: userId,
+            is_new_feedback: true,
+          }, true);
+          return { ...q, answer: transcript, userId: userId };
+        }
+        return q;
+      }));
     }
     setTranscript('');
   }, [currentCard]);
 
   useEffect(() => {
-    setQuestions((prev) => prev.map((q, index) => (index === finalMessage.index ? { ...q, answer: finalMessage.message } : q)));
+    setQuestions((prev) => prev.map((q, index) => {
+      if (index === currentCard) {
+        doStore({ 
+          test_id: q.id, 
+          content: finalMessage, 
+          user_id: userId,
+          is_new_feedback: true,
+        }, true);
+        return { ...q, answer: finalMessage, userId: userId };
+      }
+      return q;
+    }));
   }, [finalMessage]);
 
   const handleLanguage = (newLanguage) => {
@@ -63,22 +104,54 @@ export default function Evaluation() {
 
   useEffect(() => {
     if (typeToAnswer && pushToTalk) {
-      alert('You cant have both "Push to talk" and "Type to answer" active');
-      setTypeToAnswer(false);
-      setPushToTalk(false);
+      swal({
+        title: 'Warning',
+        text: 'You cannot use Push to Talk and Type to Answer at the same time',
+        icon: 'warning',
+        buttons: ['Push To Talk', 'Type To Answer'],
+      }).then((value) => {
+        if (value) {
+          setTypeToAnswer(true);
+          setPushToTalk(false);
+        } else {
+          setPushToTalk(true);
+          setTypeToAnswer(false);
+        }
+      });
     }
   }, [pushToTalk, typeToAnswer]);
 
   useEffect(() => {
-    console.log(questions);
-  }, [questions]);
+    setQuestions(data.map((q) => ({ 
+      ...q, 
+      answer: '',
+      question: q.question_text_en,
+      tagalog: q.question_text_tl,
+
+    })));
+  }, [data]);
+  useEffect(() => {
+    fetchDatas();
+  }, []);
+
+  const handleStart = () => {  
+    if (userId.length !== 4 || isNaN(userId)) {
+      swal({
+        title: 'Error',
+        text: 'Please enter a valid 4-digit User ID',
+        icon: 'error',
+      });
+      return;
+    } else {
+      setStart(true);
+    }
+  };
 
   return (
     <div className='p-4 flex flex-col items-center'>
-      <LoadingScreen loading={loading} />
+      <LoadingScreen loading={loading || fetchLoading} />
       {!loading && (
         <>
-          {' '}
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -89,9 +162,9 @@ export default function Evaluation() {
             <div>
               <AnimatePresence mode='popLayout'>
                 {!start && !(currentCard > questions.length - 1) && (
-                  <div onClick={() => setStart(true)}>
-                    <CircleButton />
-                  </div>
+                 <div onClick={handleStart}>
+                  <CircleButton />
+                </div>
                 )}
               </AnimatePresence>
               {start && language == 'Not Set' && (
@@ -105,27 +178,29 @@ export default function Evaluation() {
                 <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 1, delay: 0.5, type: 'spring' }} className='relative h-56 w-full overflow-hidden'>
                   <AnimatePresence mode='popLayout' initial={false}>
                     <CardAnimation currentCard={currentCard} direction={direction}>
-                      <QuestionCard
-                        question={questions[currentCard]}
-                        onNext={() => handleNavigation(1)}
-                        onPrev={() => handleNavigation(-1)}
-                        isFirst={currentCard === 0}
-                        isLast={currentCard === questions.length - 1}
-                        currentQuestion={currentCard}
-                        totalQuestions={questions.length}
-                        start={start}
-                        setStart={setStart}
-                        handlePlay={handlePlay}
-                        language={language}
-                        handleLanguage={handleLanguage}
-                        handleStop={speech.stop}
-                        isListening={isListening}
-                        stopListening={stopListening}
-                        startListening={startListening}
-                        transcript={transcript}
-                        setTranscript={setTranscript}
-                        typeToAnswer={typeToAnswer}
-                      />
+                      {
+                        questions.length > currentCard && <QuestionCard
+                          question={questions[currentCard]}
+                          onNext={() => handleNavigation(1)}
+                          onPrev={() => handleNavigation(-1)}
+                          isFirst={currentCard === 0}
+                          isLast={currentCard === questions.length - 1}
+                          currentQuestion={currentCard}
+                          totalQuestions={questions.length}
+                          start={start}
+                          setStart={setStart}
+                          handlePlay={handlePlay}
+                          language={language}
+                          handleLanguage={handleLanguage}
+                          handleStop={speech.stop}
+                          isListening={isListening}
+                          stopListening={stopListening}
+                          startListening={startListening}
+                          transcript={transcript}
+                          setTranscript={setTranscript}
+                          typeToAnswer={typeToAnswer}
+                        />
+                      }
                     </CardAnimation>
                   </AnimatePresence>
                   <LinearProgress className='z-40' determinate value={((currentCard + 1) / questions.length) * 100} color='danger' />
@@ -157,12 +232,14 @@ export default function Evaluation() {
             )}
 
             {!start && (
-              <div className='text-sm w-full flex justify-center'>
+              <div className='text-sm w-full flex flex-col gap-2 items-center'>
                 {/* <div>Duration: {duration}</div> */}
                 <div className='flex gap-4'>
                   <ToggleButton active={pushToTalk} setActive={setPushToTalk} text='Push to Talk' />
                   <ToggleButton active={typeToAnswer} setActive={setTypeToAnswer} text='Type to Answer' />
-                  <div>
+                
+                </div>  
+                <div>
                     <p className='text-gray-500 text-xs mb-1'>Language</p>
                     <div className='flex border-2 rounded-lg'>
                       <button onClick={() => setLanguage('English')} className={`${language === 'English' ? 'bg-red-500 text-white' : 'bg-white text-black'} 'border-2 rounded-lg rounded-r-none p-2 flex justify-center items-center'`}>
@@ -173,6 +250,15 @@ export default function Evaluation() {
                       </button>
                     </div>
                   </div>
+                <div>
+                  <p className='text-gray-500 text-xs mb-1'>Enter the last four digit of your ID</p>
+                  <input
+                    type='text'
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
+                    placeholder='Enter 4-digit User ID'
+                    className='mb-4 p-2 border rounded'
+                  />
                 </div>
               </div>
             )}

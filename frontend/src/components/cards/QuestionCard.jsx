@@ -26,7 +26,7 @@ export const QuestionCard = ({
   setTranscript,
   typeToAnswer,
 }) => {
-  return (
+  return start && (
     <div className='flex flex-col bg-white h-full w-full rounded-lg  p-4'>
       <div className='text-sm text-gray-500 mb-2'>
         Question {currentQuestion + 1} of {totalQuestions}
@@ -36,7 +36,9 @@ export const QuestionCard = ({
       {typeToAnswer && (
         <div>
           <Textarea value={transcript} onChange={(e) => setTranscript(e.target.value)} className={`${typeToAnswer ? '' : 'opacity-0'} flex-grow mb-2`} minRows={2} size='md' variant='outlined' placeholder='Say something...' />
-          <Button onClick={onNext}>Submit</Button>
+          <Button onClick={onNext}>
+            {isLast ? 'Finish' : 'Next'}
+          </Button>
         </div>
       )}
 

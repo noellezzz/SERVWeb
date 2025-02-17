@@ -1,0 +1,20 @@
+<!-- mymodel.html -->
+{% load static %}
+<!doctype html>
+<html>
+
+  <head>
+    <!-- Use "static" template tag and configure STATIC_URL as usual. -->
+    <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+  </head>
+
+  <body>
+    <h1>Feedback Report</h1>
+    <p><strong>ID:</strong> {{ object.id }}</p>
+    <p><strong>Title:</strong> {{ object.title }}</p>
+    <p><strong>Content:</strong> {{ object.content }}</p>
+    <p><strong>Created At:</strong> {{ object.created_at }}</p>
+    <p><strong>Updated At:</strong> {{ object.updated_at }}</p>
+  </body>
+
+</html>
