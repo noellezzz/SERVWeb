@@ -80,7 +80,7 @@ const WordCloud = () => {
         style={{
           color: color,
           fontSize: `${size}px`,
-          transform: `rotate(${tag.rotate})`, // Apply rotation
+          transform: `rotate(${tag.rotate})`, 
           position: 'absolute',
           left: tag.x,
           top: tag.y,
