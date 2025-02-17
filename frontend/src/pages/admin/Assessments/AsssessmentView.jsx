@@ -1,12 +1,16 @@
 import { useParams } from 'react-router-dom';
-import { useEffect } from 'react';
-import { Box, Typography, Divider, Paper, CircularProgress, Grid, Card, CardContent } from '@mui/material';
+import { useEffect, useRef } from 'react';
+import { TagCloud } from 'react-tagcloud';
+import { useReactToPrint } from "react-to-print";
+
+
+import { Box, Typography, Divider, Paper, Button, Grid, Card, CardContent } from '@mui/material';
 import SplashScreen from '@/components/splash-screen';
 import useResource from '@/hooks/useResource';
 import SentimentScatterChart from '@/components/charts/sentiment-scatter';
 import TextClassifier from '@/components/text-classifier';
 import AssessmentResult from './AssessmentResult';
-import { TagCloud } from 'react-tagcloud';
+import { PrinterIcon } from 'lucide-react';
 
 const getColor = (score, sentiment) => {
     if (score > 80) return 'green'
@@ -35,6 +39,8 @@ export default function AssessmentView() {
     const { actions: { fetchData }, states: { current, loading } } = useResource('results');
     const { actions: { fetchData: fetchFeedback }, states: { current: feedback } } = useResource('feedbacks');
     const { actions: { fetchData: fetchQuestion }, states: { current: question } } = useResource('tests');
+    const contentRef = useRef(null);
+    const reactToPrintFn = useReactToPrint({ contentRef });
 
     useEffect(() => { fetchData({ id }); }, []);
     
@@ -46,14 +52,20 @@ export default function AssessmentView() {
     if (loading) return <SplashScreen />;
 
     return current && (
-        <Box p={4}>
+        <>
+        <Box className="flex justify-end px-8 p-4">
+            <Button onClick={() => reactToPrintFn()} variant="contained" color="primary">
+                <PrinterIcon />
+            </Button>
+        </Box>
+        <Box px={4} ref={contentRef} className="print:p-8">
             <Grid container spacing={3}>
                 <Grid item xs={12} md={7}>
-                    <Paper elevation={3} sx={{ p: 3, height: '100%' }} className='border-l-4 border-blue-500'>
+                    <Paper elevation={3} sx={{ p: 3, height: '100%' }} className='print:border-0 border-l-4 border-blue-500'>
                         <Typography variant="h4" fontWeight="bold">Assessment Result</Typography>
                         <Typography variant="subtitle2" color="text.secondary">ID: {id}</Typography>
                         <Divider sx={{ my: 2 }} />
-                        <Typography variant="h6" fontWeight="bold">{current?.mode} Sentiment Analysis</Typography>
+                        <Typography variant="h6" fontWeight="bold" className='uppercase'>{current?.mode} Sentiment Analysis</Typography>
                         <Box my={2}>
                             <Typography variant="h6" color="text.secondary">Question</Typography>
                             <Typography>{question?.question_text_en}</Typography>
@@ -72,8 +84,10 @@ export default function AssessmentView() {
                 <Grid item xs={12} md={5}>
                     <AssessmentResult current={current} />
                 </Grid>
+
+                    
                 
-                <Grid item xs={7}>
+                <Grid item xs={12} md={7} className="print:break-before-page">
                     <Card elevation={3} sx={{ height: '100%' }}>
                         <CardContent>
                             <Typography variant="h4" fontWeight="bold">Words Scatter Chart</Typography>
@@ -81,13 +95,13 @@ export default function AssessmentView() {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item xs={12} md={5}>
                     <Card elevation={3} sx={{ height: '100%' }}>
-                        <CardContent className="relative">
+                        <CardContent className="relative h-full">
                             <Typography variant="h4" fontWeight="bold" >Tags</Typography>
                             <TagCloud
                                 minSize={12}
-                                maxSize={35}
+                                maxSize={55}
                                 tags={current?.words.map((word) => ({
                                     value: word.word,
                                     count: word.score * 100,
@@ -96,29 +110,12 @@ export default function AssessmentView() {
                                     x: word.details.valence * 100,
                                     y: word.details.arousal * 100,
                                 }))}
-                                renderer={(tag, size, color) => (
-                                    <span
-                                        key={tag.value}
-                                        style={{
-                                            position: 'absolute',
-                                            left: tag.x,
-                                            top: tag.y,
-                                            transform: `rotate(${tag.rotate}deg)`,
-                                            color,
-                                        }}
-                                        className={`tag-${size}`}
-                                    >
-                                        {tag.value}
-                                    </span>
-                                )}
-                                
-
-                                
                             />
                         </CardContent>
                     </Card>
                 </Grid>
             </Grid>
         </Box>
+        </>
     );
 }

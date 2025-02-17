@@ -1,6 +1,7 @@
-import React from "react";
+
+import { useEffect, useRef } from 'react';
 import { motion } from "framer-motion";
-import { FileText, Users, FileBarChart, BarChartHorizontalBig } from "lucide-react";
+import { FileText, Users, FileBarChart, BarChartHorizontalBig, PrinterIcon } from "lucide-react";
 import StatCard from "@/layouts/admin/DashBocharts/StatCard";
 import TotalAsses from "@/layouts/admin/DashBocharts/TotalAsses";
 import Moods from "@/layouts/admin/DashBocharts/Moods";
@@ -8,9 +9,13 @@ import Demographics from "@/layouts/admin/DashBocharts/Demographics";
 import TopFB from "@/layouts/admin/DashBocharts/TopFB";
 
 
+import { useReactToPrint } from "react-to-print";
+import { Box, Button } from '@mui/material';
 const Dashboard = () => {
+    const contentRef = useRef(null);
+    const reactToPrintFn = useReactToPrint({ contentRef });
     return (
-        <div className='flex-1 overflow-auto relative z-10'>
+        <div className='flex-1 overflow-auto relative z-10' >
             <main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
                 {/* STATS */}
                 <motion.div
@@ -24,12 +29,16 @@ const Dashboard = () => {
                     <StatCard name='Total Reports' icon={FileBarChart} value='567' color='#EC4899' />
                     <StatCard name='Total Analytics' icon={BarChartHorizontalBig} value='12.5%' color='#10B981' />
                 </motion.div>
-
+                
+                <Box className="flex justify-end px-8 p-4">
+                    <Button onClick={() => reactToPrintFn()} variant="contained" color="primary">
+                        <PrinterIcon />
+                    </Button>
+                </Box>
                 {/* CHARTS */}
-                <div className='grid grid-cols-1 gap-6'>
+                <div className='grid grid-cols-1 gap-6 print:p-4' ref={contentRef}>
                     {/* Full-width Demographics */}
                     <div className='col-span-1'>
-                    
                     
                     </div>
 
@@ -38,9 +47,10 @@ const Dashboard = () => {
                     <TotalAsses />
                     <Moods />
                     </div>
-                    
                     <TopFB />
-                    <Demographics />
+                    <div className='print:break-before-page'>
+                        <Demographics />
+                    </div>
 
                 </div>
             </main>
