@@ -1,5 +1,23 @@
 import React from 'react';
 import { TagCloud } from 'react-tagcloud';
+export const customRenderer = (tag, size, color) => {
+  return (
+    <span
+      key={tag.value}
+      style={{
+        color: color,
+        fontSize: `${size}px`,
+        transform: `rotate(${tag.rotate})`, 
+        position: 'absolute',
+        left: tag.x,
+        top: tag.y,
+      }}
+      className={`tag-${size}`}
+    >
+      {tag.value}
+    </span>
+  );
+};
 
 const TagCloudComponent = ({ tags, searchKeyword, onSearch }) => {
   const handleSearch = () => {
@@ -23,24 +41,6 @@ const TagCloudComponent = ({ tags, searchKeyword, onSearch }) => {
     }
   };
 
-  const customRenderer = (tag, size, color) => {
-    return (
-      <span
-        key={tag.value}
-        style={{
-          color: color,
-          fontSize: `${size}px`,
-          transform: `rotate(${tag.rotate})`,
-          position: 'absolute',
-          left: tag.x,
-          top: tag.y,
-        }}
-        className={`tag-${size}`}
-      >
-        {tag.value}
-      </span>
-    );
-  };
 
   return (
     <div className="p-4 bg-white shadow-md rounded-xl">

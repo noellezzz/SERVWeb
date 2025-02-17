@@ -27,7 +27,7 @@ export default function useResource(resourceName, isPublic = false) {
     const kebabCaseName = changeCase.kebabCase(resourceName);
     const pascalCaseName = changeCase.pascalCase(resourceName);
     const capitalizeName = changeCase.capitalCase(resourceName);
-    const resource = resourceEndpoints[camelCaseName];
+    const resource = resourceEndpoints;
 
     const [index] = resource[`use${pascalCaseName}IndexMutation`]();
     const [archived] = resource[`use${pascalCaseName}ArchivedMutation`]();

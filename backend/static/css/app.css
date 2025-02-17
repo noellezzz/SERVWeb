@@ -1,8 +1,9 @@
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   margin: 20px;
-  line-height: 1.6;
+  /* decrease letter spacing */
+  letter-spacing: -0.5px;
 }
 
 h1 {
