@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import ScatterPlot from '../components/charts/scatter';
-import TagCloudComponent from '../components/charts/tag-cloud';
+import ScatterPlot from '@/components/charts/scatter';
+import TagCloudComponent from '@/components/charts/tag-cloud';
 
 const ExamplePage = () => {
   const scatterData = {

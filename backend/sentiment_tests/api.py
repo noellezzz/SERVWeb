@@ -12,7 +12,7 @@ from django.utils import timezone
 
 
 logger = logging.getLogger(__name__)
-
+DEFAULT_MODE = 'anew'
 
 class SentimentResultViewSet(viewsets.ModelViewSet):
     """ViewSet for the SentimentResult class"""
@@ -26,7 +26,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
         is_new_feedback = request.data.get('is_new_feedback', False)
         feedback_id = request.data.get('feedback_id')
         test_id = request.data.get('test_id')
-        mode = request.data.get('mode') or 'vader'
+        mode = request.data.get('mode') or 'anew'
         try:
             if is_new_feedback:
                 content = request.data.get('content')

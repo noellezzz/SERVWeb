@@ -1,6 +1,6 @@
 import * as changeCase from "change-case";
 
-export default function resourceBuilder(resource) {
+export default function resourceBuilder(resource, customEndpoints = (builder) => ({})) {
     let name = changeCase.camelCase(resource);
 
     return (builder) => ({
@@ -60,5 +60,6 @@ export default function resourceBuilder(resource) {
                 method: 'PATCH',
             })
         }),
+        ...customEndpoints(builder),
     });
 }

@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import DownloadView
+from .api import feedback, sentiment_results
 
 urlpatterns = [
-    path('download/<str:pk>/', DownloadView.as_view(), name='download_pdf'),
+    path('feedbacks/<str:pk>/', feedback.DownloadView.as_view(), name='download_feedbacks_pdf'),
+    path('sentiment-tests/<str:pk>/', sentiment_results.DownloadResultsView.as_view(), name='download_sentiment-tests_pdf'),
+    
 ]

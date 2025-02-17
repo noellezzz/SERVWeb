@@ -37,7 +37,7 @@ function WordsScatterChart({ title, words=[], mode="" }){
 }
 
 function TextClassifier({ text, words, className }) {
-    const textArray = text.split(' ');
+    const textArray = (text ?? '').split(' ');
 
     const getWordDetails = (word) => {
         return words.find(w => w.word === word);
@@ -157,7 +157,6 @@ export default function AsssessmentView() {
                     </div>
                 </div>
                 <hr />
-                <WordsScatterChart />
                 
 
             </div>

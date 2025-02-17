@@ -9,15 +9,16 @@ const resources = [
     'users',
 ];
 
+const customEndpoints = {
+
+}
+
 const resourceEndpoints = resources.reduce((acc, resource) => {
     let name = changeCase.camelCase(resource);
-    const endpoints = resourceBuilder(resource);
-    return {
-        ...acc,
-        [name]: apiSlice.injectEndpoints({
-            endpoints,
-        }),
-    };
+
+    return apiSlice.injectEndpoints({
+        endpoints: resourceBuilder(resource, customEndpoints[name]),
+    });
 }, {});
 
 export default resourceEndpoints;
