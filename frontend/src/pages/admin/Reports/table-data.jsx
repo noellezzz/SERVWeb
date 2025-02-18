@@ -1,5 +1,10 @@
+import ActionButtons from "@/components/actions";
 
-export const resultColumns = [
+export const getResultColumns = ({
+    onView = () => { },
+    onDelete = () => { },
+    onDownload = () => { }
+}={}) => [
     {
         field: 'id',
         headerName: 'ID',
@@ -33,7 +38,10 @@ export const resultColumns = [
         width: 150,
         sortable: false,
         renderCell: (params) => {
-            return (<ActionButtons />);
+            return (<ActionButtons
+                onView={() => onView(params.row)}
+                onDelete={() => onDelete(params.row)}
+            />);
         },
     },
 ];

@@ -87,7 +87,7 @@ export default function AssessmentView() {
 
                     
                 
-                <Grid item xs={12} md={7} className="print:break-before-page">
+                <Grid item xs={12} md={7} className="print:break-before-page" mb={5}>
                     <Card elevation={3} sx={{ height: '100%' }}>
                         <CardContent>
                             <Typography variant="h4" fontWeight="bold">Words Scatter Chart</Typography>
@@ -95,14 +95,14 @@ export default function AssessmentView() {
                         </CardContent>
                     </Card>
                 </Grid>
-                <Grid item xs={12} md={5}>
+                <Grid item xs={12} md={5} mb={5}>
                     <Card elevation={3} sx={{ height: '100%' }}>
                         <CardContent className="relative h-full">
                             <Typography variant="h4" fontWeight="bold" >Tags</Typography>
                             <TagCloud
                                 minSize={12}
                                 maxSize={55}
-                                tags={current?.words.map((word) => ({
+                                tags={current?.words?.filter((word, i) => current?.words.findIndex(w => w.word === word.word) === i).map((word) => ({
                                     value: word.word,
                                     count: word.score * 100,
                                     color: getColor(word.score * 100, word?.sentiment),

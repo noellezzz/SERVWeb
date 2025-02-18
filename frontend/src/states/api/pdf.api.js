@@ -11,32 +11,49 @@ const headers = {
 
 const pdfApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        examplePdf: builder.mutation({
+        examplePdf: builder.query({
             query: ({ id }) => ({
-                url: `${apiUrl}/example/${id}`,
+                url: `${apiUrl}/sentiment-results/${id}/`,
                 method: 'GET',
-                headers,
+                responseHandler: async (response) => {
+                    const blob = await response.blob();
+                    return URL.createObjectURL(blob);
+                },
+                cache: "no-cache",
+
             }),
         }),
-        userFeedbacksPdf: builder.mutation({
+        userFeedbacksPdf: builder.query({
             query: ({ id }) => ({
                 url: `${apiUrl}/feedbacks/${id}?filterBy=user`,
                 method: 'GET',
-                headers,
+                responseHandler: async (response) => {
+                    const blob = await response.blob();
+                    return URL.createObjectURL(blob);
+                },
+                cache: "no-cache",
             }),
         }),
-        feedbacksPdf: builder.mutation({
+        feedbacksPdf: builder.query({
             query: ({ id }) => ({
                 url: `${apiUrl}/feedbacks/${id}`,
                 method: 'GET',
-                headers,
+                responseHandler: async (response) => {
+                    const blob = await response.blob();
+                    return URL.createObjectURL(blob);
+                },
+                cache: "no-cache",
             }),
         }),
-        sentimentResultsPdf: builder.mutation({
+        sentimentResultsPdf: builder.query({
             query: ({ id }) => ({
                 url: `${apiUrl}/sentiment-results/${id}`,
                 method: 'GET',
-                headers,
+                responseHandler: async (response) => {
+                    const blob = await response.blob();
+                    return URL.createObjectURL(blob);
+                },
+                cache: "no-cache",
             }),
         }),
     }),
@@ -44,5 +61,5 @@ const pdfApi = apiSlice.injectEndpoints({
 });
 
 
-export const { useExamplePdfMutation } = pdfApi;
+export const { useExamplePdfQuery } = pdfApi;
 export default pdfApi;
