@@ -48,6 +48,9 @@ export const getResultColumns = (onView, onDelete) => [
         field: 'score',
         headerName: 'Score',
         flex: 1,
+        valueGetter : (value) => {
+            return value?.toFixed(2) * 100 + '%'
+        }
     },
     {
         field: 'sentiment',

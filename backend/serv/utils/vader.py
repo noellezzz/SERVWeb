@@ -130,7 +130,8 @@ class ServSentimentAnalysis(SentimentIntensityAnalyzer):
     def sentiment_valence(self, valence, sentitext, item, i, sentiments):
         translated_item = self.translate(item)
         result = super().sentiment_valence(valence, sentitext, translated_item, i, sentiments)
-        valence = self.valence_dict.get(translated_item.lower())
+        valence = self.valence_dict.get(translated_item.lower() if translated_item else item.lower(), {})
+        
         if result[i]:
             self.words.append({
                 'word': item,
