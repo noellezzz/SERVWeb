@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export const useSpeechToText = () => {
+export default function useSpeechToText () {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [recognition, setRecognition] = useState(null);

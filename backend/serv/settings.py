@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'sentiment_tests',
     'feedbacks',
     'queues',
+    'tts',
     'pdf',
 ]
 
