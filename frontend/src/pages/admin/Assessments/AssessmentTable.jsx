@@ -52,7 +52,13 @@ export default function AssessmentTable() {
                 onRowClick={(params) => setCurrent(params.row)}
                 sx={{
                     paper: { boxShadow: 3 },
-                    grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
+                    grid: { '& .MuiDataGrid-cell': { fontSize: 14 } },
+                    boxShadow: 2,
+                    border: 2,
+                    borderColor: 'primary.light',
+                    '& .MuiDataGrid-cell:hover': {
+                      color: 'primary.main',
+                    },
                 }}
             />
 

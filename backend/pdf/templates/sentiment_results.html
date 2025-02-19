@@ -1,0 +1,29 @@
+{% load static %}
+<!doctype html>
+<html>
+
+  <head>
+    <!-- Use "static" template tag and configure STATIC_URL as usual. -->
+    <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+  </head>
+
+  <body>
+    <h1>Analysis Report</h1>
+    <p><strong>ID:</strong> {{ object.id }}</p>
+    <p><strong><span style="text-transform: uppercase;">{{ object.mode }}</span> Analysis</strong></p>
+    <p><strong>Sentiment:</strong> {{ object.sentiment }}</p>
+    <p><strong>Score:</strong> {{object.score}} </p>
+
+    <!-- Polarity Scores -->
+    <p><strong>Polarity Scores:</strong></p>
+    <ul>
+      <li><strong>Positive:</strong> {{ object.details.positive }}</li>
+      <li><strong>Negative:</strong> {{ object.details.negative }}</li>
+      <li><strong>Neutral:</strong> {{ object.details.neutral }}</li>
+    </ul>
+
+    <p><strong>Created At:</strong> {{ object.created_at }}</p>
+    <p><strong>Updated At:</strong> {{ object.updated_at }}</p>
+  </body>
+
+</html>

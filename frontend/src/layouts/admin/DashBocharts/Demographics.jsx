@@ -42,7 +42,7 @@ const Demographics = () => {
 
   return (
     <motion.div
-      className="bg-white shadow-lg rounded-xl p-6 border border-gray-300 mb-8"
+      className="print:shadow-none print:bg-transparent print:border-none bg-white shadow-lg rounded-xl p-6 border border-gray-300 mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
@@ -53,7 +53,7 @@ const Demographics = () => {
         </h2>
 
         <select
-          className="bg-gray-700 text-white rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="print:hidden bg-gray-700 text-white rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={selectedView}
           onChange={(e) => setSelectedView(e.target.value)}
         >
@@ -118,9 +118,9 @@ const Demographics = () => {
         </div>
 
         {/* Civil Status Distribution - Fixed Layout */}
-        <div className="bg-white border border-gray-300 rounded-lg p-4 md:col-span-2 flex flex-col md:flex-row items-center md:items-start gap-6">
+        <div className="bg-white border border-gray-300 rounded-lg p-4 md:col-span-2 flex flex-col md:flex-row items-center md:items-start gap-6 print:break-before-page ">
           {/* Chart on the Left */}
-          <div className="w-full md:w-1/2 h-64 flex items-center justify-center">
+          <div className="w-full md:w-1/2 h-64 flex items-center justify-center print:py-8">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie

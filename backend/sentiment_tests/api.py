@@ -5,13 +5,15 @@ from rest_framework.decorators import action
 from . import serializers
 from . import models
 from feedbacks.models import Feedback
+
 from serv.utils.vader import ServSentimentAnalysis
 import logging
 from django.utils import timezone
+import numpy as np
 
 
 logger = logging.getLogger(__name__)
-
+DEFAULT_MODE = 'anew'
 
 class SentimentResultViewSet(viewsets.ModelViewSet):
     """ViewSet for the SentimentResult class"""
@@ -25,7 +27,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
         is_new_feedback = request.data.get('is_new_feedback', False)
         feedback_id = request.data.get('feedback_id')
         test_id = request.data.get('test_id')
-        mode = request.data.get('mode') or 'vader'
+        mode = request.data.get('mode') or DEFAULT_MODE
         try:
             if is_new_feedback:
                 content = request.data.get('content')
@@ -56,20 +58,28 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
             analysis = ssa.analyze()
             words = ssa.get_words()
             mode = ssa.get_mode()
+            details = {
+                'translated_text': analysis.get('translated_text', ''),
+                'prediction': {
+                    'label': analysis.get('prediction', ''),
+                    'score': analysis.get('prediction_score', 0)
+                },
+                'polarity': analysis.get('polarity', {})
+            }
+            if mode == 'anew':
+                valence = np.mean([word['details']['valence'] for word in words])
+                arousal = np.mean([word['details']['arousal'] for word in words])
+                dominance = np.mean([word['details']['dominance'] for word in words])
+                details['valence'] = valence
+                details['arousal'] = arousal
+                details['dominance'] = dominance
             
             result = models.SentimentResult.objects.create(
                 mode=mode,
                 score=analysis['score'],
                 sentiment=analysis['sentiment'],
                 words=words,
-                details={
-                    'translated_text': analysis.get('translated_text', ''),
-                    'prediction': {
-                        'label': analysis.get('prediction', ''),
-                        'score': analysis.get('prediction_score', 0)
-                    },
-                    'polarity': analysis.get('polarity', {})
-                },
+                details=details,
 
                 feedback=feedback,
                 sentiment_test=test
