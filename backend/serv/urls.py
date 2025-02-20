@@ -32,5 +32,6 @@ urlpatterns = [
         path('', include('feedbacks.urls')),
         path('', include('queues.urls')),
         path('', include('sentiment_tests.urls')),
+        path('', include('tts.urls')),
     ])),
 ]
