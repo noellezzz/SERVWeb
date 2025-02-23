@@ -96,7 +96,7 @@ export default function Evaluation() {
 
 
   return (
-    <div className='p-4 flex flex-col items-center justify-center h-screen border' ref={mainContentRef}>
+    <div className='p-4 flex flex-col items-center justify-center h-screen' ref={mainContentRef}>
       <LoadingScreen loading={loading} />
 
       {/* START SCREEN */}
