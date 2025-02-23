@@ -10,6 +10,7 @@ const ttsApi = apiSlice.injectEndpoints({
                 params: { text },
                 responseHandler: (response) => response.blob(),
             }),
+            transformResponse: (response) => URL.createObjectURL(response),
         }),
     }),
 });

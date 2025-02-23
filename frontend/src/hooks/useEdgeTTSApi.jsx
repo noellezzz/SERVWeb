@@ -6,8 +6,7 @@ const useEdgeTTSApi = () => {
     const convertTextToSpeech = async (text) => {
         try {
             const response = await getTextToSpeech(text).unwrap();
-            const audioUrl = URL.createObjectURL(response);
-            return audioUrl;
+            return response;
         } catch (error) {
             console.error('Error converting text to speech:', error);
             throw error;

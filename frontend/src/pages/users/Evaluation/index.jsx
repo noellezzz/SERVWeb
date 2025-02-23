@@ -16,7 +16,7 @@ export default function Evaluation() {
   const audioRef = useRef(null);
 
   const [userId, setUserId] = useState('');
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = useState('tl');
   const [questions, setQuestions] = useState(DEFAULT_QUESTIONS);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
@@ -140,7 +140,7 @@ export default function Evaluation() {
           </div>
         </div>
       )}
-      <audio ref={audioRef} />
+      <audio ref={audioRef} autoPlay/>
     </div>
   );
 }
