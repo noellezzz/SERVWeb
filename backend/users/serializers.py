@@ -5,7 +5,7 @@ from .models import BasicInformation, SeniorCitizenInfo, EmployeeInfo
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = '__all__'
 
 class BasicInformationSerializer(serializers.ModelSerializer):
     class Meta:
