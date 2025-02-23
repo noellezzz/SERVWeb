@@ -42,6 +42,12 @@ export default function QuestionCard({
   }, [transcript]);
 
   useEffect(() => {
+    if (question) {
+      clearAnswer();
+    }
+  }, [question]);
+
+  useEffect(() => {
     if (!speak.isPlaying()) {
       startListening();
     } else if (isListening) {
