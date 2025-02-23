@@ -55,10 +55,8 @@ INSTALLED_APPS = [
     
     # Local Apps
     'dashboard',
-    'face_recognition',
     'sentiment_tests',
     'feedbacks',
-    'queues',
     'tts',
     'pdf',
 ]
