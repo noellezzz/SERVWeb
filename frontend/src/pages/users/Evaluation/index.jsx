@@ -3,24 +3,24 @@ import LoadingScreen from '@/components/LoadingScreen';
 import useResource from '@/hooks/useResource';
 import useEdgeTTSApi from '@/hooks/useEdgeTTSApi';
 import DEFAULT_QUESTIONS from '@/assets/data/questions_sample.js';
-import swal from 'sweetalert';
 
-import Button from '@mui/material/Button';
-import RepeatIcon from '@mui/icons-material/Repeat';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import LanguageIcon from '@mui/icons-material/Language';
 import QuestionCard from './QuestionCard';
+import Actions from './Actions';
 
 export default function Evaluation() {
   const audioRef = useRef(null);
+  const mainContentRef = useRef(null);
 
+  // ################################################################
   const [userId, setUserId] = useState('');
+  const [serviceId, setServiceId] = useState('');
+  const [empId, setEmpId] = useState('');
+
   const [lang, setLang] = useState('tl');
   const [questions, setQuestions] = useState(DEFAULT_QUESTIONS);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const { convertTextToSpeech, isLoading, isError } = useEdgeTTSApi();
+  const { convertTextToSpeech } = useEdgeTTSApi();
   const {
     actions: {
       fetchDatas,
@@ -35,19 +35,18 @@ export default function Evaluation() {
       doStore
     },
   } = useResource('results');
+  // ################################################################
 
-  const handleTranscript = (transcript) => {
-    console.log('Transcript:', transcript);
-  }
 
-  const handleRepeat = () => {
-    if (audioRef.current) {
-      audioRef.current.play();
-    }
-  };
+  // ################################################################
+  // EFFECTS
+  // ################################################################
 
   useEffect(() => {
     fetchDatas();
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, []);
 
   useEffect(() => {
@@ -74,9 +73,35 @@ export default function Evaluation() {
     playAudio();
   }, [currentQuestionIndex, lang]);
 
+
+  // ################################################################
+  // HANDLERS
+  // ################################################################
+  
+  const handleTranscript = (transcript) => {
+    console.log('Transcript:', transcript);
+  }
+
+  const handleRepeat = () => {
+    if (audioRef.current) {
+      audioRef.current.play();
+    }
+  };
+  
+  const handleNext = () => {};
+
+  const handlePrev = () => {};
+
+  const handleDone = () => {};
+
+
   return (
-    <div className='p-4 flex flex-col items-center min-h-screen'>
+    <div className='p-4 flex flex-col items-center justify-center h-screen border' ref={mainContentRef}>
       <LoadingScreen loading={loading} />
+
+      {/* START SCREEN */}
+
+      {/* CONTENT */}
       {!loading && (
         <div className='flex flex-col items-center w-full max-w-4xl white'>
 
@@ -87,59 +112,23 @@ export default function Evaluation() {
             lang={lang}
            />
 
-          <div className="flex justify-between items-center w-full">
-            {/* LANGUAGE TOGGLE */}
-            <div className="flex items-center bg-base-100 w-full justify-start my-2">
-              <button
-                className={`flex gap-2 items-center p-2 ${lang == 'en' ? 'bg-red-400 font-bold text-black':'bg-slate-50'} rounded-l `}
-                onClick={() => setLang('en')}
-              >
-                <LanguageIcon />
-                <span>English</span>
-              </button>
-              <button
-                className={`flex gap-2 items-center p-2 ${lang == 'tl' ? 'bg-red-400 font-bold text-black':'bg-slate-50'} rounded-r `}
-                onClick={() => setLang('tl')}
-              >
-                <LanguageIcon />
-                <span>Tagalog</span>
-              </button>
-            </div>
-            {/* LANGUAGE TOGGLE */}
+          {/* ACTIONS */}
+          <Actions
+            lang={lang}
+            setLang={setLang}
+            handleRepeat={handleRepeat}
+            currentQuestionIndex={currentQuestionIndex}
+            setCurrentQuestionIndex={setCurrentQuestionIndex}
+            questions={questions}
+            handleNext={handleNext}
+            handlePrev={handlePrev}
+            handleDone={handleDone}
+          />
 
-            {/* ACTIONS */}
-            {/* REPEAT */}
-            <Button color="white" onClick={handleRepeat}>
-              <RepeatIcon />
-            </Button>
-            {/* PREV */}
-            <Button
-              color="white"
-              onClick={() => {
-                if (currentQuestionIndex > 0) {
-                  setCurrentQuestionIndex((prev) => prev - 1);
-                }
-              }}
-            >
-              <ArrowBackIcon />
-            </Button>
-            {/* NEXT */}
-            <Button
-              color="white"
-              onClick={() => {
-                if (currentQuestionIndex < questions.length - 1) {
-                  setCurrentQuestionIndex((prev) => prev + 1);
-                } else {
-                  swal('Thank you for answering all questions!');
-                }
-              }}
-            >
-              <ArrowForwardIcon />
-            </Button>
-            {/* ACTIONS */}
-          </div>
         </div>
       )}
+
+      {/* AUDIO */}
       <audio ref={audioRef} autoPlay/>
     </div>
   );

@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useSpeechToText from '@/hooks/useSpeechToText';
 import useEdgeTTSApi from '@/hooks/useEdgeTTSApi';
 import { FaMicrophone } from 'react-icons/fa';
-// import { useWhisper } from '@chengsokdara/use-whisper'
 
 const activityResponse = {
   timeout: {
@@ -32,35 +31,11 @@ const activityResponse = {
 };
 
 export default function QuestionCard({ onChange, question, lang }) {
-  const [transcript, setTranscript] = React.useState('');
 
-  // const { transcript: whisperTranscript } = useWhisper({
-  //     apiKey: import.meta.env.VITE_OPENAI_API_TOKEN,
-  //     nonStop: true,
-  //     stopTimeout: 5000,
-  // })
-
-  const audioRef = React.useRef(null);
   const sr = useSpeechToText();
-
+  const audioRef = useRef(null);
+  const [transcript, setTranscript] = useState('');
   const { convertTextToSpeech, isLoading, isError } = useEdgeTTSApi();
-  const handleTranscript = (e) => {
-    let t = transcript + e.target.value;
-    setTranscript(t);
-    onChange(t);
-  };
-
-  const playAudioResponse = async (text) => {
-    try {
-      const audioUrl = await convertTextToSpeech(text);
-      if (audioRef.current) {
-        audioRef.current.src = audioUrl;
-        audioRef.current.play();
-      }
-    } catch (error) {
-      console.error('Error converting text to speech:', error);
-    }
-  };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -92,6 +67,23 @@ export default function QuestionCard({ onChange, question, lang }) {
     return 'text-green-500';
   };
 
+  const handleTranscript = (e) => {
+    setTranscript(e.target.value);
+    onChange(e.target.value);
+  };
+
+  const playAudioResponse = async (text) => {
+    try {
+      const audioUrl = await convertTextToSpeech(text);
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.play();
+      }
+    } catch (error) {
+      console.error('Error converting text to speech:', error);
+    }
+  };
+
   return (
     <div className='w-full'>
       <div className='p-4 bg-white rounded-lg shadow-md w-full flex justify-between items-center'>
@@ -100,7 +92,7 @@ export default function QuestionCard({ onChange, question, lang }) {
       </div>
 
       <textarea className='mt-4 p-4 w-full h-64 bg-white rounded-lg shadow-md' value={transcript} onChange={handleTranscript} />
-      <audio ref={audioRef} />
+      <audio ref={audioRef} autoPlay />
     </div>
   );
 }
