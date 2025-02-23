@@ -1,49 +1,37 @@
 import { useState, useEffect } from 'react';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
-export default function useSpeechToText () {
-  const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [recognition, setRecognition] = useState(null);
+export default function useSpeechToText({
+  commands = [],
+  continuous = true,
+} = {}) {
   const [volumeLevel, setVolumeLevel] = useState(0);
   const [audioContext, setAudioContext] = useState(null);
   const [analyser, setAnalyser] = useState(null);
   const [microphone, setMicrophone] = useState(null);
   const [filterNode, setFilterNode] = useState(null);
 
-  useEffect(() => {
-    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognitionInstance = new SpeechRecognition();
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
+  } = useSpeechRecognition({ commands});
 
-      recognitionInstance.continuous = true;
-      recognitionInstance.interimResults = true;
-      recognitionInstance.lang = 'en-US';
-
-      recognitionInstance.onresult = (event) => {
-        const transcriptText = event.results[event.resultIndex][0].transcript;
-        setTranscript(transcriptText);
-      };
-
-      recognitionInstance.onend = () => setIsListening(false);
-
-      setRecognition(recognitionInstance);
-    }
-
-    return () => {
-      recognition?.stop();
-      stopVolumeTracking();
-    };
-  }, []);
 
   const startListening = async () => {
-    setIsListening(true);
-    recognition?.start();
+    if (!isMicrophoneAvailable) {
+      console.error('Microphone is not available.');
+      return;
+    }
+
+    SpeechRecognition.startListening({ continuous });
     await startVolumeTracking();
   };
 
   const stopListening = () => {
-    setIsListening(false);
-    recognition?.stop();
+    SpeechRecognition.stopListening();
     stopVolumeTracking();
   };
 
@@ -63,8 +51,8 @@ export default function useSpeechToText () {
       filter.gain.setValueAtTime(0, audioCtx.currentTime);
 
       // Noise Reduction Mode
-      // filter.frequency.setValueAtTime(2000, audioCtx.currentTime);
-      // filter.Q.setValueAtTime(2.0, audioCtx.currentTime);
+      filter.frequency.setValueAtTime(2000, audioCtx.currentTime);
+      filter.Q.setValueAtTime(2.0, audioCtx.currentTime);
 
       micSource.connect(filter);
       filter.connect(analyserNode);
@@ -108,12 +96,25 @@ export default function useSpeechToText () {
     setFilterNode(null);
   };
 
+  useEffect(() => {
+    if (!browserSupportsSpeechRecognition) {
+      console.error('Browser does not support speech recognition.');
+      return;
+    }
+
+    return () => {
+      stopListening();
+    };
+  }, [browserSupportsSpeechRecognition]);
+
   return {
-    isListening,
-    startListening,
-    stopListening,
     transcript,
     volumeLevel,
-    setTranscript,
+    isListening: listening,
+    startListening,
+    stopListening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
   };
-};
+}

@@ -6,9 +6,9 @@ import DEFAULT_QUESTIONS from '@/assets/data/questions_sample.js';
 
 import QuestionCard from './QuestionCard';
 import Actions from './Actions';
+import swal from 'sweetalert';
 
 export default function Evaluation() {
-  const audioRef = useRef(null);
   const mainContentRef = useRef(null);
 
   // ################################################################
@@ -20,7 +20,7 @@ export default function Evaluation() {
   const [questions, setQuestions] = useState(DEFAULT_QUESTIONS);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const { convertTextToSpeech } = useEdgeTTSApi();
+  const { speak } = useEdgeTTSApi();
   const {
     actions: {
       fetchDatas,
@@ -50,27 +50,16 @@ export default function Evaluation() {
   }, []);
 
   useEffect(() => {
-    if (data) {
+    if (data?.length) {
       setQuestions(data);
     }
   }, [data]);
 
   useEffect(() => {
-    const playAudio = async () => {
-      try {
-        const audioUrl = await convertTextToSpeech(
-          questions[currentQuestionIndex][`question_text_${lang}`]
-        );
-        if (audioRef.current) {
-          audioRef.current.src = audioUrl;
-          audioRef.current.play();
-        }
-      } catch (error) {
-        console.error('Error converting text to speech:', error);
-      }
-    };
-
-    playAudio();
+    if (questions.length) {
+      let text = questions[currentQuestionIndex][`question_text_${lang}`];
+      speak.play(text, lang);
+    }
   }, [currentQuestionIndex, lang]);
 
 
@@ -83,16 +72,35 @@ export default function Evaluation() {
   }
 
   const handleRepeat = () => {
-    if (audioRef.current) {
-      audioRef.current.play();
-    }
+    speak.repeat()
   };
   
-  const handleNext = () => {};
-
-  const handlePrev = () => {};
-
   const handleDone = () => {};
+
+  const handleNext = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    } else {
+      swal({
+        title: 'Complete Evaluation',
+        text: 'Are you sure you want to finish the evaluation?',
+        icon: 'warning',
+        buttons: true,
+        dangerMode: true,
+      }).then((willFinish) => {
+        if (willFinish) {
+          handleDone();
+        }
+      });
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prev) => prev - 1);
+    }
+  };
+
 
 
   return (
@@ -110,6 +118,10 @@ export default function Evaluation() {
             question={questions[currentQuestionIndex][`question_text_${lang}`]}
             onChange={handleTranscript}
             lang={lang}
+            speak={speak}
+            handleNext={handleNext}
+            handlePrev={handlePrev}
+            handleDone={handleDone}
            />
 
           {/* ACTIONS */}
@@ -129,7 +141,6 @@ export default function Evaluation() {
       )}
 
       {/* AUDIO */}
-      <audio ref={audioRef} autoPlay/>
     </div>
   );
 }

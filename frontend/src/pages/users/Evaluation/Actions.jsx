@@ -4,14 +4,10 @@ import RepeatIcon from '@mui/icons-material/Repeat';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import LanguageIcon from '@mui/icons-material/Language';
-import swal from 'sweetalert';
 
 export default function Actions({
     lang,
-    questions,
-    currentQuestionIndex,
     setLang = () => {},
-    setCurrentQuestionIndex = () => {},
     handleRepeat = () => {},
     handleNext = () => {},
     handlePrev = () => {},
@@ -51,12 +47,7 @@ export default function Actions({
             {/* PREV */}
             <Button
               color="white"
-              onClick={() => {
-                if (currentQuestionIndex > 0) {
-                  setCurrentQuestionIndex((prev) => prev - 1);
-                  handlePrev();
-                }
-              }}
+              onClick={handlePrev}
             >
               <ArrowBackIcon />
             </Button>
@@ -65,24 +56,7 @@ export default function Actions({
             {/* NEXT */}
             <Button
               color="white"
-              onClick={() => {
-                if (currentQuestionIndex < questions.length - 1) {
-                  setCurrentQuestionIndex((prev) => prev + 1);
-                  handleNext();
-                } else {
-                  swal({
-                    title: 'Complete Evaluation',
-                    text: 'Are you sure you want to finish the evaluation?',
-                    icon: 'warning',
-                    buttons: true,
-                    dangerMode: true,
-                  }).then((willFinish) => {
-                    if (willFinish) {
-                      handleDone();
-                    }
-                  });
-                }
-              }}
+              onClick={handleNext}
             >
               <ArrowForwardIcon />
             </Button>

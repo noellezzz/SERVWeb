@@ -1,98 +1,100 @@
 import { useEffect, useRef, useState } from 'react';
+import { FaMicrophone, FaMicrophoneSlash, FaVolumeUp } from 'react-icons/fa';
 import useSpeechToText from '@/hooks/useSpeechToText';
-import useEdgeTTSApi from '@/hooks/useEdgeTTSApi';
-import { FaMicrophone } from 'react-icons/fa';
+import { comma } from 'postcss/lib/list';
 
-const activityResponse = {
-  timeout: {
-    en: 'I am sorry, I did not hear anything. Please try again.',
-    tl: 'Pasensya na, hindi ko narinig ang sinabi mo. Pakiulit muli.',
-  },
-  unclear: {
-    en: 'I am sorry but I did not understand what you said. Please try again.',
-    tl: 'Pasensya na, hindi ko naintindihan ang sinabi mo. Pakiulit muli.',
-  },
-  done: {
-    en: 'Are you done speaking?',
-    tl: 'Salamat sa iyong tugon, maari ka bang magpatuloy sa susunod na tanong?',
-  },
-  next: {
-    en: 'Next question',
-    tl: 'Susunod na tanong',
-  },
-  continue: {
-    en: 'Continue speaking',
-    tl: 'Magpatuloy sa pagsasalita',
-  },
-  stop: {
-    en: 'Thank you for your time. Goodbye.',
-    tl: 'Salamat sa iyong oras. Paalam.',
-  },
-};
+export default function QuestionCard({  
+  question, 
+  lang, 
+  speak, 
+  onChange = () => {}, 
+  handleNext = () => {},
+  handlePrev = () => {},
+}) {
+  const answerRef = useRef('');
+  const [command, setCommand] = useState('');
 
-export default function QuestionCard({ onChange, question, lang }) {
+  const commands = ['clear', 'next', 'previous', 'yes', 'no',].map((c) => ({
+    command: c,
+    callback: () => setCommand(c),
+  }));
 
-  const sr = useSpeechToText();
-  const audioRef = useRef(null);
-  const [transcript, setTranscript] = useState('');
-  const { convertTextToSpeech, isLoading, isError } = useEdgeTTSApi();
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'v') {
-        if (sr.isListening) {
-          sr.stopListening();
-        } else {
-          sr.startListening();
-        }
-      }
-    };
+  const {
+    transcript,
+    volumeLevel,
+    isListening,
+    startListening,
+    stopListening,
+    resetTranscript,
+  } = useSpeechToText({commands});
 
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [sr]);
-
-  useEffect(() => {
-    setTranscript(sr.transcript);
-    onChange(sr.transcript);
-  }, [sr.transcript, onChange, lang, sr.isListening]);
-
-  const getMicrophoneColor = () => {
-    if (!sr.isListening) return 'text-gray-400';
-    if (sr.volumeLevel > 0.5) return 'text-red-500';
-    if (sr.volumeLevel > 0.2) return 'text-yellow-500';
-    return 'text-green-500';
+  const clearAnswer = () => {
+    answerRef.current.value = '';
+    resetTranscript();
   };
 
-  const handleTranscript = (e) => {
-    setTranscript(e.target.value);
-    onChange(e.target.value);
-  };
 
-  const playAudioResponse = async (text) => {
-    try {
-      const audioUrl = await convertTextToSpeech(text);
-      if (audioRef.current) {
-        audioRef.current.src = audioUrl;
-        audioRef.current.play();
-      }
-    } catch (error) {
-      console.error('Error converting text to speech:', error);
+  useEffect(() => {
+    if (transcript) {
+      answerRef.current.value = transcript;
     }
+  }, [transcript]);
+
+  useEffect(() => {
+    if (!speak.isPlaying()) {
+      startListening();
+    } else if (isListening) {
+      stopListening();
+    }
+  }, [speak, isListening]);
+
+  useEffect(() => {
+    if (command === 'clear') {
+      clearAnswer();
+      setCommand('');
+    } 
+
+    if (command === 'next') {
+      handleNext();
+      clearAnswer();
+      setCommand('');
+    }
+
+    if (command === 'previous') {
+      handlePrev();
+      clearAnswer();
+      setCommand('');
+    }
+
+  }, [command]);
+
+  const getVolumeColor = (level) => {
+    if (level < 0.4) return 'red';
+    if (level > 0.7) return 'orange';
+    return 'green';
   };
 
   return (
     <div className='w-full'>
       <div className='p-4 bg-white rounded-lg shadow-md w-full flex justify-between items-center'>
         <h1 className='text-2xl font-semibold text-center'>{question}</h1>
-        <FaMicrophone className={`text-2xl ${getMicrophoneColor()}`} />
+        <button onClick={isListening ? stopListening : startListening}>
+          {isListening ? <FaMicrophone  
+            style={{ color: getVolumeColor(volumeLevel) }}
+          /> : <FaMicrophoneSlash 
+            style={{ color: 'gray' }}
+          />}
+        </button>
       </div>
 
-      <textarea className='mt-4 p-4 w-full h-64 bg-white rounded-lg shadow-md' value={transcript} onChange={handleTranscript} />
-      <audio ref={audioRef} autoPlay />
+      <textarea
+        className='mt-4 p-4 w-full h-64 bg-white rounded-lg shadow-md'
+        ref={answerRef}
+        onChange={(e) => {
+          onChange(e.target.value);
+        }}
+      />
     </div>
   );
 }

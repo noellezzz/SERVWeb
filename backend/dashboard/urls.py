@@ -6,8 +6,8 @@ from .api import services, charts, reports
 
 router = routers.DefaultRouter()
 services = router.register("services", services.ServiceViewSet)
-charts = router.register("charts", charts.ChartViewSet)
-reports = router.register("reports", reports.ReportViewSet)
+# charts = router.register("charts", charts.ChartViewSet)
+# reports = router.register("reports", reports.ReportViewSet)
 
 
 urlpatterns = (

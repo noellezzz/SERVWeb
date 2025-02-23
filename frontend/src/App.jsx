@@ -1,4 +1,6 @@
 import "./App.css";
+import 'regenerator-runtime/runtime'
+
 import { Routes, Route } from "react-router-dom";
 
 // Layouts
@@ -7,7 +9,7 @@ import AdminLayout from "./layouts/admin/AdminLayout";
 
 // USER PAGES
 import Home from "./pages/users/Home";
-import Evaluation from "./pages/users/Evaluation";
+import Evaluation from "./pages/users/Evaluation/index.jsx";
 import Services from "./pages/users/Services";
 import About from "./pages/users/About";
 import Contact from "./pages/users/Contact";
