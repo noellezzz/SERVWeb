@@ -2,25 +2,43 @@ import { useEffect, useState, useRef } from 'react';
 import evaluationImg from "@/assets/evaluationImg.png";
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { QrCode } from '@mui/icons-material';
+import useResource from '@/hooks/useResource';
 
 export default function StartPage({ onStart }) {
   const mainContentRef = useRef(null);
+
+  const [isScanning, setIsScanning] = useState(false);
   const [info, setInfo] = useState({
     userId: '',
     employeeId: '',
     serviceId: '',
   });
 
-  const [isScanning, setIsScanning] = useState(false);
 
-  useEffect(() => {
-    const mainContent = mainContentRef.current;
-    if (mainContent) {
-      mainContent.scrollIntoView();
-      mainContent.focus();
+  const {
+    actions: {
+      fetchDatas: fetchServices,
+    },
+    states: {
+      data: services,
+      loading: servicesLoading
     }
-  }, []);
+  } = useResource('services');
 
+  const {
+    actions: {
+      fetchDatas: fetchEmployees,
+    },
+    states: {
+      data: employees,
+      loading: employeeLoading
+    }
+  } = useResource('employee-info');
+
+
+  // ################################################################
+  // HANDLERS
+  // ################################################################
   const handleQrCodeScan = () => {
     setIsScanning((prev) => !prev);
   };
@@ -38,6 +56,27 @@ export default function StartPage({ onStart }) {
       [name]: value,
     }));
   };
+
+  // ################################################################
+  // EFFECTS
+  // ################################################################
+  useEffect(() => {
+    fetchServices();
+    fetchEmployees();
+  }, []);
+  useEffect(() => {
+    console.log(employees)
+    console.log(services)
+  }, [employees, services]);
+
+
+  useEffect(() => {
+    const mainContent = mainContentRef.current;
+    if (mainContent) {
+      mainContent.scrollIntoView();
+      mainContent.focus();
+    }
+  }, []);
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen h-screen' ref={mainContentRef}>

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import BasicInformation, SeniorCitizenInfo, EmployeeInfo
+from dashboard.serializers import ServiceSerializer
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,6 +19,8 @@ class SeniorCitizenInfoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class EmployeeInfoSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    services = ServiceSerializer(many=True)
     class Meta:
         model = EmployeeInfo
         fields = '__all__'

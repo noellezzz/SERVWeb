@@ -30,6 +30,7 @@ urlpatterns = [
         path('', include('dashboard.urls')),
         path('', include('feedbacks.urls')),
         path('', include('sentiment_tests.urls')),
+        path('', include('users.urls')),
         path('', include('tts.urls')),
     ])),
 ]

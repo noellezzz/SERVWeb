@@ -27,45 +27,13 @@ export default function Questions({ info, onFinish }) {
       loading
     }
   } = useResource('tests');
+
   const {
     actions: {
       doStore
     },
   } = useResource('results');
   // ################################################################
-
-
-  // ################################################################
-  // EFFECTS
-  // ################################################################
-
-  useEffect(() => {
-    fetchDatas();
-    return () => speak.stop();
-  }, []);
-
-  useEffect(() => {
-    if (data?.length) {
-      setQuestions(data);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (mainContentRef.current) {
-      mainContentRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-    if (questions.length) {
-      let text = questions[currentQuestionIndex][`question_text_${lang}`];
-      if (currentQuestionIndex < 1){
-        setTimeout(() => {
-        speak.play(text, lang);
-        }, 1000);
-      }
-      else {
-        speak.play(text, lang);
-      }
-    }
-  }, [currentQuestionIndex, lang]);
 
 
   // ################################################################
@@ -107,6 +75,39 @@ export default function Questions({ info, onFinish }) {
       setCurrentQuestionIndex((prev) => prev - 1);
     }
   };
+
+  // ################################################################
+  // EFFECTS
+  // ################################################################
+
+  useEffect(() => {
+    fetchDatas();
+    return () => speak.stop();
+  }, []);
+
+  useEffect(() => {
+    if (data?.length) {
+      setQuestions(data);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+    if (questions.length) {
+      let text = questions[currentQuestionIndex][`question_text_${lang}`];
+      if (currentQuestionIndex < 1){
+        setTimeout(() => {
+        speak.play(text, lang);
+        }, 1000);
+      }
+      else {
+        speak.play(text, lang);
+      }
+    }
+  }, [currentQuestionIndex, lang]);
+
 
 
 
