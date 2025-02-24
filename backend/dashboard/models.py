@@ -7,7 +7,7 @@ class Service(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     category = models.CharField(max_length=100, blank=True, null=True)
-    image = models.ImageField(upload_to='services', blank=True)
+    image_url = models.URLField(blank=True)
 
     def __str__(self):
         return self.name

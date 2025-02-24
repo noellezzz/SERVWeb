@@ -1,0 +1,46 @@
+[
+    {
+        "username": "admin_user",
+        "email": "admin@example.com",
+        "role": "admin",
+        "first_name": "Alice",
+        "last_name": "Admin",
+        "date_of_birth": "1980-01-01",
+        "gender": "F",
+        "contact_number": "+639171234567",
+        "address": "123 Admin Street, Metro Manila"
+    },
+    {
+        "username": "employee1",
+        "email": "employee1@example.com",
+        "role": "employee",
+        "first_name": "Bob",
+        "last_name": "Builder",
+        "date_of_birth": "1985-06-15",
+        "gender": "M",
+        "contact_number": "+639172345678",
+        "address": "456 Worker Lane, Quezon City"
+    },
+    {
+        "username": "employee2",
+        "email": "employee2@example.com",
+        "role": "employee",
+        "first_name": "Charlie",
+        "last_name": "Carter",
+        "date_of_birth": "1990-09-22",
+        "gender": "M",
+        "contact_number": "+639183456789",
+        "address": "789 Engineer Road, Makati"
+    },
+    {
+        "username": "regular_user",
+        "email": "user@example.com",
+        "role": "user",
+        "first_name": "Diana",
+        "last_name": "Doe",
+        "date_of_birth": "1995-12-05",
+        "gender": "F",
+        "contact_number": "+639194567890",
+        "address": "101 Main Avenue, Cebu City"
+    }
+]

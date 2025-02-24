@@ -1,0 +1,12 @@
+[
+    {
+        "username": "employee1",
+        "employee_id": "EMP001",
+        "score": 85
+    },
+    {
+        "username": "employee2",
+        "employee_id": "EMP002",
+        "score": 90
+    }
+]
