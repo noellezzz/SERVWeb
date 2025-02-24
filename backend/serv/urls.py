@@ -28,9 +28,9 @@ urlpatterns = [
         path('auth/registration/', include('dj_rest_auth.registration.urls')),
         path('accounts/', include('allauth.urls')),
         path('', include('dashboard.urls')),
-        path('', include('face_recognition.urls')),
         path('', include('feedbacks.urls')),
-        path('', include('queues.urls')),
         path('', include('sentiment_tests.urls')),
+        path('', include('users.urls')),
+        path('', include('tts.urls')),
     ])),
 ]

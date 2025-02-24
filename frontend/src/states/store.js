@@ -14,6 +14,7 @@ const persistConfig = {
     storage,
     blacklist: [
         'api',
+        'tts',
         // 'auth',
         'theme',
         'loading',

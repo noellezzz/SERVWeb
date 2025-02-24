@@ -55,10 +55,10 @@ INSTALLED_APPS = [
     
     # Local Apps
     'dashboard',
-    'face_recognition',
     'sentiment_tests',
     'feedbacks',
-    'queues',
+    'users',
+    'tts',
     'pdf',
 ]
 
@@ -221,3 +221,4 @@ ACCOUNT_UNIQUE_EMAIL = True
 # settings.py
 WEASYPRINT_BASEURL = '/'  # Treat URLs as file paths instead of absolute
 
+AUTH_USER_MODEL = 'users.User'
