@@ -61,12 +61,12 @@ export default function StartPage({ onStart }) {
   // EFFECTS
   // ################################################################
   useEffect(() => {
-    fetchServices();
-    fetchEmployees();
+    // fetchServices();
+    // fetchEmployees();
   }, []);
   useEffect(() => {
-    console.log(employees)
-    console.log(services)
+    // console.log(employees)
+    // console.log(services)
   }, [employees, services]);
 
 
@@ -153,7 +153,7 @@ export default function StartPage({ onStart }) {
               <p className='text-sm font-light'>
                 Enter the employee ID you want to evaluate
               </p>
-              <input
+              {/* <input
                 value={info.employeeId}
                 onChange={handleInputChange}
                 type='text'
@@ -161,7 +161,22 @@ export default function StartPage({ onStart }) {
                 name='employeeId'
                 placeholder='Enter the employee ID'
                 className='w-full px-4 py-2 mt-2  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600'
-              />
+              /> */}
+              {/* Selection */}
+              <select
+                name='employeeId'
+                value={info.employeeId}
+                onChange={handleInputChange}
+                className='w-full px-4 py-2 mt-2  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600'
+              >
+                {
+                  (employees || []).map((employee) => (
+                    <option key={employee.id} value={employee.id}>
+                      
+                    </option>
+                  ))
+                }
+              </select>
             </div>
 
             {/* SELECTION FOR SERVICE */}
@@ -175,12 +190,10 @@ export default function StartPage({ onStart }) {
                 value={info.serviceId}
               />
               <div className='flex gap-2 min-h-[100px] border rounded w-full max-w-2xl overflow-x-auto small-scrollbar'>
-                {/* Service list content */}
-                {/* Horizontal list of square cards with service name inside the card */}
                 {
-                  [1, 2, 3, 4, 5, 6, 7, 8].map((service) => (
-                    <div key={service} className='min-w-24 h-24 bg-gray-200 m-2 rounded-md flex items-center justify-center'>
-                      <span>{service}</span>
+                  (services || []).map((service) => (
+                    <div key={service.id} className='min-w-24 h-24 bg-gray-200 m-2 rounded-md flex items-center justify-center'>
+                      <span>{service?.name}</span>
                     </div>
                   ))
                 }
