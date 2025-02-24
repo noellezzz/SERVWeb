@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from dashboard.models import Service
 
 class User(AbstractUser):
     ROLE_CHOICES = [
@@ -35,6 +36,7 @@ class EmployeeInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     employee_id = models.CharField(max_length=20)
     score = models.IntegerField()
+    services = models.ManyToManyField(Service, related_name='employees', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
 

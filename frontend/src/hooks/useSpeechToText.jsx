@@ -31,8 +31,9 @@ export default function useSpeechToText({
   };
 
   const stopListening = () => {
-    SpeechRecognition.stopListening();
     stopVolumeTracking();
+    SpeechRecognition.stopListening();
+
   };
 
   const startVolumeTracking = async () => {

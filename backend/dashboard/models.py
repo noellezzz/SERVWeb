@@ -1,7 +1,6 @@
 from django.db import models
 from django.urls import reverse
 
-
 # Services Model
 class Service(models.Model):
     id = models.AutoField(primary_key=True)
@@ -15,4 +14,3 @@ class Service(models.Model):
 
     def get_absolute_url(self):
         return reverse('service-detail', kwargs={'pk': self.pk})
-    

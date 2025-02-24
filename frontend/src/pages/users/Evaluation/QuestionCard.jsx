@@ -34,6 +34,11 @@ export default function QuestionCard({
     resetTranscript();
   };
 
+  useEffect(() => {
+    return () => {
+      stopListening();
+    };
+  }, []);
 
   useEffect(() => {
     if (transcript) {
