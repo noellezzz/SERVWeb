@@ -61,12 +61,12 @@ export default function StartPage({ onStart }) {
   // EFFECTS
   // ################################################################
   useEffect(() => {
-    // fetchServices();
-    // fetchEmployees();
+    fetchServices();
+    fetchEmployees();
   }, []);
   useEffect(() => {
-    // console.log(employees)
-    // console.log(services)
+    console.log(employees)
+    console.log(services)
   }, [employees, services]);
 
 
@@ -172,7 +172,9 @@ export default function StartPage({ onStart }) {
                 {
                   (employees || []).map((employee) => (
                     <option key={employee.id} value={employee.id}>
-                      
+                      {
+                        employee?.user.username
+                      }
                     </option>
                   ))
                 }

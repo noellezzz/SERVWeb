@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from .models import BasicInformation, SeniorCitizenInfo, EmployeeInfo
+from .models import BasicInformation, SeniorCitizenInfo, EmployeeInfo, User
 from dashboard.serializers import ServiceSerializer
 
 class UserSerializer(serializers.ModelSerializer):
