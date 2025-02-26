@@ -48,7 +48,16 @@ export default function Questions({ info, onFinish = () => { } }) {
   };
   
   const handleDone = () => {
-    onFinish();
+    const payload = {
+      user_info: info,
+      evaluation: questions,
+      multiple: true,
+      is_new_feedback: true,
+    }
+    console.log(payload);
+    // doStore(payload).then(() => {
+      // onFinish();
+    // });
   };
 
   const handleNext = () => {

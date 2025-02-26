@@ -5,15 +5,10 @@ import { QrCode } from '@mui/icons-material';
 import useResource from '@/hooks/useResource';
 import swal from 'sweetalert';
 
-export default function StartPage({ onStart }) {
+export default function StartPage({ info, setInfo = () => {}, onStart }) {
   const mainContentRef = useRef(null);
 
   const [isScanning, setIsScanning] = useState(false);
-  const [info, setInfo] = useState({
-    userId: '',
-    employeeId: '',
-    serviceId: '',
-  });
 
 
   const {
@@ -48,7 +43,7 @@ export default function StartPage({ onStart }) {
 
   const handleStart = () => {
     console.log(info);
-    if (!info.userId || !info.employeeId || !info.serviceId) {
+    if (!info.userId || !info.employeeIds.length || !info.serviceIds.length) {
       swal('Error', 'Please fill out all fields', 'error');
       return;
     }
@@ -57,10 +52,12 @@ export default function StartPage({ onStart }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setInfo((prevInfo) => ({
-      ...prevInfo,
-      [name]: value,
-    }));
+    // TODO: Change the value of serviceIds and employeeIds to an array
+    if (name === 'serviceIds' || name === 'employeeIds') {
+      setInfo((prev) => ({ ...prev, [name]: value.split(',') }));
+      return;
+    }
+    setInfo((prev) => ({ ...prev, [name]: value }));
   };
 
   // ################################################################
@@ -79,6 +76,7 @@ export default function StartPage({ onStart }) {
       mainContent.focus();
     }
   }, []);
+
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen h-screen' ref={mainContentRef}>
@@ -157,42 +155,47 @@ export default function StartPage({ onStart }) {
               </p>
 
               {/* Selection */}
-              <select
-                name='employeeId'
-                value={info.employeeId}
-                onChange={handleInputChange}
-                className='w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600'
-              >
-                <option value='' disabled>Select an employee</option>
+              <input
+                type="hidden"
+                name="employeeIds"
+                value={info.employeeIds?.join(',')}
+              />
+              <div className='flex gap-2 min-h-[100px] border rounded w-full max-w-2xl overflow-x-auto small-scrollbar'>
                 {
-                  (employees || []).map((employee) => (
-                    <option key={employee.id} value={employee.id}>
-                      {
-                        employee?.user.username
-                      }
-                    </option>
+                  (employees || []).map((emp, index) => (
+                    <div
+                      key={emp.id}
+                      className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 ${info.employeeIds.includes(emp.id) ? 'bg-red-600 text-white' : ''}`}
+
+                      // TODO: Change the value of serviceId to an array
+                      onClick={() => setInfo((prev) => ({ ...prev, employeeIds: [emp.id] }))}
+                    >
+                      <span>{emp?.user.first_name + ' ' + emp?.user.last_name  || emp?.user.username}</span>
+                    </div>
                   ))
                 }
-              </select>
+              </div>
             </div>
 
             {/* SELECTION FOR SERVICE */}
             <div className='flex-1'>
-              <label htmlFor='serviceId' className='block text-lg font-medium text-gray-700'>
+              <label htmlFor='serviceIds' className='block text-lg font-medium text-gray-700'>
                 Service Lists
               </label>
               <input
                 type="hidden"
-                name="serviceId"
-                value={info.serviceId}
+                name="serviceIds"
+                value={info.serviceIds?.join(',')}
               />
               <div className='flex gap-2 min-h-[100px] border rounded w-full max-w-2xl overflow-x-auto small-scrollbar'>
                 {
                   (services || []).map((service, index) => (
                     <div
                       key={service.id}
-                      className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 ${info.serviceId === service.id ? 'bg-red-600 text-white' : ''}`}
-                      onClick={() => setInfo((prev) => ({ ...prev, serviceId: service.id }))}
+                      className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 ${info.serviceIds.includes(service.id) ? 'bg-red-600 text-white' : ''}`}
+
+                      // TODO: Change the value of serviceId to an array
+                      onClick={() => setInfo((prev) => ({ ...prev, serviceIds: [service.id] }))}
                     >
                       <span>{service?.name}</span>
                     </div>

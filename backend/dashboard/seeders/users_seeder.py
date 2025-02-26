@@ -2,7 +2,7 @@ import os
 import json
 import random
 from django.core.exceptions import ObjectDoesNotExist
-from users.models import User, BasicInformation, EmployeeInfo
+from users.models import User, EmployeeInfo, SeniorCitizenInfo
 from dashboard.models import Service
 
 # Define the paths to your JSON data files
@@ -24,19 +24,11 @@ def run():
             defaults={
                 'email': user['email'],
                 'role': user['role'],
-            }
-        )
-        BasicInformation.objects.get_or_create(
-            user=user_instance,
-            defaults={
                 'first_name': user['first_name'],
                 'last_name': user['last_name'],
-                'date_of_birth': user['date_of_birth'],
-                'gender': user['gender'],
-                'contact_number': user['contact_number'],
-                'address': user['address'],
             }
         )
+
     
     # Fetch all available services
     available_services = list(Service.objects.all())

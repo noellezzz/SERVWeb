@@ -62,7 +62,6 @@ export default function QuestionCard({
   }, [transcript]);
 
   useEffect(() => {
-    console.log('Question:', question);
     if (question?.answer) {
       answerRef.current.value = question.answer || '';
     }

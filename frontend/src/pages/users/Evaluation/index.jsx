@@ -5,20 +5,33 @@ import Questions from './Questions';
 export default function Evaluation() {
 
   const [step, setStep] = useState(0);
+  const [info, setInfo] = useState({
+    userId: '',
+    employeeIds: [],
+    serviceIds: [],
+  });
 
 
   const handleStart = (values) => {
+    setInfo(values);
     setStep(1);
   };
 
-  const handleNext = () => {}
+  const handleNext = () => { }
 
-  const handleBack = () => {}
+  const handleBack = () => { }
 
 
   const steps = [
-    <StartPage onStart={handleStart} />,
-    <Questions />
+    <StartPage
+      info={info}
+      setInfo={setInfo}
+      onStart={handleStart}
+    />,
+    <Questions 
+      info={info}
+      // onFinish={() => setStep(0)}
+    />
   ];
 
   return (
