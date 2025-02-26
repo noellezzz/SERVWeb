@@ -1,6 +1,6 @@
 
 
-- [ ] Fix multiple
+- [ ] Fix multiple employeeids, serviceids selection
 - [ ] Fix Results Storing After Evaluation (test/api py)
 - [x] Add rating, employee_ids, service_ids, in Feedback (feedbacks/models.py)
 - [ ] relate employee, services to Sentiment Results (aggregation)
