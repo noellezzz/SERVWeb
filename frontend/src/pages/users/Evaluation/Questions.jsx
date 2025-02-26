@@ -5,10 +5,9 @@ import useEdgeTTSApi from '@/hooks/useEdgeTTSApi';
 import DEFAULT_QUESTIONS from '@/assets/data/questions_sample.js';
 
 import QuestionCard from './QuestionCard';
-import Actions from './Actions';
 import swal from 'sweetalert';
 
-export default function Questions({ info, onFinish }) {
+export default function Questions({ info, onFinish = () => { } }) {
   const mainContentRef = useRef(null);
 
   // ################################################################
@@ -41,7 +40,7 @@ export default function Questions({ info, onFinish }) {
   // ################################################################
   
   const handleTranscript = (transcript) => {
-    console.log('Transcript:', transcript);
+    // console.log('Transcript:', transcript);
   }
 
   const handleRepeat = () => {
@@ -108,6 +107,10 @@ export default function Questions({ info, onFinish }) {
     }
   }, [currentQuestionIndex, lang]);
 
+  useEffect(() => {
+    // console.log(questions)
+  }, [questions]);
+
 
 
 
@@ -120,27 +123,20 @@ export default function Questions({ info, onFinish }) {
 
           {/* QUESTION */}
           <QuestionCard
-            question={questions[currentQuestionIndex][`question_text_${lang}`]}
-            onChange={handleTranscript}
             lang={lang}
             speak={speak}
+            question={questions[currentQuestionIndex]}
+            questions={questions}
+            currentQuestionIndex={currentQuestionIndex}
+            setQuestions={setQuestions}
+            setLang={setLang}
+            onChange={handleTranscript}
             handleNext={handleNext}
             handlePrev={handlePrev}
             handleDone={handleDone}
+            handleRepeat={handleRepeat}
            />
 
-          {/* ACTIONS */}
-          <Actions
-            lang={lang}
-            setLang={setLang}
-            handleRepeat={handleRepeat}
-            currentQuestionIndex={currentQuestionIndex}
-            setCurrentQuestionIndex={setCurrentQuestionIndex}
-            questions={questions}
-            handleNext={handleNext}
-            handlePrev={handlePrev}
-            handleDone={handleDone}
-          />
 
         </div>
       )}

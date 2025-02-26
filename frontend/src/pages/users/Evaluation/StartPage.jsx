@@ -3,6 +3,7 @@ import evaluationImg from "@/assets/evaluationImg.png";
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { QrCode } from '@mui/icons-material';
 import useResource from '@/hooks/useResource';
+import swal from 'sweetalert';
 
 export default function StartPage({ onStart }) {
   const mainContentRef = useRef(null);
@@ -43,9 +44,14 @@ export default function StartPage({ onStart }) {
     setIsScanning((prev) => !prev);
   };
 
-  const handleScanId = () => {};
+  const handleScanId = () => { };
 
   const handleStart = () => {
+    console.log(info);
+    if (!info.userId || !info.employeeId || !info.serviceId) {
+      swal('Error', 'Please fill out all fields', 'error');
+      return;
+    }
     onStart(info);
   };
 
@@ -64,10 +70,6 @@ export default function StartPage({ onStart }) {
     fetchServices();
     fetchEmployees();
   }, []);
-  useEffect(() => {
-    console.log(employees)
-    console.log(services)
-  }, [employees, services]);
 
 
   useEffect(() => {
@@ -153,22 +155,15 @@ export default function StartPage({ onStart }) {
               <p className='text-sm font-light'>
                 Enter the employee ID you want to evaluate
               </p>
-              {/* <input
-                value={info.employeeId}
-                onChange={handleInputChange}
-                type='text'
-                id='employeeId'
-                name='employeeId'
-                placeholder='Enter the employee ID'
-                className='w-full px-4 py-2 mt-2  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600'
-              /> */}
+
               {/* Selection */}
               <select
                 name='employeeId'
                 value={info.employeeId}
                 onChange={handleInputChange}
-                className='w-full px-4 py-2 mt-2  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600'
+                className='w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600'
               >
+                <option value='' disabled>Select an employee</option>
                 {
                   (employees || []).map((employee) => (
                     <option key={employee.id} value={employee.id}>
@@ -193,14 +188,17 @@ export default function StartPage({ onStart }) {
               />
               <div className='flex gap-2 min-h-[100px] border rounded w-full max-w-2xl overflow-x-auto small-scrollbar'>
                 {
-                  (services || []).map((service) => (
-                    <div key={service.id} className='min-w-24 h-24 bg-gray-200 m-2 rounded-md flex items-center justify-center'>
+                  (services || []).map((service, index) => (
+                    <div
+                      key={service.id}
+                      className={`flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-100 ${info.serviceId === service.id ? 'bg-red-600 text-white' : ''}`}
+                      onClick={() => setInfo((prev) => ({ ...prev, serviceId: service.id }))}
+                    >
                       <span>{service?.name}</span>
                     </div>
                   ))
                 }
               </div>
-
             </div>
 
             {/* START EVALUATION */}
@@ -208,7 +206,7 @@ export default function StartPage({ onStart }) {
               <button
                 type='submit'
                 className='px-6 py-3 bg-red-600 text-white text-lg rounded-md hover:bg-red-700 focus:outline-none'
-                onClick={() => handleStart(info)}
+                onClick={handleStart}
               >
                 Start
               </button>
