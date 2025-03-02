@@ -11,6 +11,8 @@ from users.models import SeniorCitizenInfo, EmployeeInfo
 from dashboard.models import Service
 from serv.utils.vader import ServSentimentAnalysis
 
+from .tasks import process_question
+
 logger = logging.getLogger(__name__)
 DEFAULT_MODE = 'anew'
 
@@ -30,6 +32,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
         """Helper method to perform sentiment analysis and create a result."""
         if not feedback.content:
             raise ValueError("Feedback content is empty.")
+        result = None
 
         ssa = ServSentimentAnalysis(feedback.content, mode=mode)
         analysis = ssa.analyze()
@@ -44,9 +47,12 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
         }
 
         if mode == 'anew':
-            valence = np.mean([word['details']['valence'] for word in words])
-            arousal = np.mean([word['details']['arousal'] for word in words])
-            dominance = np.mean([word['details']['dominance'] for word in words])
+            if words:
+                valence = np.mean([word['details']['valence'] for word in words])
+                arousal = np.mean([word['details']['arousal'] for word in words])
+                dominance = np.mean([word['details']['dominance'] for word in words])
+            else:
+                valence = arousal = dominance = 0
             details.update({
                 'valence': valence,
                 'arousal': arousal,
@@ -64,12 +70,10 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
         )
         return result
 
-    def multiCreate(self, payload):
-        """Handle creation of multiple feedbacks and sentiment results."""
+    def multiCreate(self, payload, user_channel_name):
         user_info = payload.get('user_info')
         evaluation = payload.get('evaluation')
         mode = payload.get('mode') or DEFAULT_MODE
-        results = []
 
         if not user_info or not evaluation:
             raise ValueError("Payload must contain 'user_info' and 'evaluation'.")
@@ -89,9 +93,6 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
 
         if self._not_numeric_array(employee_ids) or self._not_numeric_array(service_ids):
             raise ValueError("EmployeeIds and ServiceIds must be numeric arrays.")
-        
-
-            
 
         try:
             user = SeniorCitizenInfo.objects.get(nid=user_nid)
@@ -101,7 +102,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
             for question in evaluation:
                 content = question.get('answer')
                 rating = question.get('rating')
-                test_id = question.get('question_id')
+                test_id = question.get('id')
 
                 if not content:
                     logger.warning(f"Skipping feedback creation for question {test_id}: Content is empty.")
@@ -115,10 +116,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
                 feedback.employees.set(employees)
                 feedback.services.set(services)
 
-                test = models.SentimentTest.objects.get(id=test_id)
-                result = self._perform_sentiment_analysis(feedback, test, mode)
-                serializer = self.get_serializer(result)
-                results.append(serializer.data)
+                process_question.delay(feedback.id, test_id, mode, user_channel_name)
 
         except SeniorCitizenInfo.DoesNotExist:
             raise ValueError(f"SeniorCitizenInfo with nid {user_nid} not found.")
@@ -128,8 +126,6 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
             raise ValueError(f"One or more Service instances not found.")
         except models.SentimentTest.DoesNotExist:
             raise ValueError(f"SentimentTest with id {test_id} not found.")
-
-        return results
 
     def create(self, request, *args, **kwargs):
         """Handle creation of a single sentiment result."""

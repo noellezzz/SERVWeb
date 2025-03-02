@@ -19,7 +19,11 @@
         "date_of_birth": "1985-06-15",
         "gender": "M",
         "contact_number": "+639172345678",
-        "address": "456 Worker Lane, Quezon City"
+        "address": "456 Worker Lane, Quezon City",
+        "employee_info": {
+            "employee_id": "EMP001",
+            "score": 85
+        }
     },
     {
         "username": "employee2",
@@ -30,7 +34,11 @@
         "date_of_birth": "1990-09-22",
         "gender": "M",
         "contact_number": "+639183456789",
-        "address": "789 Engineer Road, Makati"
+        "address": "789 Engineer Road, Makati",
+        "employee_info": {
+            "employee_id": "EMP002",
+            "score": 90
+        }
     },
     {
         "username": "regular_user",
@@ -41,6 +49,9 @@
         "date_of_birth": "1995-12-05",
         "gender": "F",
         "contact_number": "+639194567890",
-        "address": "101 Main Avenue, Cebu City"
+        "address": "101 Main Avenue, Cebu City",
+        "senior_info": {
+            "nid": "1234"
+        }
     }
 ]

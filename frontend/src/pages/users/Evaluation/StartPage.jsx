@@ -42,7 +42,6 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
   const handleScanId = () => { };
 
   const handleStart = () => {
-    console.log(info);
     if (!info.userId || !info.employeeIds.length || !info.serviceIds.length) {
       swal('Error', 'Please fill out all fields', 'error');
       return;
