@@ -1,4 +1,3 @@
-import uuid
 from django.db import models
 from django.urls import reverse
 
@@ -29,7 +28,7 @@ class SentimentCategory(models.Model):
 class SentimentTest(models.Model):
     """Model for managing sentiment test questions"""
     
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.AutoField(primary_key=True)
     question_text_tl = models.TextField(blank=True, null=True)
     question_text_en = models.TextField(blank=True, null=True)
     category = models.CharField(max_length=50, blank=True, null=True)
@@ -61,7 +60,7 @@ class SentimentResult(models.Model):
 
     """Model for storing sentiment analysis results"""
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)    
+    id = models.AutoField(primary_key=True)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
     deleted_at = models.DateTimeField(blank=True, null=True)

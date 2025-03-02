@@ -6,6 +6,7 @@ import SERVLogo from '../../assets/SERV_Logo.png';
 import TUPLogo from '../../assets/TUP.png';
 import OSCALogo from '../../assets/OSCA.png';
 import TAGUIGLogo from '../../assets/TAGUIG.png';
+import OSCAAbout from '../../assets/osca-about.jpg';
 
 const developmentTeam = [
   {
@@ -36,7 +37,7 @@ const AboutSection = () => {
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
-    }, 3000); // Simulating loading for 3 seconds
+    }, 3000);
   }, []);
 
   if (loading) {
@@ -45,27 +46,31 @@ const AboutSection = () => {
 
   return (
     <div>
-      <section className='hero-section w-full h-[calc(60vh+50px)] bg-white flex flex-col lg:flex-row items-center justify-between px-4'>
+      {/* About Section */}
+      <section className='hero-section w-full h-auto bg-white flex flex-col lg:flex-row items-center justify-between px-4 py-10'>
+        {/* Image */}
         <div className='flex-1 flex justify-center items-center'>
-          <div className='w-full max-w-[600px]'>
-            <iframe
-              src='https://player.vimeo.com/video/795953189?autoplay=1&loop=1&background=1&muted=0' // Ensure muted is set to 0
-              width='560'
-              height='415'
-              frameBorder='0'
-              allow='autoplay; fullscreen'
-              allowFullScreen
-              title='Taguig City Center Video'
-            />
-          </div>
+          <img src={OSCAAbout} alt='OSCA About' className='w-full max-w-[600px] object-cover rounded-lg shadow-lg' />
         </div>
-
+        
+        {/* Mission and Vision */}
         <div className='flex-1 flex flex-col justify-center pl-8 text-center lg:text-left'>
-          <h1 className='text-5xl font-bold text-red-600'>Taguig City Center for the Elderly</h1>
-          <p className='mt-4 text-lg text-black'>
-            The five-storey wellness hub for Taguigeño senior citizens was opened last April and features a therapy pool, a massage room, two saunas, a yoga room, a gym, and a cinema for relaxation purposes. It also comes with a dialysis
-            center to accommodate 14 patients at a time and a multi-purpose hall for city programs and recreational activities.
-          </p>
+          <h1 className='text-5xl font-bold text-red-600 mb-6'>OSCA Taguig City</h1>
+          <div className='mb-6'>
+            <h2 className='text-3xl font-semibold text-black'>MISSION</h2>
+            <p className='mt-2 text-lg text-black'>
+              The OSCA Taguig City is a model pro-active and responsive organization that continuously provides and caters to 
+              the special needs of its Senior Citizens which gives them a sense of security, care, and confidence as valued members of society in their “Golden Years”.
+            </p>
+          </div>
+          <div>
+            <h2 className='text-3xl font-semibold text-black'>VISION</h2>
+            <p className='mt-2 text-lg text-black'>
+              To ensure the proper, adequate and necessary atmosphere for the Senior Citizens of the City that makes them healthy and active 
+              participants in their community through appropriate, timely, and easily deliverable social and other related programs that 
+              recognize their roles and increase their awareness of their rights, benefits, and privileges under the laws.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -89,10 +94,8 @@ const AboutSection = () => {
       {/* Meet the Team Section */}
       <section className='py-10 px-4 bg-white'>
         <div className='container mx-auto text-center'>
-          {/* Project Adviser */}
           <h2 className='text-6xl font-bold text-red-600 mb-8'>Meet the Team</h2>
           <div className='flex justify-center mb-8'>
-            {/* Project Adviser Card */}
             <div className='animate__animated animate__fadeIn'>
               <TeamCard
                 name='Project Adviser'
@@ -102,8 +105,6 @@ const AboutSection = () => {
               />
             </div>
           </div>
-
-          {/* Development Team */}
           <h3 className='text-4xl font-semibold text-red-600 mt-16 mb-2'>Development Team</h3>
           <h4 className='text-l font-semibold text-black mb-4'>
             The S.E.R.V Developer Team is a skilled and passionate group of TUP-Taguig BSIT students dedicated to developing and maintaining a user-friendly platform that delivers healthcare services to the elderly community in Taguig City.

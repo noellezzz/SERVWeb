@@ -1,7 +1,18 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+from dashboard.models import Service
 
-# Create your models here.
+class User(AbstractUser):
+    ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('employee', 'Employee'),
+        ('user', 'User'),
+    ]
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user')
+    
+    
+
+
 
 class BasicInformation(models.Model):
     """Model for storing basic information"""
@@ -14,6 +25,9 @@ class BasicInformation(models.Model):
     address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.user.username
 
 class SeniorCitizenInfo(models.Model):
     """Model for storing senior citizen information"""
@@ -21,13 +35,20 @@ class SeniorCitizenInfo(models.Model):
     nid = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     
+    def __str__(self):
+        return self.user.username
+    
     
 class EmployeeInfo(models.Model):
     """Model for storing employee information"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     employee_id = models.CharField(max_length=20)
     score = models.IntegerField()
+    services = models.ManyToManyField(Service, related_name='employeeinfo', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.user.username
     
 
     

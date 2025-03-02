@@ -7,6 +7,8 @@ const resources = [
     'results',
     'tests',
     'users',
+    'employee-info',
+    'services'
 ];
 
 const customEndpoints = {

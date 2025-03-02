@@ -8,6 +8,10 @@ export default defineConfig({
     react(),
     tsconfigPaths(),
   ],
+  assetsInclude: ['**/*.old'],
+  esbuild: {
+    exclude: ['**/*.old'],
+  },
   server: {
     port: 3000,
     proxy: {

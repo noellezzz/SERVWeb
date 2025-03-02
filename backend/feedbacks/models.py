@@ -1,4 +1,3 @@
-import uuid
 from django.db import models
 from django.urls import reverse
 from django.conf import settings
@@ -6,7 +5,7 @@ from django.conf import settings
 
 
 class Feedback(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.AutoField(primary_key=True)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
     

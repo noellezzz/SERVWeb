@@ -1,0 +1,50 @@
+[
+    {
+        "name": "IT Support",
+        "description": "Provides technical assistance for software, hardware, and network issues.",
+        "category": "Technology",
+        "image_url": "https://example.com/images/it_support.jpg"
+    },
+    {
+        "name": "Customer Service",
+        "description": "Handles customer inquiries, complaints, and support requests.",
+        "category": "Support",
+        "image_url": "https://example.com/images/customer_service.jpg"
+    },
+    {
+        "name": "HR Management",
+        "description": "Manages employee records, benefits, and company policies.",
+        "category": "Human Resources",
+        "image_url": "https://example.com/images/hr_management.jpg"
+    },
+    {
+        "name": "Finance & Accounting",
+        "description": "Oversees company finances, including payroll and financial reporting.",
+        "category": "Finance",
+        "image_url": "https://example.com/images/finance_accounting.jpg"
+    },
+    {
+        "name": "Logistics & Supply Chain",
+        "description": "Manages inventory, procurement, and transportation logistics.",
+        "category": "Operations",
+        "image_url": "https://example.com/images/logistics.jpg"
+    },
+    {
+        "name": "Marketing & Advertising",
+        "description": "Handles promotions, branding, and customer engagement campaigns.",
+        "category": "Marketing",
+        "image_url": "https://example.com/images/marketing.jpg"
+    },
+    {
+        "name": "Legal Consultation",
+        "description": "Provides legal advice and compliance guidance.",
+        "category": "Legal",
+        "image_url": "https://example.com/images/legal.jpg"
+    },
+    {
+        "name": "Software Development",
+        "description": "Develops and maintains software applications for internal and external use.",
+        "category": "Technology",
+        "image_url": "https://example.com/images/software_development.jpg"
+    }
+]
