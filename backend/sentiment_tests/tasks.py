@@ -9,9 +9,11 @@ import numpy as np
 
 @shared_task
 def process_question(feedback_id, test_id, mode, user_channel_name):
-    feedback = Feedback.objects.get(id=feedback_id)
-    test = SentimentTest.objects.get(id=test_id)
+    feedback = Feedback.objects.get(pk=feedback_id)
+    test = SentimentTest.objects.get(pk=test_id)
+    
     ssa = ServSentimentAnalysis(feedback.content, mode=mode)
+    
     analysis = ssa.analyze()
     words = ssa.get_words()
     details = {
@@ -47,8 +49,18 @@ def process_question(feedback_id, test_id, mode, user_channel_name):
     )
 
     serializer = SentimentResultSerializer(result)
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.send)(user_channel_name, {
-        "type": "question.processed",
-        "result": serializer.data
-    })
+    
+    try:
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            user_channel_name,
+            {
+                'type': 'send_message',
+                'message': serializer.data
+            }
+        )
+    except Exception as e:
+        print(e)
+        pass
+    
+    return serializer.data

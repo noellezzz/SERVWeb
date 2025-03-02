@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import StartPage from './StartPage';
 import Questions from './Questions';
 
 export default function Evaluation() {
+
 
   const [step, setStep] = useState(0);
   const [info, setInfo] = useState({
@@ -30,12 +31,13 @@ export default function Evaluation() {
     />,
     <Questions 
       info={info}
-      // onFinish={() => setStep(0)}
+      onFinish={() => {}}
     />
   ];
+  
 
   return (
-    <>
+    <> 
       {steps[step]}
     </>
   );

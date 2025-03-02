@@ -1,4 +1,7 @@
 
+- [ ] Seeder 
+- [ ] List TO Fix Charts
+- [ ] Fix charts
 
 - [ ] Fix multiple employeeids, serviceids selection
 - [ ] Fix Results Storing After Evaluation (test/api py)
@@ -6,8 +9,6 @@
 - [ ] relate employee, services to Sentiment Results (aggregation)
 - [ ] Seed users, employee, services, feedbacks, results
 - [ ] Add user page 
-- [ ] List TO Fix Charts
-- [ ] Fix charts
 - [ ] Services CRUD
 - [ ] User CRUD
 - [ ] Fix VISUALIZER / Tag Cloud / Timeline

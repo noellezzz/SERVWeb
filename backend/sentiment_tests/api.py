@@ -1,9 +1,11 @@
+import numpy as np
+import logging
+
+
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils import timezone
-import numpy as np
-import logging
 
 from . import serializers, models
 from feedbacks.models import Feedback
@@ -12,6 +14,7 @@ from dashboard.models import Service
 from serv.utils.vader import ServSentimentAnalysis
 
 from .tasks import process_question
+from kombu.exceptions import OperationalError
 
 logger = logging.getLogger(__name__)
 DEFAULT_MODE = 'anew'
@@ -70,10 +73,11 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
         )
         return result
 
-    def multiCreate(self, payload, user_channel_name):
+    def multiCreate(self, payload, user_channel_name = 'sentiment_tests'):
         user_info = payload.get('user_info')
         evaluation = payload.get('evaluation')
         mode = payload.get('mode') or DEFAULT_MODE
+        results = []
 
         if not user_info or not evaluation:
             raise ValueError("Payload must contain 'user_info' and 'evaluation'.")
@@ -115,8 +119,18 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
                 )
                 feedback.employees.set(employees)
                 feedback.services.set(services)
+                
+                feedback.save()
+                
 
-                process_question.delay(feedback.id, test_id, mode, user_channel_name)
+                try:
+                    result = process_question.delay(feedback.id, test_id, mode, user_channel_name)
+                except OperationalError as e:
+                    logger.error(f"Error processing question {test_id}: {e}")
+                    test = models.SentimentTest.objects.get(id=test_id)
+                    result = self._perform_sentiment_analysis(feedback, test, mode)
+                    
+                results.append(result)                
 
         except SeniorCitizenInfo.DoesNotExist:
             raise ValueError(f"SeniorCitizenInfo with nid {user_nid} not found.")
@@ -131,10 +145,11 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
         """Handle creation of a single sentiment result."""
         logger.info(f"Creating sentiment result: {request.data}")
         multiple = request.data.get('multiple', False)
+        user_channel_name = request.data.get('user_channel_name', 'sentiment_tests')
 
         if multiple:
             try:
-                results = self.multiCreate(request.data)
+                results = self.multiCreate(request.data, user_channel_name)
                 return Response(results)
             except ValueError as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
