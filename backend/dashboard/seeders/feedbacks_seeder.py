@@ -2,9 +2,9 @@ import os
 import json
 import random
 from feedbacks.models import Feedback
-from dashboard.seeders._seeder import Seeder
 from dashboard.models import Service
 from users.models import User, SeniorCitizenInfo, EmployeeInfo
+from dashboard.seeders._seeder import Seeder
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), 'data/reviews.json')
 
