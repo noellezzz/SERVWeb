@@ -9,6 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SeniorCitizenInfoSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
     class Meta:
         model = SeniorCitizenInfo
         fields = '__all__'
