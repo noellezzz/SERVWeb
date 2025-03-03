@@ -10,7 +10,6 @@ const ReportsTable = () => {
     const {
         actions: {
             fetchDatas,
-            doDestroy
         },
         states: {
             data,
@@ -18,17 +17,7 @@ const ReportsTable = () => {
         }
     } = useResource('feedbacks');	
 
-    const [rows, setRows] = useState([
-        {
-            id: 1,
-            user_id: 1,
-            positive_score: 0.5,
-            negative_score: 0.5,
-            score: 0.5,
-            sentiment: 'Neutral',
-            actions: ''
-        }
-    ]);
+    const [rows, setRows] = useState([]);
 
     const { handleView, isLoading } = usePdfViewer({
         action: useExamplePdfQuery,
@@ -44,10 +33,13 @@ const ReportsTable = () => {
         fetchDatas();
     }, []);
 
-    
     useEffect(() => {
-        console.log(data)
+        if (data) {
+            setRows(data)
+        }
     }, [data]);
+
+
 
     return (
         <div>

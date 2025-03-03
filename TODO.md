@@ -1,10 +1,24 @@
 REPORTS
 - [ ] relate employee, services to Sentiment Results (aggregation)
+- [ ] by employee reports
+- [ ] by services reports
+- [ ] by users
+
 
 CHARTS
-- [ ] Fix VISUALIZER / Tag Cloud / Timeline
+- [ ] Fix 
+    - [x] VISUALIZER / 
+    - [ ] Tag Cloud / 
+    - [ ] Timeline
 - [ ] List TO Fix Charts
-- [ ] Fix charts
+    - [ ] total assesments, total users, total reports, total analytics(sentiments)
+    - [ ] total assesments (pie chart)
+    - [ ] emotion response (stack bar chart)
+    - [ ] top 3 feedbacks   pos/neg
+    - [ ] todays feedbacks top/3
+    - [ ] gender, age, civil status
+    
+
 
 FRONTEND
 - [ ] Fix multiple employeeids, serviceids selection

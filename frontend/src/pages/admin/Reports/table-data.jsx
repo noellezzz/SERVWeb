@@ -8,30 +8,48 @@ export const getResultColumns = ({
     {
         field: 'id',
         headerName: 'ID',
-        flex: 1
+    },
+
+    {
+        field: 'user',
+        headerName: 'user',
+        renderCell: (params) => {
+            return (
+                <div className="flex-1 flex items-center">
+                    <span className="truncate">{params.value?.user?.username}</span>
+                </div>
+            );
+        }
     },
     {
-        field: 'user_id',
-        headerName: 'User',
-        flex: 1
+        field: 'content',
+        headerName: 'content',
+        flex: 1,
+        renderCell: (params) => {
+            return (
+                <div className="flex-1 flex items-center">
+                    <span className="truncate">{params.value}</span>
+                </div>
+            );
+        }
     },
-    {
-        field: 'positive_score',
-        headerName: 'Positive',
-    },
-    {
-        field: 'negative_score',
-        headerName: 'Negative',
-    },
-    {
-        field: 'score',
-        headerName: 'Score',
-    },
-    {
-        field: 'sentiment',
-        headerName: 'Sentiment',
-        flex: 1
-    },
+    // {
+    //     field: 'positive_score',
+    //     headerName: 'Positive',
+    // },
+    // {
+    //     field: 'negative_score',
+    //     headerName: 'Negative',
+    // },
+    // {
+    //     field: 'score',
+    //     headerName: 'Score',
+    // },
+    // {
+    //     field: 'sentiment',
+    //     headerName: 'Sentiment',
+    //     flex: 1
+    // },
     {
         field: 'actions',
         headerName: '',

@@ -22,6 +22,8 @@ const getColor = (score, sentiment) => {
  * 
  */
 const getWords = (data) => {
+    console.log(data);
+
     let words = [];
     data.forEach((feedback) => {
         const sentiments = feedback?.sentiment_results || [];
@@ -53,8 +55,8 @@ export default function VisualizeScatter({ search = '' }) {
         datasets: words.map((word) => ({
             label: word.word,
             data: [{
-                x: word.details.valence * 100,
-                y: word.details.arousal * 100,
+                x: word.details.valence * 100 * (word.details.valence < 0.3 ? -1 : 1),
+                y: word.details.arousal * 100 * (word.details.valence < 0.3 ? -1 : 1),
             }],
             pointRadius: 10 * word.score,
             backgroundColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.8)`,
