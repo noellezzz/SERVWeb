@@ -20,8 +20,9 @@ class DownloadResultsView(WeasyTemplateResponseMixin, DetailView):
         queryset = SentimentResult.objects.all()
         sentiment_test_id = self.request.GET.get('id')
         if sentiment_test_id:
-            queryset = queryset.filter(sentiment_test_id=sentiment_test_id)
-        
+            queryset = queryset.filter(id=sentiment_test_id)
+        for result in queryset:
+            logger.info(f"SentimentResult ID: {result.id}, Sentiment: {result.sentiment}")
         return queryset
     
 
