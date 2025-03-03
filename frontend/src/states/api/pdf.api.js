@@ -13,8 +13,11 @@ const pdfApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         examplePdf: builder.query({
             query: ({ id }) => ({
-                url: `${apiUrl}/sentiment-results/${id}/`,
+                url: `${apiUrl}/sentiment-results/${id}`,
                 method: 'GET',
+                params: {
+                    id,
+                },
                 responseHandler: async (response) => {
                     const blob = await response.blob();
                     return URL.createObjectURL(blob);
@@ -27,6 +30,9 @@ const pdfApi = apiSlice.injectEndpoints({
             query: ({ id }) => ({
                 url: `${apiUrl}/feedbacks/${id}?filterBy=user`,
                 method: 'GET',
+                params: {
+                    id,
+                },
                 responseHandler: async (response) => {
                     const blob = await response.blob();
                     return URL.createObjectURL(blob);
@@ -38,6 +44,9 @@ const pdfApi = apiSlice.injectEndpoints({
             query: ({ id }) => ({
                 url: `${apiUrl}/feedbacks/${id}`,
                 method: 'GET',
+                params: {
+                    id,
+                },
                 responseHandler: async (response) => {
                     const blob = await response.blob();
                     return URL.createObjectURL(blob);
@@ -49,6 +58,9 @@ const pdfApi = apiSlice.injectEndpoints({
             query: ({ id }) => ({
                 url: `${apiUrl}/sentiment-results/${id}`,
                 method: 'GET',
+                params: {
+                    id,
+                },
                 responseHandler: async (response) => {
                     const blob = await response.blob();
                     return URL.createObjectURL(blob);
