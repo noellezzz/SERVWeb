@@ -1,17 +1,15 @@
-import React from 'react'
+import React from 'react';
+import { useGeneratePdfMutation } from '@/states/api/pdf.api';
 
-// hook instead of component
-export function usePdfViewer({
-    action = () => { },
-    params = null,
-}) {
-    const {
-        data: pdfUrl = "",
-        isLoading = false
-    } = action(params);
+export function usePdfViewer() {
+    const [generatePdf, { data: pdfUrl = "", isLoading }] = useGeneratePdfMutation();
 
-    const handleView = () => {
-        window.open(pdfUrl, "_blank");
+    const handleView = (params) => {
+        generatePdf(params).then((response) => {
+            if (response.data) {
+                window.open(response.data, "_blank");
+            }
+        });
     };
 
     return {
@@ -20,21 +18,15 @@ export function usePdfViewer({
     }
 }
 
-
 export default function PDFViewer({
-    action = () => { },
     params = null,
     title = "View Report"
 }) {
-    const {
-        data: pdfUrl = "",
-        isLoading = false
-    } = action(params);
+    const { handleView, isLoading } = usePdfViewer();
 
-    const handleView = () => {
-        window.open(pdfUrl, "_blank");
+    const handlePdfView = (params) => {
+        handleView(params);
     };
-
 
     if (isLoading) return <p>Loading PDF...</p>;
 
@@ -48,7 +40,7 @@ export default function PDFViewer({
                 borderRadius: "5px",
                 cursor: "pointer"
             }}
-            onClick={handleView}>
+            onClick={handlePdfView}>
             {title}
         </button>
     )

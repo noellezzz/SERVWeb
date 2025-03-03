@@ -6,24 +6,29 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from sentiment_tests.models import SentimentResult, SentimentTest
 from sentiment_tests.serializers import SentimentResultSerializer, SentimentTestSerializer
 import logging
-
+import pprint
 logger = logging.getLogger(__name__)
 
-class DownloadResultsView(WeasyTemplateResponseMixin, DetailView):
-    queryset = SentimentResult.objects.all()
+class SentimentResultView(DetailView):
+    model = SentimentResult
     serializer_class = SentimentResultSerializer
-    template_name = 'sentiment_results.html' 
+    template_name = 'sentiment_results.html'
+    queryset = SentimentResult.objects.all()    
+
+    def get_queryset(self, *args, **kwargs):
+        qs = self.queryset.filter(id=self.kwargs['pk'])
+        return qs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['now'] = timezone.now()
+        pprint.pprint(context)
+        return context
+
+class DownloadResultsView(WeasyTemplateResponseMixin, SentimentResultView):
     pdf_filename = 'sentiment_results_report.pdf'  
     pdf_stylesheets = [settings.STATIC_ROOT + '/css/app.css'] 
 
-    def get_queryset(self):
-        queryset = SentimentResult.objects.all()
-        sentiment_test_id = self.request.GET.get('id')
-        if sentiment_test_id:
-            queryset = queryset.filter(id=sentiment_test_id)
-        for result in queryset:
-            logger.info(f"SentimentResult ID: {result.id}, Sentiment: {result.sentiment}")
-        return queryset
     
 
 class DownloadTestView(WeasyTemplateResponseMixin, DetailView):

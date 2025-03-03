@@ -49,99 +49,30 @@
     <!-- Header with logo and title -->
     <div class="header">
       <img src="{% static 'images/logo.png' %}" alt="SERV Logo" />
-      <h1>SERV Sentiment Analysis</h1>
-    </div>
-
-    <!-- Feedback Details -->
-    <div class="section">
-      <h2>Feedback Details</h2>
-      <p><strong>ID:</strong> {{ object.id }}</p>
-      <p><strong>User:</strong> {{ object.user.user.first_name }} {{ object.user.user.last_name }}</p>
-      <p><strong>Content:</strong> {{ object.content }}</p>
-      <p><strong>Rating:</strong> {{ object.rating }}</p>
-      <p><strong>Created At:</strong> {{ object.created }}</p>
-      <p><strong>Updated At:</strong> {{ object.last_updated }}</p>
+      <h1>
+        SERV Sentiment Analysis: {{ object.id }}
+      </h1>
     </div>
 
     <!-- Sentiment Analysis -->
     <div class="section">
       <h2>Sentiment Analysis</h2>
-      <p><strong>Mode:</strong> <span style="text-transform: uppercase;">{{ object.sentiment_results.0.mode }}</span>
+      <p><strong>Mode:</strong> <span style="text-transform: uppercase;">{{ object.mode }}</span>
       </p>
-      <p><strong>Sentiment:</strong> {{ object.sentiment_results.0.sentiment }}</p>
-      <p><strong>Score:</strong> {{ object.sentiment_results.0.score }}</p>
+      <p><strong>Sentiment:</strong> {{ object.sentiment }}</p>
+      <p><strong>Score:</strong> {{ object.score }}</p>
 
       <!-- Polarity Scores -->
       <p><strong>Polarity Scores:</strong></p>
       <ul>
-        <li><strong>Positive:</strong> {{ object.sentiment_results.0.details.polarity.pos }}</li>
-        <li><strong>Negative:</strong> {{ object.sentiment_results.0.details.polarity.neg }}</li>
-        <li><strong>Neutral:</strong> {{ object.sentiment_results.0.details.polarity.neu }}</li>
+        <li><strong>Positive:</strong> {{ object.details.polarity.pos }}</li>
+        <li><strong>Negative:</strong> {{ object.details.polarity.neg }}</li>
+        <li><strong>Neutral:</strong> {{ object.details.polarity.neu }}</li>
       </ul>
     </div>
 
-    <!-- Employees -->
-    <div class="section">
-      <h2>Employees</h2>
-      <ul>
-        {% for employee in object.employees %}
-        <li>
-          <strong>{{ employee.user.first_name }} {{ employee.user.last_name }}</strong> ({{ employee.employee_id }})
-          <ul>
-            <li><strong>Score:</strong> {{ employee.score }}</li>
-            <li><strong>Services:</strong>
-              <ul>
-                {% for service in employee.services %}
-                <li>{{ service.name }} ({{ service.category }})</li>
-                {% endfor %}
-              </ul>
-            </li>
-          </ul>
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
 
-    <!-- Services -->
-    <div class="section">
-      <h2>Services</h2>
-      <ul>
-        {% for service in object.services %}
-        <li>
-          <strong>{{ service.name }}</strong> ({{ service.category }})
-          <p>{{ service.description }}</p>
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
 
-    <!-- Sentiment Words -->
-    <div class="section">
-      <h2>Sentiment Words</h2>
-      <ul>
-        {% for word in object.sentiment_results.0.words %}
-        <li>
-          <strong>{{ word.word }}</strong>
-          <ul>
-            <li><strong>Sentiment:</strong> {{ word.sentiment }}</li>
-            <li><strong>Score:</strong> {{ word.score }}</li>
-            <li><strong>Details:</strong>
-              <ul>
-                <li><strong>Valence:</strong> {{ word.details.valence }}</li>
-                <li><strong>Arousal:</strong> {{ word.details.arousal }}</li>
-                <li><strong>Dominance:</strong> {{ word.details.dominance }}</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
-    <!-- Debug Section -->
-    <div class="section">
-      <h2>Debug Information</h2>
-      <pre>{{ object|safe }}</pre>
-    </div>
   </body>
 
 </html>

@@ -23,7 +23,6 @@ const pdfApi = apiSlice.injectEndpoints({
                     return URL.createObjectURL(blob);
                 },
                 cache: "no-cache",
-
             }),
         }),
         userFeedbacksPdf: builder.query({
@@ -68,10 +67,22 @@ const pdfApi = apiSlice.injectEndpoints({
                 cache: "no-cache",
             }),
         }),
+        generatePdf: builder.mutation({
+            query: ({ id, type }) => ({
+                url: `${apiUrl}/${type}/${id}`,
+                method: 'GET',
+                params: {
+                    id,
+                },
+                responseHandler: async (response) => {
+                    const blob = await response.blob();
+                    return URL.createObjectURL(blob);
+                },
+                cache: "no-cache",
+            }),
+        }),
     }),
-
 });
 
-
-export const { useExamplePdfQuery } = pdfApi;
+export const { useExamplePdfQuery, useGeneratePdfMutation } = pdfApi;
 export default pdfApi;

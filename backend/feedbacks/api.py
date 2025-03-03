@@ -14,6 +14,13 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 
 
     @action(detail=False, methods=['get'])
+    def filter (self, request):
+        feedbacks = models.Feedback.objects.all()
+        serializer = self.get_serializer(feedbacks, many=True)
+        return Response(serializer.data)
+    
+
+    @action(detail=False, methods=['get'])
     def search(self, request):
         search_term = request.query_params.get('q', None)
         if search_term:

@@ -34,6 +34,17 @@ const customEndpoints = {
                 params: { q: searchTerm },
             }),
         }),
+        filterFeedbacks: build.mutation({
+            query: (filter) => ({
+                url: `/feedbacks/filter`,
+                method: 'GET',
+                headers: {
+                    resource: 'feedbacks',
+                    tags: ['feedbacks'],
+                },
+                params: filter,
+            }),
+        }),
     }),
 }
 
