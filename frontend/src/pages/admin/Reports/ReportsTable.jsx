@@ -1,10 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getResultColumns as headers } from './table-data'
 import DashboardTable from '@/components/tables';
 import {usePdfViewer} from '@/components/pdf';
 import { useExamplePdfQuery } from '@/states/api/pdf.api';
 
+import useResource from '@/hooks/useResource';
+
 const ReportsTable = () => {
+    const {
+        actions: {
+            fetchDatas,
+            doDestroy
+        },
+        states: {
+            data,
+            loading
+        }
+    } = useResource('feedbacks');	
 
     const [rows, setRows] = useState([
         {
@@ -17,13 +29,25 @@ const ReportsTable = () => {
             actions: ''
         }
     ]);
+
     const { handleView, isLoading } = usePdfViewer({
         action: useExamplePdfQuery,
-        params: {id: "e5c9cd41-29b0-405d-ab94-9a067798956c"}
+        params: {id: "1"}
     });
+
     const onView = (id) => {
         handleView();
     }
+
+    
+    useEffect(() => {
+        fetchDatas();
+    }, []);
+
+    
+    useEffect(() => {
+        console.log(data)
+    }, [data]);
 
     return (
         <div>

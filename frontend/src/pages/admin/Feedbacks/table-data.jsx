@@ -13,7 +13,7 @@ export const feedbackColumns = [
         renderCell: (params) => {
             return (
                 <div className="flex-1 flex items-center">
-                    <span className="truncate">{params.value.user}</span>
+                    <span className="truncate">{params.value?.user?.username}</span>
                 </div>
             );
         }

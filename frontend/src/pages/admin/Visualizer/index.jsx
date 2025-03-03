@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Tabs, Tab, Box, TextField, Button } from '@mui/material';
-import SampleScatter from './samples/scatter';
-import WordCloud from './samples/wordcloud'; // Updated import
-import Timeline from './samples/timeline'; // Import the Timeline chart
+import Timeline from './samples/timeline'; 
+import WordCloud from './samples/wordcloud'; 
+import VisualizeScatter from './scatter';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -30,18 +30,8 @@ export default function Visualizer() {
   };
 
   const handleSearch = () => {
-    setFilteredTerm(searchTerm.toLowerCase()); // Filter charts by search term
+    setFilteredTerm(searchTerm.toLowerCase()); 
   };
-
-  // Example data for the Timeline chart (replace with dynamic data if needed)
-  const timelineData = [
-    { time: 'Feb 14 8:00am', relaxed: 5, happy: 3, unhappy: 1, upset: 0 },
-    { time: 'Feb 14 9:00am', relaxed: 10, happy: 4, unhappy: 2, upset: 1 },
-    { time: 'Feb 14 10:00am', relaxed: 8, happy: 6, unhappy: 3, upset: 0 },
-    { time: 'Feb 14 11:00am', relaxed: 12, happy: 8, unhappy: 1, upset: 2 },
-    { time: 'Feb 14 12:00pm', relaxed: 30, happy: 10, unhappy: 2, upset: 1 },
-    { time: 'Feb 14 1:00pm', relaxed: 8, happy: 4, unhappy: 3, upset: 0 },
-  ];
 
   return (
     <div className="m-8">
@@ -66,17 +56,19 @@ export default function Visualizer() {
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
           <Tab label="Scatter Chart" />
           <Tab label="Word Cloud" />
-          <Tab label="Timeline Chart" /> {/* Add a new tab for Timeline */}
+          <Tab label="Timeline Chart" />
         </Tabs>
 
         <TabPanel value={value} index={0}>
-          <SampleScatter searchTerm={filteredTerm} />
+          <VisualizeScatter search={filteredTerm} />          
         </TabPanel>
+
         <TabPanel value={value} index={1}>
-          <WordCloud searchTerm={filteredTerm} />
+          <WordCloud />
         </TabPanel>
+
         <TabPanel value={value} index={2}>
-          <Timeline data={timelineData} /> {/* Render the Timeline chart */}
+          <Timeline />
         </TabPanel>
       </div>
     </div>
