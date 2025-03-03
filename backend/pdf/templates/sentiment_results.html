@@ -6,7 +6,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SERV Sentiment Analysis</title>
+    <title>SERV Feedback Report</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}" />
     <style>
       @page {
@@ -14,7 +14,7 @@
         margin: 2cm;
 
         @top-center {
-          content: "SERV Sentiment Analysis Report";
+          content: "SERV Feedback Report";
           font-size: 10pt;
         }
 
@@ -195,13 +195,54 @@
         background-color: #e8f5e9;
         border-color: #2e7d32;
       }
+
+      .user-info-card {
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+
+      .employee-card {
+        background-color: #e8f5e9;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid #4caf50;
+      }
+
+      .service-card {
+        background-color: #e3f2fd;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-left: 4px solid #0056b3;
+      }
+
+      .rating-display {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      .star {
+        color: #ffc107;
+        font-size: 24px;
+        margin-right: 5px;
+      }
+
+      .star-empty {
+        color: #e0e0e0;
+        font-size: 24px;
+        margin-right: 5px;
+      }
     </style>
   </head>
 
   <body>
     <div class="header">
       <img src="{% static 'images/logo.png' %}" alt="SERV Logo" />
-      <h1>SERV Sentiment Analysis: {{ object.id }}</h1>
+      <h1>SERV Feedback Report: {{ object.id }}</h1>
     </div>
 
     <div class="report-date">
@@ -209,26 +250,132 @@
     </div>
 
     <div class="section">
+      <div class="section-title">User Information</div>
+      <div class="user-info-card">
+        <div class="info-group">
+          <div class="info-label">User ID</div>
+          <div class="info-value">{{ object.user.user.id }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Name</div>
+          <div class="info-value">{{ object.user.user.first_name }} {{ object.user.user.last_name }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">NID</div>
+          <div class="info-value">{{ object.user.nid }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Contact</div>
+          <div class="info-value">{{ object.user.user.contact_number }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Email</div>
+          <div class="info-value">{{ object.user.user.email }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Feedback Overview</div>
+
+      <div class="info-group">
+        <div class="info-label">Feedback Content</div>
+        <div class="info-value"
+          style="font-style: italic; padding: 10px; background-color: #f9f9f9; border-radius: 4px;">
+          "{{ object.content }}"
+        </div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-label">Rating</div>
+        <div class="rating-display">
+          {% for i in "12345" %}
+          {% if forloop.counter <= object.rating %}
+          <span class="star">★</span>
+          {% else %}
+          <span class="star-empty">★</span>
+          {% endif %}
+          {% endfor %}
+          <span style="margin-left: 10px; font-weight: bold;">{{ object.rating }}/5</span>
+        </div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-label">Created</div>
+        <div class="info-value">{{ object.created|date:"F d, Y H:i" }}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Services</div>
+      {% for service in object.services %}
+      <div class="service-card">
+        <div class="info-group">
+          <div class="info-label">Service Name</div>
+          <div class="info-value">{{ service.name }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Category</div>
+          <div class="info-value">{{ service.category }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Description</div>
+          <div class="info-value">{{ service.description }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Employees</div>
+      {% for employee in object.employees %}
+      <div class="employee-card">
+        <div class="info-group">
+          <div class="info-label">Name</div>
+          <div class="info-value">{{ employee.user.first_name }} {{ employee.user.last_name }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Employee ID</div>
+          <div class="info-value">{{ employee.employee_id }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Score</div>
+          <div class="info-value">{{ employee.score }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Services</div>
+          <div class="info-value">
+            {% for service in employee.services %}
+            <div style="margin-bottom: 5px;">{{ service.name }} ({{ service.category }})</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% for sentiment_result in object.sentiment_results %}
+    <div class="section">
       <div class="section-title">Sentiment Analysis</div>
 
       <div class="info-group">
         <div class="info-label">Analysis Mode</div>
-        <div class="info-value" style="text-transform: uppercase;">{{ object.mode }}</div>
+        <div class="info-value" style="text-transform: uppercase;">{{ sentiment_result.mode }}</div>
       </div>
 
       <div
-        class="sentiment-box {% if object.sentiment == 'very negative' %}very-negative{% elif object.sentiment == 'negative' %}negative{% elif object.sentiment == 'neutral' %}neutral{% elif object.sentiment == 'positive' %}positive{% elif object.sentiment == 'very positive' %}very-positive{% endif %}">
-        <div class="sentiment-type">{{ object.sentiment }}</div>
+        class="sentiment-box {% if sentiment_result.sentiment == 'very negative' %}very-negative{% elif sentiment_result.sentiment == 'negative' %}negative{% elif sentiment_result.sentiment == 'neutral' %}neutral{% elif sentiment_result.sentiment == 'positive' %}positive{% elif sentiment_result.sentiment == 'very positive' %}very-positive{% endif %}">
+        <div class="sentiment-type">{{ sentiment_result.sentiment }}</div>
       </div>
 
       <div class="score-display">
         <span>Sentiment Score:</span>
         <div class="score-meter">
           <!-- Calculate the percentage for the score (assumes score between -1 and 1) -->
-          <div class="score-fill" style="width: {{ object.score|mul:100|abs }}%;">
+          <div class="score-fill" style="width: {{ sentiment_result.score|mul:100|abs }}%;">
           </div>
         </div>
-        <span class="score-number">{{ object.score|mul:100|floatformat:2 }}%</span>
+        <span class="score-number">{{ sentiment_result.score|mul:100|floatformat:2 }}%</span>
       </div>
     </div>
 
@@ -238,51 +385,51 @@
       <div class="polarity-grid">
         <div class="polarity-card polarity-card-pos">
           <div class="polarity-label">Positive</div>
-          <div class="polarity-value">{{ object.details.polarity.pos|floatformat:3 }}</div>
+          <div class="polarity-value">{{ sentiment_result.details.polarity.pos|floatformat:3 }}</div>
         </div>
 
         <div class="polarity-card polarity-card-neg">
           <div class="polarity-label">Negative</div>
-          <div class="polarity-value">{{ object.details.polarity.neg|floatformat:3 }}</div>
+          <div class="polarity-value">{{ sentiment_result.details.polarity.neg|floatformat:3 }}</div>
         </div>
 
         <div class="polarity-card polarity-card-neu">
           <div class="polarity-label">Neutral</div>
-          <div class="polarity-value">{{ object.details.polarity.neu|floatformat:3 }}</div>
+          <div class="polarity-value">{{ sentiment_result.details.polarity.neu|floatformat:3 }}</div>
         </div>
       </div>
     </div>
 
-    {% if object.details.arousal or object.details.dominance or object.details.valence %}
+    {% if sentiment_result.details.arousal or sentiment_result.details.dominance or sentiment_result.details.valence %}
     <div class="section">
       <div class="section-title">Emotional Dimensions</div>
 
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-        {% if object.details.valence %}
+        {% if sentiment_result.details.valence %}
         <div class="info-group">
           <div class="info-label">Valence</div>
-          <div class="info-value">{{ object.details.valence|floatformat:3 }}</div>
+          <div class="info-value">{{ sentiment_result.details.valence|floatformat:3 }}</div>
         </div>
         {% endif %}
 
-        {% if object.details.arousal %}
+        {% if sentiment_result.details.arousal %}
         <div class="info-group">
           <div class="info-label">Arousal</div>
-          <div class="info-value">{{ object.details.arousal|floatformat:3 }}</div>
+          <div class="info-value">{{ sentiment_result.details.arousal|floatformat:3 }}</div>
         </div>
         {% endif %}
 
-        {% if object.details.dominance %}
+        {% if sentiment_result.details.dominance %}
         <div class="info-group">
           <div class="info-label">Dominance</div>
-          <div class="info-value">{{ object.details.dominance|floatformat:3 }}</div>
+          <div class="info-value">{{ sentiment_result.details.dominance|floatformat:3 }}</div>
         </div>
         {% endif %}
       </div>
     </div>
     {% endif %}
 
-    {% if object.details.translated_text %}
+    {% if sentiment_result.details.translated_text %}
     <div class="section">
       <div class="section-title">Text Analysis</div>
 
@@ -290,7 +437,7 @@
         <div class="info-label">Original Text</div>
         <div class="info-value"
           style="font-style: italic; padding: 10px; background-color: #f9f9f9; border-radius: 4px;">
-          "{{ object.text }}"
+          "{{ object.content }}"
         </div>
       </div>
 
@@ -298,29 +445,29 @@
         <div class="info-label">Translated Text</div>
         <div class="info-value"
           style="font-style: italic; padding: 10px; background-color: #f9f9f9; border-radius: 4px;">
-          "{{ object.details.translated_text }}"
+          "{{ sentiment_result.details.translated_text }}"
         </div>
       </div>
     </div>
     {% endif %}
 
-    {% if object.details.prediction %}
+    {% if sentiment_result.details.prediction %}
     <div class="section">
       <div class="section-title">Prediction Details</div>
 
       <div class="info-group">
         <div class="info-label">Predicted Label</div>
-        <div class="info-value">{{ object.details.prediction.label }}</div>
+        <div class="info-value">{{ sentiment_result.details.prediction.label }}</div>
       </div>
 
       <div class="info-group">
         <div class="info-label">Prediction Score</div>
-        <div class="info-value">{{ object.details.prediction.score|floatformat:3 }}</div>
+        <div class="info-value">{{ sentiment_result.details.prediction.score|floatformat:3 }}</div>
       </div>
     </div>
     {% endif %}
 
-    {% if object.words %}
+    {% if sentiment_result.words %}
     <div class="section">
       <div class="section-title">Word Analysis</div>
 
@@ -336,7 +483,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for word in object.words %}
+          {% for word in sentiment_result.words %}
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ word.word }}</td>
             <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">{{ word.sentiment }}</td>
@@ -354,6 +501,7 @@
       </table>
     </div>
     {% endif %}
+    {% endfor %}
   </body>
 
 </html>

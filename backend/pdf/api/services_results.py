@@ -52,9 +52,6 @@ class ServiceReportView(DetailView):
             context['average_sentiment_score'] = 0
             context['average_performance_score'] = 0
 
-        pprint.pprint(context['feedbacks'][0])
-        pprint.pprint(context['service'])
-
         return context
 
 

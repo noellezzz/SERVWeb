@@ -3,8 +3,10 @@ from django.utils import timezone
 from django.views.generic import DetailView
 from django_weasyprint import WeasyTemplateResponseMixin
 
-from sentiment_tests.models import SentimentResult, SentimentTest
-from sentiment_tests.serializers import SentimentResultSerializer, SentimentTestSerializer
+from sentiment_tests.models import SentimentTest
+from sentiment_tests.serializers import SentimentTestSerializer
+from feedbacks.models import Feedback
+from feedbacks.serializers import FeedbackSerializer
 import logging
 import pprint
 
@@ -12,10 +14,10 @@ import pprint
 logger = logging.getLogger(__name__)
 
 class SentimentResultView(DetailView):
-    model = SentimentResult
-    serializer_class = SentimentResultSerializer
+    model = Feedback
+    serializer_class = FeedbackSerializer
     template_name = 'sentiment_results.html'
-    queryset = SentimentResult.objects.all()    
+    queryset = Feedback.objects.all()    
 
     def get_queryset(self, *args, **kwargs):
         qs = self.queryset.filter(id=self.kwargs['pk'])
@@ -24,7 +26,8 @@ class SentimentResultView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['now'] = timezone.now()
-        pprint.pprint(context)
+        context['object'] = FeedbackSerializer(self.get_object()).data
+        print(context['feedback'])
         return context
 
 class DownloadResultsView(WeasyTemplateResponseMixin, SentimentResultView):

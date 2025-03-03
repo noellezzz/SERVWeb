@@ -6,6 +6,13 @@ import { useExamplePdfQuery } from '@/states/api/pdf.api';
 import useResource from '@/hooks/useResource';
 import { Tabs, Tab, Box } from '@mui/material';
 
+
+const ENDPOINTS = [
+    'sentiment-results',
+    'employee-results',
+    'services-results'
+]
+
 const ReportsTable = () => {
     const {
         actions: {
@@ -52,9 +59,9 @@ const ReportsTable = () => {
             </h4>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={tabIndex} onChange={handleTabChange} aria-label="basic tabs example">
+                    <Tab label="Users Feedbacks" />
                     <Tab label="Employee Reports" />
                     <Tab label="Services Reports" />
-                    <Tab label="Users Reports" />
                 </Tabs>
             </Box>
             <DashboardTable

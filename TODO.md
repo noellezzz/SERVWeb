@@ -1,8 +1,14 @@
 REPORTS
-- [ ] relate employee, services to Sentiment Results (aggregation)
-- [ ] by employee reports
-- [ ] by services reports
-- [ ] by users
+- [x] relate employee, services to Sentiment Results (aggregation)
+
+- [x] by employee reports pdf
+- [x] by services reports pdf
+- [x] by sentiment pdf
+
+- [ ] frotend table employee
+- [ ] frotend table services
+- [ ] frotend table sentiment
+
 
 
 CHARTS

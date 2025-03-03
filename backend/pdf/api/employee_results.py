@@ -29,8 +29,6 @@ class EmployeeReportView(DetailView):
         feedbacks  = Feedback.objects.filter(employees__id=self.kwargs['pk'])
         context['feedbacks'] = FeedbackSerializer(feedbacks, many=True).data
         context['employee'] = EmployeeInfoSerializer(self.get_object()).data	
-        pprint.pprint(context['feedbacks'][0])
-        pprint.pprint(context['employee'])
         return context
 
 class DownloadResultsView(WeasyTemplateResponseMixin, EmployeeReportView):
