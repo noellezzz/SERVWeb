@@ -1,4 +1,5 @@
 {% load static %}
+{% load mathfilters %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -133,6 +134,14 @@
         border-radius: 4px;
       }
 
+      .positive-feedback {
+        border-left: 5px solid #4caf50;
+      }
+
+      .negative-feedback {
+        border-left: 5px solid #f44336;
+      }
+
       .feedback-header {
         display: flex;
         justify-content: space-between;
@@ -234,6 +243,31 @@
         color: #777;
         font-style: italic;
       }
+
+      .subsection-title {
+        background-color: #e0e0e0;
+        color: #333;
+        padding: 5px 15px;
+        font-size: 16px;
+        margin: 20px 0 15px 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .sentiment-score-comparison {
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 20px;
+      }
+
+      .score-diff-positive {
+        color: #4caf50;
+      }
+
+      .score-diff-negative {
+        color: #f44336;
+      }
     </style>
   </head>
 
@@ -310,21 +344,47 @@
 
     <div class="section">
       <div class="section-title">Performance Evaluation</div>
+
       <div class="score-display">
-        <span>Overall Score:</span>
+        <span>Official Score:</span>
         <div class="score-meter">
           <div class="score-fill" style="width: {{ employee.score }}%;"></div>
         </div>
         <span class="score-number">{{ employee.score }}/100</span>
       </div>
+
+      <div class="score-display">
+        <span>Sentiment Score:</span>
+        <div class="score-meter">
+          <div class="score-fill" style="width: {{ avg_sentiment_score|mul:100 }}%;"></div>
+        </div>
+        <span class="score-number">{{ avg_sentiment_score|floatformat:2|mul:100 }}/100</span>
+      </div>
+
+      {% if score_difference %}
+      <div class="sentiment-score-comparison">
+        <p><strong>Score Comparison:</strong> The sentiment-based score is
+          {% if score_difference > 0 %}
+          <span class="score-diff-positive">{{ score_difference|floatformat:2 }} points higher</span>
+          {% elif score_difference < 0 %}
+          <span class="score-diff-negative">{{ score_difference|mul:-1|floatformat:2 }} points lower</span>
+          {% else %}
+          equal
+          {% endif %}
+          than the official score (normalized to same scale).
+        </p>
+      </div>
+      {% endif %}
     </div>
 
     <div class="section feedback-section">
-      <div class="section-title">Customer Feedback</div>
+      <div class="section-title">Customer Feedback Analysis ({{ total_feedbacks }} Total Feedbacks)</div>
 
-      {% if feedbacks %}
-      {% for feedback in feedbacks %}
-      <div class="feedback-card">
+      <!-- Positive Feedbacks -->
+      <div class="subsection-title">Top Positive Feedbacks</div>
+      {% if positive_feedbacks %}
+      {% for feedback in positive_feedbacks %}
+      <div class="feedback-card positive-feedback">
         <div class="feedback-header">
           <div class="feedback-from">From: {{ feedback.user.user.first_name }} {{ feedback.user.user.last_name }}</div>
           <div class="feedback-date">{{ feedback.created|date:"F d, Y" }}</div>
@@ -347,13 +407,13 @@
             <span class="sentiment-label">Sentiment:</span>
             {% with sentiment=feedback.sentiment_results.0.details.prediction.label %}
             <span class="
-                  {% if sentiment == 'Very Negative' %}very-negative
-                  {% elif sentiment == 'Negative' %}negative
-                  {% elif sentiment == 'Neutral' %}neutral
-                  {% elif sentiment == 'Positive' %}positive
-                  {% elif sentiment == 'Very Positive' %}very-positive
-                  {% endif %}
-                ">
+                    {% if sentiment == 'Very Negative' %}very-negative
+                    {% elif sentiment == 'Negative' %}negative
+                    {% elif sentiment == 'Neutral' %}neutral
+                    {% elif sentiment == 'Positive' %}positive
+                    {% elif sentiment == 'Very Positive' %}very-positive
+                    {% endif %}
+                  ">
               {{ sentiment }}
             </span>
             (Score: {{ feedback.sentiment_results.0.details.prediction.score|floatformat:2 }})
@@ -377,7 +437,67 @@
       </div>
       {% endfor %}
       {% else %}
-      <div class="no-data">No feedback data available for this employee.</div>
+      <div class="no-data">No positive feedback data available for this employee.</div>
+      {% endif %}
+
+      <!-- Negative Feedbacks -->
+      <div class="subsection-title">Top Negative Feedbacks</div>
+      {% if negative_feedbacks %}
+      {% for feedback in negative_feedbacks %}
+      <div class="feedback-card negative-feedback">
+        <div class="feedback-header">
+          <div class="feedback-from">From: {{ feedback.user.user.first_name }} {{ feedback.user.user.last_name }}</div>
+          <div class="feedback-date">{{ feedback.created|date:"F d, Y" }}</div>
+        </div>
+
+        <div class="feedback-rating">
+          Rating: {{ feedback.rating }}/5
+        </div>
+
+        <div class="feedback-content">
+          "{{ feedback.content }}"
+          {% if feedback.sentiment_results.0.details.translated_text %}
+          <br><small>(Translated: "{{ feedback.sentiment_results.0.details.translated_text }}")</small>
+          {% endif %}
+        </div>
+
+        {% if feedback.sentiment_results %}
+        <div class="sentiment-results">
+          <div>
+            <span class="sentiment-label">Sentiment:</span>
+            {% with sentiment=feedback.sentiment_results.0.details.prediction.label %}
+            <span class="
+                    {% if sentiment == 'Very Negative' %}very-negative
+                    {% elif sentiment == 'Negative' %}negative
+                    {% elif sentiment == 'Neutral' %}neutral
+                    {% elif sentiment == 'Positive' %}positive
+                    {% elif sentiment == 'Very Positive' %}very-positive
+                    {% endif %}
+                  ">
+              {{ sentiment }}
+            </span>
+            (Score: {{ feedback.sentiment_results.0.details.prediction.score|floatformat:2 }})
+            {% endwith %}
+          </div>
+          <div>
+            <span class="sentiment-label">Emotion Values:</span>
+            Valence: {{ feedback.sentiment_results.0.details.valence|floatformat:2 }},
+            Arousal: {{ feedback.sentiment_results.0.details.arousal|floatformat:2 }},
+            Dominance: {{ feedback.sentiment_results.0.details.dominance|floatformat:2 }}
+          </div>
+        </div>
+        {% endif %}
+
+        <div style="margin-top: 10px;">
+          <span class="sentiment-label">Service:</span>
+          {% for service in feedback.services %}
+          {{ service.name }}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="no-data">No negative feedback data available for this employee.</div>
       {% endif %}
     </div>
 
@@ -385,17 +505,68 @@
       <h3 style="margin-top: 0;">Performance Summary</h3>
       <p>This report summarizes the performance metrics and customer feedback for {{ employee.user.first_name }}
         {{ employee.user.last_name }}.</p>
-      <p>The employee has achieved an overall performance score of <strong>{{ employee.score }}/100</strong>.</p>
+      <p>The employee has achieved an official performance score of <strong>{{ employee.score }}/100</strong>.</p>
 
-      {% if feedbacks %}
-      {% with total_feedbacks=feedbacks|length %}
-      <p>Based on {{ total_feedbacks }} customer feedback{% if total_feedbacks != 1 %}s{% endif %}, the overall customer
-        satisfaction with this employee's service is reflected in the reviews and sentiment analysis above.</p>
-      {% endwith %}
+      {% if total_feedbacks > 0 %}
+      <p>Based on {{ total_feedbacks }} customer feedback{% if total_feedbacks != 1 %}s{% endif %}, the overall
+        sentiment score is
+        <strong>{{ avg_sentiment_score|floatformat:2 }}/1</strong>, which indicates
+        {% if avg_sentiment_score >= 0.8 %}
+        excellent customer satisfaction.
+        {% elif avg_sentiment_score >= 0.6 %}
+        good customer satisfaction.
+        {% elif avg_sentiment_score >= 0.4 %}
+        average customer satisfaction.
+        {% elif avg_sentiment_score >= 0.2 %}
+        below average customer satisfaction.
+        {% else %}
+        poor customer satisfaction.
+        {% endif %}
+      </p>
+
+      {% if score_difference %}
+      <p>
+        {% if score_difference > 0.1 %}
+        The sentiment analysis suggests that the official performance score might be underestimating this employee's
+        actual performance.
+        {% elif score_difference < -0.1 %}
+        The sentiment analysis suggests that the official performance score might be overestimating this employee's
+        actual performance.
+        {% else %}
+        The sentiment analysis generally aligns with the official performance evaluation.
+        {% endif %}
+      </p>
+      {% endif %}
+
       {% else %}
       <p>No customer feedback is available at this time. Future evaluations will incorporate customer feedback as it
         becomes available.</p>
       {% endif %}
+    </div>
+    <div style="page-break-before: always;"></div>
+
+    <div class="section">
+      <div class="section-title">References</div>
+      <div style="font-size: 14px; margin-bottom: 20px;">
+        <p><strong>Sentiment Analysis Model:</strong><br>
+          TabularisAI. (2023). <em>Multilingual Sentiment Analysis</em>. Hugging Face.<br>
+          <a
+            href="https://huggingface.co/tabularisai/multilingual-sentiment-analysis">https://huggingface.co/tabularisai/multilingual-sentiment-analysis</a>
+        </p>
+
+        <p><strong>Emotion Analysis Dataset:</strong><br>
+          Mohammad, S. M. (2018). <em>NRC Valence, Arousal, and Dominance Lexicon</em>. National Research Council
+          Canada.<br>
+          Version: 1, Released: July 2018<br>
+          <a href="http://saifmohammad.com/WebPages/nrc-vad.html">http://saifmohammad.com/WebPages/nrc-vad.html</a>
+        </p>
+
+        <div style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 20px; font-size: 12px; color: #777;">
+          <p>Note: This report uses sentiment analysis based on machine learning models and datasets. Results should be
+            interpreted as supplementary information and not as a definitive evaluation. The NRC-VAD Lexicon is used for
+            non-commercial, research and educational purposes only.</p>
+        </div>
+      </div>
     </div>
   </body>
 

@@ -6,14 +6,19 @@ import { useExamplePdfQuery } from '@/states/api/pdf.api';
 import useResource from '@/hooks/useResource';
 import { Tabs, Tab, Box } from '@mui/material';
 
-
 const ENDPOINTS = [
-    'sentiment-results',
-    'employee-results',
-    'services-results'
+    'feedbacks',
+    'employee-info',
+    'services'
 ]
 
 const ReportsTable = () => {
+    const [tabIndex, setTabIndex] = useState(0);
+    const [rows, setRows] = useState([]);
+    const { handleView, isLoading } = usePdfViewer();
+
+    const currentResource = ENDPOINTS[tabIndex];
+    
     const {
         actions: {
             fetchDatas,
@@ -22,23 +27,20 @@ const ReportsTable = () => {
             data,
             loading
         }
-    } = useResource('feedbacks');	
+    } = useResource(currentResource);
 
-    const [rows, setRows] = useState([]);
-    const [tabIndex, setTabIndex] = useState(0);
-
-    const { handleView, isLoading } = usePdfViewer();
 
     const onView = (item) => {
+        const types = ['sentiment-results', 'employee-results', 'services-results'];
         handleView({ 
             id: item.id, 
-            type: 'sentiment-results'
+            type: types[tabIndex]
         });
     }
 
     useEffect(() => {
         fetchDatas();
-    }, []);
+    }, [tabIndex, fetchDatas]);
 
     useEffect(() => {
         if (data) {
@@ -48,8 +50,6 @@ const ReportsTable = () => {
 
     const handleTabChange = (event, newValue) => {
         setTabIndex(newValue);
-        // Fetch data based on the selected tab
-        // Example: fetchDatasByTab(newValue);
     };
 
     return (
@@ -57,23 +57,27 @@ const ReportsTable = () => {
             <h4 className="text-xl text-gray-600 font-semibold">
                 Results
             </h4>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={tabIndex} onChange={handleTabChange} aria-label="basic tabs example">
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+                <Tabs value={tabIndex} onChange={handleTabChange} aria-label="report tabs">
                     <Tab label="Users Feedbacks" />
                     <Tab label="Employee Reports" />
                     <Tab label="Services Reports" />
                 </Tabs>
             </Box>
-            <DashboardTable
-                columns={headers({ onView })}
-                rows={rows}
-                checkboxSelection
-                onRowClick={(params) => console.log(params.row)}
-                sx={{
-                    paper: { boxShadow: 3 },
-                    grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
-                }}
-            />
+            {loading ? (
+                <div>Loading...</div>
+            ) : (
+                <DashboardTable
+                    columns={headers({ onView, tabIndex })}
+                    rows={rows}
+                    checkboxSelection
+                    onRowClick={(params) => console.log(params.row)}
+                    sx={{
+                        paper: { boxShadow: 3 },
+                        grid: { '& .MuiDataGrid-cell': { fontSize: 14 } }
+                    }}
+                />
+            )}
         </div>
     );
 };

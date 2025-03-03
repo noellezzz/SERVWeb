@@ -12,7 +12,7 @@ REPORTS
 
 
 CHARTS
-- [ ] Fix 
+- [ ] Fix p
     - [x] VISUALIZER / 
     - [ ] Tag Cloud / 
     - [ ] Timeline
