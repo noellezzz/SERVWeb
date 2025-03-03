@@ -30,11 +30,36 @@ class ServiceReportView(DetailView):
         context['now'] = timezone.now()
         feedbacks  = Feedback.objects.filter(services__id=self.kwargs['pk'])
         context['feedbacks'] = FeedbackSerializer(feedbacks, many=True).data
+        context['service'] = ServiceSerializer(self.get_object()).data
+        
+        total_sentiment_score = 0
+        total_performance_score = 0
+        feedback_count = len(context['feedbacks'])
+
+        for feedback in context['feedbacks']:
+            if feedback.get('sentiment_results'):
+                sentiment_score = feedback['sentiment_results'][0]['score']
+                total_sentiment_score += sentiment_score
+
+            if feedback.get('rating'):
+                total_performance_score += feedback['rating']
+
+        # Calculate average scores
+        if feedback_count > 0:
+            context['average_sentiment_score'] = (total_sentiment_score / feedback_count) * 100
+            context['average_performance_score'] = (total_performance_score / feedback_count) * 20  # Convert 5-star rating to 100
+        else:
+            context['average_sentiment_score'] = 0
+            context['average_performance_score'] = 0
+
+        pprint.pprint(context['feedbacks'][0])
+        pprint.pprint(context['service'])
+
         return context
 
 
 
 
 class DownloadResultsView(WeasyTemplateResponseMixin, ServiceReportView):
-    pdf_filename = 'employee_results_report.pdf'  
+    pdf_filename = 'service_results_report.pdf'  
     pdf_stylesheets = [settings.STATIC_ROOT + '/css/app.css']
