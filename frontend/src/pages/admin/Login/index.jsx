@@ -39,6 +39,7 @@ const Login = () => {
             bgcolor: '#FFF0F3', // Slight transparency for soft glass effect
             backdropFilter: 'blur(10px)',
             border: '2px solid rgba(255, 117, 143, 0.3)', // Soft pink border
+            fontFamily: 'Poppins, sans-serif', // Apply Poppins font
           }}
         >
           <Typography variant='h5' gutterBottom sx={{ fontWeight: 'bold', color: '#A4161A' }}>
@@ -57,6 +58,7 @@ const Login = () => {
                   backgroundColor: '#FFB3C1',
                   color: '#660708',
                   borderRadius: '8px',
+                  fontFamily: 'Poppins, sans-serif', // Apply Poppins font
                 },
               }}
             />
@@ -73,6 +75,7 @@ const Login = () => {
                   backgroundColor: '#FFB3C1',
                   color: '#660708',
                   borderRadius: '8px',
+                  fontFamily: 'Poppins, sans-serif', // Apply Poppins font
                 },
               }}
             />
@@ -89,6 +92,7 @@ const Login = () => {
                   backgroundColor: '#FFB3C1',
                   color: '#660708',
                   borderRadius: '8px',
+                  fontFamily: 'Poppins, sans-serif', // Apply Poppins font
                 },
               }}
             />
@@ -110,6 +114,7 @@ const Login = () => {
                 bgcolor: '#A4161A',
                 color: '#f1f1f1',
                 '&:hover': { bgcolor: '#E5383B' },
+                fontFamily: 'Poppins, sans-serif', // Apply Poppins font
               }}
             >
               Login
