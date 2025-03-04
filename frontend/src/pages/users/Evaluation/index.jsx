@@ -27,8 +27,8 @@ export default function Evaluation() {
     if (employeeIdsParam || serviceIdsParam || userIdParam) {
       const newInfo = {
         userId: userIdParam || '',
-        employeeIds: employeeIdsParam ? employeeIdsParam.split(',').filter(Boolean) : [],
-        serviceIds: serviceIdsParam ? serviceIdsParam.split(',').filter(Boolean) : []
+        employeeIds: employeeIdsParam ? employeeIdsParam.split(',').filter(Boolean).map(Number) : [],
+        serviceIds: serviceIdsParam ? serviceIdsParam.split(',').filter(Boolean).map(Number) : []
       };
       
       setInfo(newInfo);

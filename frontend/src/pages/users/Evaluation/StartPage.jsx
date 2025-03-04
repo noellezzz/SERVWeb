@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import evaluationImg from "@/assets/evaluationImg.png";
 import { Scanner } from '@yudiel/react-qr-scanner';
-import { QrCode, ExpandMore, Check, Close } from '@mui/icons-material';
+import { QrCode, ExpandMore, Check, Close, Videocam } from '@mui/icons-material';
 import useResource from '@/hooks/useResource';
 import swal from 'sweetalert';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,12 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
   const [scanMode, setScanMode] = useState(null); // 'userId', 'evaluation', or null
   const [employeeDropdownOpen, setEmployeeDropdownOpen] = useState(false);
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
-  
+
+  // Camera selection states
+  const [cameras, setCameras] = useState([]);
+  const [selectedCamera, setSelectedCamera] = useState(null);
+  const [showCameraSelector, setShowCameraSelector] = useState(false);
+
   // Initialize local state for selections
   const [localEmployeeIds, setLocalEmployeeIds] = useState(info.employeeIds || []);
   const [localServiceIds, setLocalServiceIds] = useState(info.serviceIds || []);
@@ -48,6 +53,34 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
     }
   }, [info.employeeIds, info.serviceIds]);
 
+  // Load available cameras when scanning starts
+  useEffect(() => {
+    if (isScanning) {
+      loadCameras();
+    }
+  }, [isScanning]);
+
+  // Function to get available camera devices
+  const loadCameras = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+      if (videoDevices.length > 0) {
+        setCameras(videoDevices);
+        // Select the last device by default (often the external/virtual camera)
+        if (!selectedCamera) {
+          setSelectedCamera(videoDevices[videoDevices.length - 1].deviceId);
+        }
+      } else {
+        console.log('No video devices found');
+      }
+    } catch (error) {
+      console.error('Error accessing media devices:', error);
+      swal('Error', 'Unable to access camera devices', 'error');
+    }
+  };
+
   // ################################################################
   // HANDLERS
   // ################################################################
@@ -63,7 +96,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
     setIsScanning(true);
     setScanMode(mode);
   };
-  
+
   const generateEvaluationQrUrl = () => {
     // Get the current base URL of the application
     const baseUrl = window.location.origin;
@@ -75,7 +108,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
 
     // Generate the URL with parameters
     let url = `${baseUrl}/evaluation?employeeIds=${employeeIds}&serviceIds=${serviceIds}`;
-    
+
     // Add user ID if available
     if (userId) {
       url += `&userId=${userId}`;
@@ -93,14 +126,14 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
 
     return url;
   };
-  
+
   // Handle QR code result based on current scan mode
   const handleScanResult = (result) => {
     console.log(result)
     if (!result) return;
 
     try {
-      const scannedData = result.text;
+      let scannedData = result[0]?.rawValue || result[0]?.text;
 
       if (scanMode === 'userId') {
         // Handle user ID scan - assuming the QR code contains just the ID
@@ -112,7 +145,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
       }
       else if (scanMode === 'evaluation') {
         // Check if the scanned text is a URL
-        if (scannedData.startsWith('http')) {
+        if (scannedData?.startsWith('http')) {
           try {
             // Extract parameters from URL
             const url = new URL(scannedData);
@@ -187,7 +220,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
                 ...prev,
                 serviceIds: [...new Set([...(prev.serviceIds || []), ...svcIds])]
               }));
-              setLocalServiceIds(prev => [...new Set([...prev, ...svcIds])]);
+              setLocalServiceIds(prev => [...new Set([...prev, ...serviceIds])]);
             }
 
             swal('Success', 'Evaluation data captured successfully', 'success');
@@ -258,10 +291,10 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
   // Toggle employee selection and auto-select their services
   const toggleEmployeeSelection = (empId) => {
     const newEmployeeIds = toggleItemInArray(info.employeeIds || [], empId);
-    
+
     // Update local state for UI
     setLocalEmployeeIds(newEmployeeIds);
-    
+
     setInfo((prev) => {
       // If employee was added, add their services
       if (!prev.employeeIds?.includes(empId)) {
@@ -269,10 +302,10 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
         if (employee && employee.services) {
           const serviceIds = employee.services.map(service => service.id);
           const updatedServiceIds = [...new Set([...(prev.serviceIds || []), ...serviceIds])];
-          
+
           // Update local state for services too
           setLocalServiceIds(updatedServiceIds);
-          
+
           return {
             ...prev,
             employeeIds: newEmployeeIds,
@@ -291,10 +324,10 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
   // Toggle service selection
   const toggleServiceSelection = (serviceId) => {
     const newServiceIds = toggleItemInArray(info.serviceIds || [], serviceId);
-    
+
     // Update local state for UI
     setLocalServiceIds(newServiceIds);
-    
+
     setInfo((prev) => ({
       ...prev,
       serviceIds: newServiceIds
@@ -339,7 +372,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
     if (!localEmployeeIds.length) return "Select Employees";
 
     const selectedEmployees = (employees || [])
-      .filter(emp => localEmployeeIds.includes(`${emp.id}`))
+      .filter(emp => localEmployeeIds.includes(emp.id))
       .map(emp => `${emp.user.first_name} ${emp.user.last_name || emp.user.username}`);
 
     return selectedEmployees.length > 1
@@ -352,7 +385,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
     if (!localServiceIds.length) return "Select Services";
 
     const selectedServices = (services || [])
-      .filter(service => localServiceIds.includes(`${service.id}`))
+      .filter(service => localServiceIds.includes(service.id))
       .map(service => service.name);
 
     return selectedServices.length > 1
@@ -395,6 +428,11 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
     return employeeServiceIds.includes(serviceId);
   };
 
+  // Helper to get camera label
+  const getCameraLabel = (deviceId) => {
+    const camera = cameras.find(cam => cam.deviceId === deviceId);
+    return camera ? camera.label || `Camera ${cameras.indexOf(camera) + 1}` : 'Unknown Camera';
+  };
   return (
     <div className='flex flex-col items-center justify-center min-h-screen w-full' ref={mainContentRef}>
       <div className='hero-section w-full lg:min-h-[calc(100vh-80px)] bg-white flex flex-col-reverse lg:flex-row items-start justify-between px-4 py-6 lg:py-10'>
@@ -405,7 +443,18 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
             {isScanning && (
               <>
                 <div className="bg-gray-100 px-4 py-2 rounded-lg mb-4 flex items-center justify-between w-full max-w-sm">
-                  <span className="text-gray-700 font-medium">{getScanModeText()}</span>
+                  <div className="flex items-center">
+                    <span className="text-gray-700 font-medium">{getScanModeText()}</span>
+                    {cameras.length > 1 && (
+                      <button
+                        onClick={() => setShowCameraSelector(!showCameraSelector)}
+                        className="ml-2 text-gray-600 hover:text-red-600"
+                        title="Change camera"
+                      >
+                        <Videocam />
+                      </button>
+                    )}
+                  </div>
                   <button
                     onClick={() => { setIsScanning(false); setScanMode(null); }}
                     className="text-gray-500 hover:text-red-600"
@@ -413,9 +462,47 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
                     <Close />
                   </button>
                 </div>
+
+                {/* Camera selector dropdown */}
+                {showCameraSelector && cameras.length > 1 && (
+                  <div className="w-full max-w-sm mb-2 bg-white border border-gray-200 rounded-md shadow-sm">
+                    <div className="p-2 border-b border-gray-200">
+                      <h4 className="text-sm font-medium">Select Camera</h4>
+                    </div>
+                    <div className="max-h-40 overflow-y-auto">
+                      {cameras.map(camera => (
+                        <div
+                          key={camera.deviceId}
+                          className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${selectedCamera === camera.deviceId ? 'bg-gray-50' : ''}`}
+                          onClick={() => {
+                            setSelectedCamera(camera.deviceId);
+                            setShowCameraSelector(false);
+                          }}
+                        >
+                          <div className="flex items-center">
+                            <div className={`w-4 h-4 mr-2 rounded-full ${selectedCamera === camera.deviceId ? 'bg-red-600' : 'bg-gray-300'}`} />
+                            <span className="text-sm">
+                              {camera.label || `Camera ${cameras.indexOf(camera) + 1}`}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className='w-full max-w-sm aspect-square'>
-                  <Scanner onScan={(result) => handleScanResult(result)} />
+                  <Scanner
+                    onScan={(result) => handleScanResult(result)}
+                  />
                 </div>
+
+                {/* Display currently selected camera */}
+                {selectedCamera && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    Using: {getCameraLabel(selectedCamera)}
+                  </div>
+                )}
               </>
             )}
             {!isScanning && (
@@ -516,8 +603,8 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
                           className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
                           onClick={() => toggleEmployeeSelection(emp.id)}
                         >
-                          <div className={`w-4 h-4 mr-2 border rounded flex items-center justify-center ${localEmployeeIds.includes(`${emp.id}`) ? 'bg-red-600 border-red-600' : 'border-gray-400'}`}>
-                            {localEmployeeIds.includes(`${emp.id}`) && <Check className="text-white" style={{ fontSize: '0.75rem' }} />}
+                          <div className={`w-4 h-4 mr-2 border rounded flex items-center justify-center ${localEmployeeIds.includes(emp.id) ? 'bg-red-600 border-red-600' : 'border-gray-400'}`}>
+                            {localEmployeeIds.includes(emp.id) && <Check className="text-white" style={{ fontSize: '0.75rem' }} />}
                           </div>
                           <span>{emp?.user.first_name + ' ' + emp?.user.last_name || emp?.user.username}</span>
                           <span className="ml-2 text-xs text-gray-500">
@@ -568,8 +655,8 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
                           className={`px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center ${isServiceFromSelectedEmployee(service.id) ? 'bg-gray-50' : ''}`}
                           onClick={() => toggleServiceSelection(service.id)}
                         >
-                          <div className={`w-4 h-4 mr-2 border rounded flex items-center justify-center ${localServiceIds.includes(`${service.id}`) ? 'bg-red-600 border-red-600' : 'border-gray-400'}`}>
-                            {localServiceIds.includes(`${service.id}`) && <Check className="text-white" style={{ fontSize: '0.75rem' }} />}
+                          <div className={`w-4 h-4 mr-2 border rounded flex items-center justify-center ${localServiceIds.includes(service.id) ? 'bg-red-600 border-red-600' : 'border-gray-400'}`}>
+                            {localServiceIds.includes(service.id) && <Check className="text-white" style={{ fontSize: '0.75rem' }} />}
                           </div>
                           <span>{service.name}</span>
                           {isServiceFromSelectedEmployee(service.id) && (
