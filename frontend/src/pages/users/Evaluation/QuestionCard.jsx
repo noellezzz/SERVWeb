@@ -110,25 +110,30 @@ export default function QuestionCard({
 
   return (
     <div className='w-full'>
-      <div className='p-4 bg-white rounded-lg shadow-md w-full flex flex-col justify-between items-center'>
-        <span className="text-sm font-bold text-gray-600">
+      <div className='p-3 md:p-4 bg-white rounded-lg shadow-md w-full flex flex-col justify-between items-center'>
+        <span className="text-xs md:text-sm font-bold text-gray-600">
           Question {currentQuestionIndex + 1} of {questions.length}
         </span>
-        <div className='flex items-center justify-between w-full'>
-          <h1 className='text-2xl font-semibold text-center'>{question[`question_text_${lang}`]}</h1>
-          <button onClick={isListening ? stopListening : startListening}>
+        <div className='flex items-center justify-between w-full mt-2'>
+          <h1 className='text-lg md:text-2xl font-semibold text-center flex-grow pr-2'>{question[`question_text_${lang}`]}</h1>
+          <button 
+            onClick={isListening ? stopListening : startListening}
+            className="flex-shrink-0 p-2 rounded-full hover:bg-gray-100"
+          >
             {isListening ? <FaMicrophone
+              className="text-xl md:text-2xl"
               style={{ color: getVolumeColor(volumeLevel) }}
             /> : <FaMicrophoneSlash
+              className="text-xl md:text-2xl"
               style={{ color: 'gray' }}
             />}
           </button>
         </div>
       </div>
 
-      <div className='mt-4 p-4 w-full bg-white rounded-t-lg shadow-md'>
+      <div className='mt-3 md:mt-4 p-3 md:p-4 w-full bg-white rounded-t-lg shadow-md'>
         <textarea
-          className='h-64 w-full'
+          className='h-40 md:h-64 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-300'
           placeholder='Type your answer here...'
           defaultValue={answerRef.current?.value || question?.answer || ''}
           ref={answerRef}
@@ -137,19 +142,20 @@ export default function QuestionCard({
           }}
         />
         {/* Options */}
-        <div className="flex justify-around mt-4">
+        <div className="flex flex-wrap justify-around mt-4 gap-2">
           {[rating1, rating2, rating3, rating4, rating5].map((ratingImg, index) => (
-            <div key={index} className="flex flex-col items-center">
+            <div key={index} className="flex flex-col items-center w-16 md:w-auto">
               <button
-                className={`flex items-center justify-center p-2 rounded-full aspect-square transition-transform transform hover:scale-110 active:scale-95 ${rating === index + 1 ? 'border-2 border-black bg-gray-300' : ''}`}
+                className={`flex items-center justify-center p-1 md:p-2 rounded-full aspect-square transition-transform transform hover:scale-110 active:scale-95 ${rating === index + 1 ? 'border-2 border-black bg-gray-300' : ''}`}
                 onClick={() => handleRatingSelect(index)}
               >
                 <img
                   src={ratingImg}
-                  className="w-8 h-8 object-contain"
+                  className="w-6 h-6 md:w-8 md:h-8 object-contain"
+                  alt={`Rating ${index + 1}`}
                 />
               </button>
-              <span className="mt-2 text-sm md:text-base text-center">
+              <span className="mt-1 text-xs md:text-sm text-center">
                 {["Very Unsatisfied", "Unsatisfied", "Neutral", "Satisfied", "Very Satisfied"][index]}
               </span>
             </div>
@@ -184,7 +190,7 @@ export default function QuestionCard({
           handlePrev();
           clearAnswer();
         }}
-        handleDone={()=>{
+        handleDone={() => {
           setQuestions(prev => prev
             .map((q, i) => {
               if (i === currentQuestionIndex) {
@@ -197,6 +203,5 @@ export default function QuestionCard({
         }}
       />
     </div>
-
   );
 }
