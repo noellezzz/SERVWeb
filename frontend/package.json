@@ -23,6 +23,7 @@
     "@yudiel/react-qr-scanner": "^2.2.1",
     "change-case": "^5.4.4",
     "chart.js": "^4.4.7",
+    "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-annotation": "^3.1.0",
     "faker": "^5.5.3",
     "formik": "^2.4.6",
