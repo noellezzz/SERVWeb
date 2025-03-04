@@ -5,17 +5,17 @@ REPORTS
 - [x] by services reports pdf
 - [x] by sentiment pdf
 
-- [ ] frotend table employee
-- [ ] frotend table services
-- [ ] frotend table sentiment
+- [x] frotend table employee
+- [x] frotend table services
+- [x] frotend table sentiment
 
 
 
 CHARTS
-- [ ] Fix p
+- [x] Fix p
     - [x] VISUALIZER / 
-    - [ ] Tag Cloud / 
-    - [ ] Timeline
+    - [x] Tag Cloud / 
+    - [x] Timeline
 - [ ] List TO Fix Charts
     - [ ] total assesments, total users, total reports, total analytics(sentiments)
     - [ ] total assesments (pie chart)
@@ -27,11 +27,13 @@ CHARTS
 
 
 FRONTEND
-- [ ] Fix multiple employeeids, serviceids selection
-- [ ] User CRUD
-- [ ] Services CRUD
+- [x] Fix multiple employeeids, serviceids selection
+- [ ] qr code generator
+- [ ] url params, -put the employee ids and service ids in url for qr generator
 - [ ] Add user page 
 - [ ] Fix Results Storing After Evaluation (test/api py)
+- [ ] User CRUD
+- [ ] Services CRUD
 
 
 - [x] Seed users, employee, services, feedbacks, results

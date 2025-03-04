@@ -56,25 +56,25 @@ export default function Visualizer() {
 
       <div className="rounded border shadow-md p-4">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
+          <Tab label="Feedbacks Table" />
           <Tab label="Scatter Chart" />
           <Tab label="Word Cloud" />
           <Tab label="Timeline Chart" />
-          <Tab label="Feedbacks Table" />
         </Tabs>
 
         <TabPanel value={value} index={0}>
+          <VisualizeTable search={filteredTerm} />
+        </TabPanel>
+        <TabPanel value={value} index={1}>
           <VisualizeScatter search={filteredTerm} />          
         </TabPanel>
 
-        <TabPanel value={value} index={1}>
+        <TabPanel value={value} index={2}>
         <VisualizeWordCloud search={filteredTerm} />
         </TabPanel>
 
-        <TabPanel value={value} index={2}>
-          <VisualizeTimeline search={filteredTerm} />
-        </TabPanel>
         <TabPanel value={value} index={3}>
-          <VisualizeTable search={filteredTerm} />
+          <VisualizeTimeline search={filteredTerm} />
         </TabPanel>
       </div>
       
