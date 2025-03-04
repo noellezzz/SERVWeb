@@ -11,7 +11,6 @@ export default function Questions({
   info, 
   onFinish = () => { },
   setStep = () => { }, 
-
 }) {
   const mainContentRef = useRef(null);
 
@@ -126,16 +125,12 @@ export default function Questions({
     // console.log(questions)
   }, [questions]);
 
-
-
-
   return (
-    <div className='py-12 p-4 flex flex-col items-center justify-center min-h-screen' ref={mainContentRef}>
+    <div className='py-6 md:py-12 px-2 md:px-4 flex flex-col items-center justify-center min-h-screen w-full' ref={mainContentRef}>
       <LoadingScreen loading={loading} />
       {/* CONTENT */}
       {!loading && (
-        <div className='flex flex-col items-center w-full max-w-4xl white'>
-
+        <div className='flex flex-col items-center w-full max-w-4xl'>
           {/* QUESTION */}
           <QuestionCard
             lang={lang}
@@ -150,13 +145,9 @@ export default function Questions({
             handlePrev={handlePrev}
             handleDone={handleDone}
             handleRepeat={handleRepeat}
-           />
-
-
+          />
         </div>
       )}
-
-      {/* AUDIO */}
     </div>
   );
 }
