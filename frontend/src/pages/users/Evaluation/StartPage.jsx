@@ -4,8 +4,10 @@ import { Scanner } from '@yudiel/react-qr-scanner';
 import { QrCode, ExpandMore, Check, Close } from '@mui/icons-material';
 import useResource from '@/hooks/useResource';
 import swal from 'sweetalert';
+import { useNavigate } from 'react-router-dom';
 
-export default function StartPage({ info, setInfo = () => {}, onStart }) {
+export default function StartPage({ info, setInfo = () => { }, onStart }) {
+  const navigate = useNavigate();
   const mainContentRef = useRef(null);
   const employeeDropdownRef = useRef(null);
   const serviceDropdownRef = useRef(null);
@@ -14,6 +16,10 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
   const [scanMode, setScanMode] = useState(null); // 'userId', 'evaluation', or null
   const [employeeDropdownOpen, setEmployeeDropdownOpen] = useState(false);
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
+  
+  // Initialize local state for selections
+  const [localEmployeeIds, setLocalEmployeeIds] = useState(info.employeeIds || []);
+  const [localServiceIds, setLocalServiceIds] = useState(info.serviceIds || []);
 
   const {
     actions: {
@@ -33,6 +39,15 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
     }
   } = useResource('employee-info');
 
+  useEffect(() => {
+    if (info.employeeIds) {
+      setLocalEmployeeIds(info.employeeIds);
+    }
+    if (info.serviceIds) {
+      setLocalServiceIds(info.serviceIds);
+    }
+  }, [info.employeeIds, info.serviceIds]);
+
   // ################################################################
   // HANDLERS
   // ################################################################
@@ -43,16 +58,46 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
       setScanMode(null);
       return;
     }
-    
+
     // Start scanning in the specified mode
     setIsScanning(true);
     setScanMode(mode);
   };
+  
+  const generateEvaluationQrUrl = () => {
+    // Get the current base URL of the application
+    const baseUrl = window.location.origin;
 
+    // Get selected employees and services
+    const employeeIds = info.employeeIds?.join(',') || '';
+    const serviceIds = info.serviceIds?.join(',') || '';
+    const userId = info.userId || '';
+
+    // Generate the URL with parameters
+    let url = `${baseUrl}/evaluation?employeeIds=${employeeIds}&serviceIds=${serviceIds}`;
+    
+    // Add user ID if available
+    if (userId) {
+      url += `&userId=${userId}`;
+    }
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        swal('Success', 'Evaluation URL copied to clipboard', 'success');
+      })
+      .catch(err => {
+        console.error('Failed to copy URL: ', err);
+        swal('Info', `Evaluation URL: ${url}`, 'info');
+      });
+
+    return url;
+  };
+  
   // Handle QR code result based on current scan mode
   const handleScanResult = (result) => {
     if (!result) return;
-    
+
     try {
       const scannedData = result.text;
 
@@ -63,32 +108,91 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
         setIsScanning(false);
         setScanMode(null);
         swal('Success', 'User ID captured successfully', 'success');
-      } 
+      }
       else if (scanMode === 'evaluation') {
-        // Handle evaluation scan - assuming the QR contains JSON with employeeIds and serviceIds
-        try {
-          const evaluationData = JSON.parse(scannedData);
-          
-          if (evaluationData.employeeIds) {
-            setInfo((prev) => ({
-              ...prev,
-              employeeIds: [...(prev.employeeIds || []), ...evaluationData.employeeIds]
-            }));
-            
-            // Auto-select services for the scanned employees
-            updateServicesBasedOnEmployees(evaluationData.employeeIds);
+        // Check if the scanned text is a URL
+        if (scannedData.startsWith('http')) {
+          try {
+            // Extract parameters from URL
+            const url = new URL(scannedData);
+            const employeeIdsParam = url.searchParams.get('employeeIds');
+            const serviceIdsParam = url.searchParams.get('serviceIds');
+            const userIdParam = url.searchParams.get('userId');
+
+            if (employeeIdsParam || serviceIdsParam) {
+              // If we have employee IDs, extract and process them
+              if (employeeIdsParam) {
+                const employeeIds = employeeIdsParam.split(',').map(id => parseInt(id.trim(), 10)).filter(Boolean);
+                setInfo(prev => ({
+                  ...prev,
+                  employeeIds: [...new Set([...(prev.employeeIds || []), ...employeeIds])]
+                }));
+                setLocalEmployeeIds(prev => [...new Set([...prev, ...employeeIds])]);
+
+                // Auto-select services for these employees
+                updateServicesBasedOnEmployees(employeeIds);
+              }
+
+              // If we have service IDs, extract and process them
+              if (serviceIdsParam) {
+                const serviceIds = serviceIdsParam.split(',').map(id => parseInt(id.trim(), 10)).filter(Boolean);
+                setInfo(prev => ({
+                  ...prev,
+                  serviceIds: [...new Set([...(prev.serviceIds || []), ...serviceIds])]
+                }));
+                setLocalServiceIds(prev => [...new Set([...prev, ...serviceIds])]);
+              }
+
+              // If we have user ID, extract and set it
+              if (userIdParam) {
+                setInfo(prev => ({ ...prev, userId: userIdParam }));
+              }
+
+              setIsScanning(false);
+              setScanMode(null);
+              swal('Success', 'Evaluation data loaded from QR code', 'success');
+            } else {
+              // Try to navigate to the URL if it's an evaluation link
+              if (scannedData.includes('/evaluation')) {
+                window.location.href = scannedData;
+                return;
+              }
+              swal('Error', 'QR code does not contain valid evaluation parameters', 'error');
+            }
+          } catch (error) {
+            console.error("Error processing URL from QR code:", error);
+            swal('Error', 'Invalid URL in QR code', 'error');
           }
-          
-          if (evaluationData.serviceIds) {
-            setInfo((prev) => ({
-              ...prev,
-              serviceIds: [...(prev.serviceIds || []), ...evaluationData.serviceIds]
-            }));
+        } else {
+          // Handle as JSON data (existing implementation)
+          try {
+            const evaluationData = JSON.parse(scannedData);
+
+            if (evaluationData.employeeIds) {
+              const empIds = evaluationData.employeeIds;
+              setInfo((prev) => ({
+                ...prev,
+                employeeIds: [...new Set([...(prev.employeeIds || []), ...empIds])]
+              }));
+              setLocalEmployeeIds(prev => [...new Set([...prev, ...empIds])]);
+
+              // Auto-select services for the scanned employees
+              updateServicesBasedOnEmployees(empIds);
+            }
+
+            if (evaluationData.serviceIds) {
+              const svcIds = evaluationData.serviceIds;
+              setInfo((prev) => ({
+                ...prev,
+                serviceIds: [...new Set([...(prev.serviceIds || []), ...svcIds])]
+              }));
+              setLocalServiceIds(prev => [...new Set([...prev, ...svcIds])]);
+            }
+
+            swal('Success', 'Evaluation data captured successfully', 'success');
+          } catch (error) {
+            swal('Error', 'Failed to parse evaluation data from QR code', 'error');
           }
-          
-          swal('Success', 'Evaluation data captured successfully', 'success');
-        } catch (error) {
-          swal('Error', 'Failed to parse evaluation data from QR code', 'error');
         }
       }
     } catch (error) {
@@ -126,10 +230,10 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
   // Update services based on selected employees
   const updateServicesBasedOnEmployees = (employeeIds) => {
     if (!employees || !employeeIds) return;
-    
+
     // Collect all service IDs from the selected employees
     const selectedEmployeeServices = [];
-    
+
     employeeIds.forEach(empId => {
       const employee = employees.find(emp => emp.id === empId);
       if (employee && employee.services) {
@@ -140,32 +244,42 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
         });
       }
     });
-    
+
     // Update the services selection
+    const updatedServiceIds = [...new Set([...(info.serviceIds || []), ...selectedEmployeeServices])];
     setInfo(prev => ({
       ...prev,
-      serviceIds: [...new Set([...(prev.serviceIds || []), ...selectedEmployeeServices])]
+      serviceIds: updatedServiceIds
     }));
+    setLocalServiceIds(updatedServiceIds);
   };
 
   // Toggle employee selection and auto-select their services
   const toggleEmployeeSelection = (empId) => {
+    const newEmployeeIds = toggleItemInArray(info.employeeIds || [], empId);
+    
+    // Update local state for UI
+    setLocalEmployeeIds(newEmployeeIds);
+    
     setInfo((prev) => {
-      const newEmployeeIds = toggleItemInArray(prev.employeeIds || [], empId);
-      
       // If employee was added, add their services
       if (!prev.employeeIds?.includes(empId)) {
         const employee = employees.find(emp => emp.id === empId);
         if (employee && employee.services) {
           const serviceIds = employee.services.map(service => service.id);
+          const updatedServiceIds = [...new Set([...(prev.serviceIds || []), ...serviceIds])];
+          
+          // Update local state for services too
+          setLocalServiceIds(updatedServiceIds);
+          
           return {
             ...prev,
             employeeIds: newEmployeeIds,
-            serviceIds: [...new Set([...(prev.serviceIds || []), ...serviceIds])]
+            serviceIds: updatedServiceIds
           };
         }
       }
-      
+
       return {
         ...prev,
         employeeIds: newEmployeeIds
@@ -175,9 +289,14 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
 
   // Toggle service selection
   const toggleServiceSelection = (serviceId) => {
+    const newServiceIds = toggleItemInArray(info.serviceIds || [], serviceId);
+    
+    // Update local state for UI
+    setLocalServiceIds(newServiceIds);
+    
     setInfo((prev) => ({
-      ...prev, 
-      serviceIds: toggleItemInArray(prev.serviceIds || [], serviceId)
+      ...prev,
+      serviceIds: newServiceIds
     }));
   };
 
@@ -216,34 +335,34 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
 
   // Helper function to get selected employee names
   const getSelectedEmployeeNames = () => {
-    if (!info.employeeIds || !info.employeeIds.length) return "Select Employees";
-    
+    if (!localEmployeeIds.length) return "Select Employees";
+
     const selectedEmployees = (employees || [])
-      .filter(emp => info.employeeIds.includes(emp.id))
+      .filter(emp => localEmployeeIds.includes(`${emp.id}`))
       .map(emp => `${emp.user.first_name} ${emp.user.last_name || emp.user.username}`);
-    
-    return selectedEmployees.length > 1 
+
+    return selectedEmployees.length > 1
       ? `${selectedEmployees[0]} + ${selectedEmployees.length - 1} more`
-      : selectedEmployees[0];
+      : selectedEmployees[0] || "Select Employees";
   };
 
   // Helper function to get selected service names
   const getSelectedServiceNames = () => {
-    if (!info.serviceIds || !info.serviceIds.length) return "Select Services";
-    
+    if (!localServiceIds.length) return "Select Services";
+
     const selectedServices = (services || [])
-      .filter(service => info.serviceIds.includes(service.id))
+      .filter(service => localServiceIds.includes(`${service.id}`))
       .map(service => service.name);
-    
-    return selectedServices.length > 1 
+
+    return selectedServices.length > 1
       ? `${selectedServices[0]} + ${selectedServices.length - 1} more`
-      : selectedServices[0];
+      : selectedServices[0] || "Select Services";
   };
 
   // Get scanning mode display text
   const getScanModeText = () => {
     if (!isScanning) return "";
-    switch(scanMode) {
+    switch (scanMode) {
       case 'userId': return "Scanning User ID...";
       case 'evaluation': return "Scanning Evaluation Data...";
       default: return "Scanning...";
@@ -252,10 +371,10 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
 
   // Find services associated with selected employees
   const getEmployeeServiceIds = () => {
-    if (!employees || !info.employeeIds) return [];
-    
+    if (!employees || !localEmployeeIds.length) return [];
+
     const serviceIds = [];
-    info.employeeIds.forEach(empId => {
+    localEmployeeIds.forEach(empId => {
       const employee = employees.find(emp => emp.id === empId);
       if (employee && employee.services) {
         employee.services.forEach(service => {
@@ -265,7 +384,7 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
         });
       }
     });
-    
+
     return serviceIds;
   };
 
@@ -286,7 +405,7 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
               <>
                 <div className="bg-gray-100 px-4 py-2 rounded-lg mb-4 flex items-center justify-between w-full max-w-sm">
                   <span className="text-gray-700 font-medium">{getScanModeText()}</span>
-                  <button 
+                  <button
                     onClick={() => { setIsScanning(false); setScanMode(null); }}
                     className="text-gray-500 hover:text-red-600"
                   >
@@ -311,6 +430,16 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
                 onClick={() => handleQrCodeScan('evaluation')}
               >
                 <QrCode className="mr-2" /> Scan Evaluation QR
+              </button>
+            </div>
+          )}
+          {!isScanning && localEmployeeIds.length > 0 && (
+            <div className='mt-2 w-full flex justify-center'>
+              <button
+                className='px-6 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 focus:outline-none transition-colors'
+                onClick={generateEvaluationQrUrl}
+              >
+                Generate QR Link
               </button>
             </div>
           )}
@@ -347,7 +476,7 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
                   placeholder='Enter your ID'
                   className='flex-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600'
                 />
-                <button 
+                <button
                   className='w-full sm:w-auto px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none transition-colors flex items-center justify-center'
                   onClick={() => handleQrCodeScan('userId')}
                 >
@@ -364,9 +493,9 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
               <p className='text-sm font-light mb-2'>
                 Select the employees you want to evaluate (services will be auto-selected)
               </p>
-              
+
               <div className="relative w-full" ref={employeeDropdownRef}>
-                <button 
+                <button
                   type="button"
                   className="w-full px-4 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600 flex justify-between items-center bg-white"
                   onClick={() => setEmployeeDropdownOpen(!employeeDropdownOpen)}
@@ -374,7 +503,7 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
                   <span className="truncate">{getSelectedEmployeeNames()}</span>
                   <ExpandMore className={`transform transition-transform ${employeeDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
-                
+
                 {employeeDropdownOpen && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
                     {(employees || []).length === 0 ? (
@@ -386,8 +515,8 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
                           className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
                           onClick={() => toggleEmployeeSelection(emp.id)}
                         >
-                          <div className={`w-4 h-4 mr-2 border rounded flex items-center justify-center ${info.employeeIds?.includes(emp.id) ? 'bg-red-600 border-red-600' : 'border-gray-400'}`}>
-                            {info.employeeIds?.includes(emp.id) && <Check className="text-white" style={{ fontSize: '0.75rem' }} />}
+                          <div className={`w-4 h-4 mr-2 border rounded flex items-center justify-center ${localEmployeeIds.includes(`${emp.id}`) ? 'bg-red-600 border-red-600' : 'border-gray-400'}`}>
+                            {localEmployeeIds.includes(`${emp.id}`) && <Check className="text-white" style={{ fontSize: '0.75rem' }} />}
                           </div>
                           <span>{emp?.user.first_name + ' ' + emp?.user.last_name || emp?.user.username}</span>
                           <span className="ml-2 text-xs text-gray-500">
@@ -399,12 +528,12 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
                   </div>
                 )}
               </div>
-              
+
               {/* Hidden input to store values */}
               <input
                 type="hidden"
                 name="employeeIds"
-                value={info.employeeIds?.join(',') || ''}
+                value={localEmployeeIds.join(',') || ''}
               />
             </div>
 
@@ -416,9 +545,9 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
               <p className='text-sm font-light mb-2'>
                 Services are auto-selected based on employees
               </p>
-              
+
               <div className="relative w-full" ref={serviceDropdownRef}>
-                <button 
+                <button
                   type="button"
                   className="w-full px-4 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600 flex justify-between items-center bg-white"
                   onClick={() => setServiceDropdownOpen(!serviceDropdownOpen)}
@@ -426,7 +555,7 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
                   <span className="truncate">{getSelectedServiceNames()}</span>
                   <ExpandMore className={`transform transition-transform ${serviceDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
-                
+
                 {serviceDropdownOpen && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
                     {(services || []).length === 0 ? (
@@ -438,8 +567,8 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
                           className={`px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center ${isServiceFromSelectedEmployee(service.id) ? 'bg-gray-50' : ''}`}
                           onClick={() => toggleServiceSelection(service.id)}
                         >
-                          <div className={`w-4 h-4 mr-2 border rounded flex items-center justify-center ${info.serviceIds?.includes(service.id) ? 'bg-red-600 border-red-600' : 'border-gray-400'}`}>
-                            {info.serviceIds?.includes(service.id) && <Check className="text-white" style={{ fontSize: '0.75rem' }} />}
+                          <div className={`w-4 h-4 mr-2 border rounded flex items-center justify-center ${localServiceIds.includes(`${service.id}`) ? 'bg-red-600 border-red-600' : 'border-gray-400'}`}>
+                            {localServiceIds.includes(`${service.id}`) && <Check className="text-white" style={{ fontSize: '0.75rem' }} />}
                           </div>
                           <span>{service.name}</span>
                           {isServiceFromSelectedEmployee(service.id) && (
@@ -453,12 +582,12 @@ export default function StartPage({ info, setInfo = () => {}, onStart }) {
                   </div>
                 )}
               </div>
-              
+
               {/* Hidden input to store values */}
               <input
                 type="hidden"
                 name="serviceIds"
-                value={info.serviceIds?.join(',') || ''}
+                value={localServiceIds.join(',') || ''}
               />
             </div>
 

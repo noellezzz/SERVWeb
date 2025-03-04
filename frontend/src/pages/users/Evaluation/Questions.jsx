@@ -7,7 +7,12 @@ import DEFAULT_QUESTIONS from '@/assets/data/questions_sample.js';
 import QuestionCard from './QuestionCard';
 import swal from 'sweetalert';
 
-export default function Questions({ info, onFinish = () => { } }) {
+export default function Questions({ 
+  info, 
+  onFinish = () => { },
+  setStep = () => { }, 
+
+}) {
   const mainContentRef = useRef(null);
 
   // ################################################################
@@ -80,6 +85,8 @@ export default function Questions({ info, onFinish = () => { } }) {
   const handlePrev = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
+    } else {
+      setStep(0);
     }
   };
 
