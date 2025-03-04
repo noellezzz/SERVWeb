@@ -96,6 +96,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
   
   // Handle QR code result based on current scan mode
   const handleScanResult = (result) => {
+    console.log(result)
     if (!result) return;
 
     try {
@@ -413,7 +414,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
                   </button>
                 </div>
                 <div className='w-full max-w-sm aspect-square'>
-                  <Scanner onResult={(result) => handleScanResult(result)} />
+                  <Scanner onScan={(result) => handleScanResult(result)} />
                 </div>
               </>
             )}
