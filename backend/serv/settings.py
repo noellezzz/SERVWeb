@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = getEnv('SECRET', 'django-insecure-#&^l)7d*%h&db4uft@dk%h-w&nup#pu%)a!d)c7jwgoixo5_hm0$')
 DEBUG = bool(getEnv('DEBUG', True))
-ALLOWED_HOSTS = getEnv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = getEnv('ALLOWED_HOSTS', 'localhost,127.0.0.1,*').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -191,15 +191,19 @@ REST_FRAMEWORK = {
 
 # Cors
 CORS_ORIGIN_ALLOW_ALL = bool(getEnv('CORS_ORIGIN_ALLOW_ALL', False))
-CORS_ALLOW_CREDENTIALS = bool(getEnv('CORS_ALLOW_CREDENTIALS', False))
 CORS_ALLOW_ALL_ORIGINS = bool(getEnv('CORS_ALLOW_ALL_ORIGINS', False))
 # ACCESS_CONTROL_ALLOW_ORIGIN = getEnv('ACCESS_CONTROL_ALLOW_ORIGIN', '*')
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "http://localhost:8080",
-    "http://localhost:5000",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://localhost:8000",
+#     "http://localhost:8080",
+#     "http://localhost:5000",
+#     "*"
+# ]
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = bool(getEnv('CORS_ALLOW_CREDENTIALS', True))
+
+
 
 
 
