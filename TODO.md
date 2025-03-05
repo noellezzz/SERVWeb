@@ -28,8 +28,8 @@ CHARTS
 
 FRONTEND
 - [x] Fix multiple employeeids, serviceids selection
-- [ ] qr code generator
-- [ ] url params, -put the employee ids and service ids in url for qr generator
+- [x] qr code generator
+- [x] url params, -put the employee ids and service ids in url for qr generator
 - [ ] Add user page 
 - [ ] Fix Results Storing After Evaluation (test/api py)
 - [ ] User CRUD
