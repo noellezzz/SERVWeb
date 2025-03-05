@@ -1,7 +1,7 @@
 import './App.css';
 import 'regenerator-runtime/runtime';
-
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 // Layouts
 import Layout from './layouts/user/Layout';
@@ -28,35 +28,43 @@ import Notifications from './pages/admin/Notifications';
 import Profile from './pages/admin/Profile';
 import Login from './pages/admin/Login';
 
+// Protected Route Component using Redux state
+const ProtectedRoute = () => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/admin/login" replace />;
+};
+
 function App() {
   return (
     <Routes>
       {/* User Routes */}
-      <Route path='/' element={<Layout />}>
+      <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
-        <Route path='evaluation' element={<Evaluation />} />
-        <Route path='services' element={<Services />} />
-        <Route path='about' element={<About />} />
-        <Route path='contact' element={<Contact />} />
+        <Route path="evaluation" element={<Evaluation />} />
+        <Route path="services" element={<Services />} />
+        <Route path="about" element={<About />} />
+        <Route path="contact" element={<Contact />} />
       </Route>
 
-      {/* Admin Routes */}
-      <Route path='/admin/login' element={<Login />} />
-      <Route path='/admin' element={<AdminLayout />}>
-        <Route index element={<Dashboard />} />
+      {/* Admin Login Route */}
+      <Route path="/admin/login" element={<Login />} />
 
-        <Route path='users' element={<Users />} />
-        <Route path='assessments' element={<AssessmenstPage />} />
-        <Route path='assessments/:assessmentId' element={<AsssessmentView />} />
-
-        <Route path='feedbacks' element={<FeedbacksPage />} />
-        <Route path='reports' element={<ReportsPage />} />
-        <Route path='analytics' element={<Analytics />} />
-        <Route path='visualizer' element={<Visualizer />} />
-        <Route path='settings' element={<Settings />} />
-
-        <Route path='notifications' element={<Notifications />} />
-        <Route path='profile' element={<Profile />} />
+      {/* Protected Admin Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="users" element={<Users />} />
+          <Route path="assessments" element={<AssessmenstPage />} />
+          <Route path="assessments/:assessmentId" element={<AsssessmentView />} />
+          <Route path="feedbacks" element={<FeedbacksPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="visualizer" element={<Visualizer />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
       </Route>
     </Routes>
   );
