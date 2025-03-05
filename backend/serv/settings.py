@@ -29,6 +29,7 @@ ALLOWED_HOSTS = getEnv('ALLOWED_HOSTS', 'localhost,127.0.0.1,*').split(',')
 
 # Application definition
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +44,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     
-    'mathfilters',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -63,7 +63,71 @@ INSTALLED_APPS = [
     'pdf',
 ]
 
+# Add Jazzmin settings here
+JAZZMIN_SETTINGS = {
+    # Title on the login screen
+    "site_title": "SERV Admin",
+    
+    # Title to show in the tab
+    "site_header": "SERV",
+    
+    # Square logo to display in the sidebar
+    "site_logo": "images/logo.png",
+    
+    # Welcome text on login screen
+    "welcome_sign": "Welcome to the SERV Admin Portal",
+    
+    # Copyright on the footer
+    "copyright": "SERV 2025",
+    
+    # The model admin to search from the search bar
+    "search_model": "auth.User",
+    
+    # List of apps to show as dropdown
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Site", "url": "/", "new_window": True},
+    ],
+    
+    # Whether to display the side menu
+    "show_sidebar": True,
+    
+    # Whether to auto expand the menu
+    "navigation_expanded": True,
+    
+    # Custom icons for side menu apps/models
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "users.user": "fas fa-user",
+        "sentiment_tests": "fas fa-chart-line",
+        "feedbacks": "fas fa-comment",
+        "tts": "fas fa-volume-up",
+        "pdf": "fas fa-file-pdf",
+    },
+}
 
+# UI Customizer
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-success",
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "sidebar": "sidebar-dark-primary",
+    "theme": "default",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
