@@ -98,13 +98,16 @@ JAZZMIN_SETTINGS = {
     # Custom icons for side menu apps/models
     "icons": {
         "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
+        # "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
-        "users.user": "fas fa-user",
+        "users": "fas fa-users",  # This is the app itself
+        "users.User": "fas fa-user",  # Try lowercase model name
+        "auth.User": "fas fa-user",  # If Django is still recognizing it under auth
         "sentiment_tests": "fas fa-chart-line",
         "feedbacks": "fas fa-comment",
         "tts": "fas fa-volume-up",
         "pdf": "fas fa-file-pdf",
+        "dashboard.Services": "fas fa-cogs",
     },
 }
 
@@ -130,6 +133,7 @@ JAZZMIN_UI_TWEAKS = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -137,8 +141,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'serv.urls'
@@ -302,5 +305,4 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
-#ALLAUTH
 ACCOUNT_EMAIL_VERIFICATION = 'none'
