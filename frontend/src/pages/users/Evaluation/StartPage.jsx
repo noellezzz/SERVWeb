@@ -136,9 +136,16 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
       let scannedData = result[0]?.rawValue || result[0]?.text;
 
       if (scanMode === 'userId') {
-        // Handle user ID scan - assuming the QR code contains just the ID
+        if (scannedData.startsWith('http')) {
+          try {
+            const url = new URL(scannedData);
+            scannedData = url.searchParams.get('userId');
+          } catch (error) {
+            console.error("Error processing URL from QR code:", error);
+            swal('Error', 'Invalid URL in QR code', 'error ');
+          }
+        }
         setInfo((prev) => ({ ...prev, userId: scannedData }));
-        // Stop scanning after successful scan
         setIsScanning(false);
         setScanMode(null);
         swal('Success', 'User ID captured successfully', 'success');
