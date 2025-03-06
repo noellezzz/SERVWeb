@@ -1,60 +1,97 @@
 import React, { useState } from "react";
-import { FaUser, FaEdit, FaTrashAlt, FaEnvelope, FaSearch, FaFilePdf, FaTransgender, FaMapMarkerAlt, FaNotesMedical } from "react-icons/fa";
+import { FaUser, FaEdit, FaTrashAlt, FaSearch, FaFilePdf } from "react-icons/fa";
 import { motion } from "framer-motion";
 import jsPDF from "jspdf";
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editedUser, setEditedUser] = useState(null);
 
-  const users = [
+  // Initial user data
+  const [users, setUsers] = useState([
     {
       id: 1,
       user: "John Doe",
-      email: "johndoe@example.com",
       age: 45,
       gender: "Male",
       address: "123 Main St, Cityville",
-      medicalInfo: {
-        bloodPressure: "120/80",
-        heartRate: 72,
-        bloodType: "O+",
-        allergies: ["Peanuts", "Dust"],
-      },
-      latestFeedback: {
-        content: "Service was excellent and timely.",
-        date: "2025-01-30",
-        recommendedFollowUp: "Routine check-up in 6 months",
-      },
-      pdfName: "John_Doe_Profile.pdf",
-      sentimentCategory: "Positive",
+      feedbackList: [
+        {
+          id: 1,
+          content: "Service was excellent and timely.",
+          date: "2025-01-30",
+          recommendedFollowUp: "Routine check-up in 6 months",
+          sentimentCategory: "Positive"
+        },
+        {
+          id: 2,
+          content: "The waiting area was comfortable but could use more seating.",
+          date: "2024-12-15",
+          recommendedFollowUp: "None required",
+          sentimentCategory: "Neutral"
+        }
+      ],
+      pdfName: "John_Doe_Profile.pdf"
     },
     {
       id: 2,
       user: "Jane Smith",
-      email: "janesmith@example.com",
       age: 38,
       gender: "Female",
       address: "456 Elm St, Townsville",
-      medicalInfo: {
-        bloodPressure: "130/85",
-        heartRate: 78,
-        bloodType: "A+",
-        allergies: ["Gluten"],
-      },
-      latestFeedback: {
-        content: "Wait times were longer than expected.",
-        date: "2025-01-28",
-        recommendedFollowUp: "Customer service follow-up call",
-      },
-      pdfName: "Jane_Smith_Profile.pdf",
-      sentimentCategory: "Neutral",
+      feedbackList: [
+        {
+          id: 1,
+          content: "Wait times were longer than expected.",
+          date: "2025-01-28",
+          recommendedFollowUp: "Customer service follow-up call",
+          sentimentCategory: "Neutral"
+        },
+        {
+          id: 2,
+          content: "Staff was very helpful but the process was confusing.",
+          date: "2024-11-10",
+          recommendedFollowUp: "Review process documentation",
+          sentimentCategory: "Mixed"
+        }
+      ],
+      pdfName: "Jane_Smith_Profile.pdf"
     },
-  ];
+  ]);
 
   const filteredUsers = users.filter((user) =>
     user.user.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleEditUser = (user) => {
+    setEditMode(true);
+    setEditedUser({ ...user });
+    setSelectedUser(user);
+  };
+
+  const handleSaveUser = () => {
+    setUsers(users.map(user => user.id === editedUser.id ? editedUser : user));
+    setEditMode(false);
+    setSelectedUser(editedUser);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedUser({
+      ...editedUser,
+      [name]: value
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(false);
+  };
+
+  const handleFeedbackClose = () => {
+    setSelectedUser(null);
+  };
 
   const generateUserPDF = (user) => {
     const doc = new jsPDF({
@@ -66,11 +103,11 @@ const Users = () => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
     doc.setTextColor(40, 60, 100);
-    doc.text("Waiting Line Sentiment Analysis", 105, 20, null, null, "center");
+    doc.text("User Feedback Analysis", 105, 20, null, null, "center");
 
     doc.setFontSize(16);
     doc.setTextColor(0, 0, 0);
-    doc.text("Participant Profile", 20, 40);
+    doc.text("User Profile", 20, 40);
     doc.setLineWidth(0.5);
     doc.line(20, 45, 190, 45);
 
@@ -78,51 +115,34 @@ const Users = () => {
     doc.text(`Name: ${user.user}`, 20, 55);
     doc.text(`Age: ${user.age}`, 20, 65);
     doc.text(`Gender: ${user.gender}`, 20, 75);
+    doc.text(`Address: ${user.address}`, 20, 85);
 
     doc.setFontSize(16);
-    doc.text("Feedback Sentiment Analysis", 20, 95);
-    doc.line(20, 100, 190, 100);
+    doc.text("Feedback History", 20, 105);
+    doc.line(20, 110, 190, 110);
 
-    doc.setFontSize(12);
-    doc.text("Feedback Content:", 20, 110);
-    const splitFeedback = doc.splitTextToSize(user.latestFeedback.content, 170);
-    doc.text(splitFeedback, 20, 120);
-
-    doc.text("Sentiment Score:", 20, 160);
-    let sentimentColor, sentimentText;
-    switch (user.sentimentCategory) {
-      case "Positive":
-        sentimentColor = [0, 128, 0];
-        sentimentText = "Very Satisfactory Experience";
-        break;
-      case "Neutral":
-        sentimentColor = [255, 165, 0];
-        sentimentText = "Moderate Satisfaction";
-        break;
-      case "Negative":
-        sentimentColor = [255, 0, 0];
-        sentimentText = "Needs Immediate Improvement";
-        break;
-      default:
-        sentimentColor = [128, 128, 128];
-        sentimentText = "Inconclusive";
-    }
-
-    doc.setTextColor(...sentimentColor);
-    doc.text(sentimentText, 20, 170);
-
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(16);
-    doc.text("Additional Context", 20, 190);
-    doc.line(20, 195, 190, 195);
-
-    doc.setFontSize(12);
-    doc.text(`Date of Feedback: ${user.latestFeedback.date}`, 20, 205);
-    doc.text(`Recommended Follow-up: ${user.latestFeedback.recommendedFollowUp}`, 20, 215);
-
-    doc.text("Medical Context (if applicable):", 20, 230);
-    doc.text(`Blood Pressure: ${user.medicalInfo.bloodPressure}`, 20, 240);
-    doc.text(`Heart Rate: ${user.medicalInfo.heartRate}`, 20, 250);
+    let yPosition = 120;
+    user.feedbackList.forEach((feedback, index) => {
+      doc.setFontSize(14);
+      doc.text(`Feedback ${index + 1}:`, 20, yPosition);
+      yPosition += 10;
+      
+      doc.setFontSize(12);
+      doc.text(`Date: ${feedback.date}`, 25, yPosition);
+      yPosition += 10;
+      
+      doc.text("Content:", 25, yPosition);
+      yPosition += 10;
+      const splitFeedback = doc.splitTextToSize(feedback.content, 160);
+      doc.text(splitFeedback, 30, yPosition);
+      yPosition += splitFeedback.length * 7;
+      
+      doc.text(`Sentiment: ${feedback.sentimentCategory}`, 25, yPosition);
+      yPosition += 10;
+      
+      doc.text(`Follow-up: ${feedback.recommendedFollowUp}`, 25, yPosition);
+      yPosition += 20;
+    });
 
     doc.save(user.pdfName);
   };
@@ -131,7 +151,7 @@ const Users = () => {
     <div className="flex-1 overflow-auto relative z-10">
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-black">Senior Users Management</h2>
+          <h2 className="text-2xl font-semibold text-black">User Management Admin Panel</h2>
 
           <div className="relative w-72">
             <input
@@ -148,10 +168,8 @@ const Users = () => {
         <div className="bg-white shadow-lg rounded-xl p-6 border-2 border-black">
           <div className="grid grid-cols-6 gap-6 text-black mb-4 px-4">
             <div className="font-semibold">User</div>
-            <div className="font-semibold">Email</div>
             <div className="font-semibold">Age</div>
             <div className="font-semibold">Gender</div>
-            <div className="font-semibold">Profile</div>
             <div className="font-semibold">Actions</div>
           </div>
 
@@ -173,107 +191,114 @@ const Users = () => {
                   <span className="text-md text-black">{user.user}</span>
                 </div>
 
-                <div className="text-md text-black flex items-center">
-                  <FaEnvelope size={18} className="text-red-500 mr-2" />
-                  {user.email}
-                </div>
+                <div className="text-md">{user.age}</div>
+                <div className="text-md">{user.gender}</div>
 
-                <div className="text-md text-black">{user.age}</div>
-
-                <div className="text-md text-black flex items-center">
-                  <FaTransgender size={18} className="text-red-500 mr-2" />
-                  {user.gender}
-                </div>
-
-                <div className="flex items-center">
+                <div className="text-md">
                   <button
+                    className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600"
                     onClick={() => setSelectedUser(user)}
-                    className="flex items-center px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
                   >
-                    <FaFilePdf className="mr-2" />
-                    View Profile
+                    View Feedback
                   </button>
                 </div>
 
-                <div className="flex justify-end space-x-3">
-                  <button className="flex items-center px-3 py-2 border-2 border-black text-black rounded-lg hover:bg-gray-100 transition-all">
-                    <FaEdit className="mr-2" /> Edit
+                <div className="flex items-center gap-3">
+                  <button
+                    className="flex items-center text-yellow-500"
+                    onClick={() => handleEditUser(user)}
+                  >
+                    <FaEdit />
                   </button>
-                  <button className="flex items-center px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all">
-                    <FaTrashAlt className="mr-2" /> Delete
+                  <button
+                    className="flex items-center text-red-500"
+                    onClick={() => generateUserPDF(user)}
+                  >
+                    <FaFilePdf />
                   </button>
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
-      </main>
 
-      {selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-3/4 max-w-4xl shadow-lg">
-            <h2 className="text-2xl font-semibold mb-6 border-b pb-3">
-              Detailed Profile: {selectedUser.user}
-            </h2>
-
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-xl font-semibold mb-4 flex items-center">
-                  <FaUser className="mr-2 text-red-500" /> Personal Information
-                </h3>
-                <p className="mb-2"><strong>Name:</strong> {selectedUser.user}</p>
-                <p className="mb-2"><strong>Age:</strong> {selectedUser.age}</p>
-                <p className="mb-2                "><strong>Gender:</strong> {selectedUser.gender}</p>
-                <p className="mb-2"><strong>Address:</strong> {selectedUser.address}</p>
+        {selectedUser && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-20 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96 overflow-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-black">{selectedUser.user}'s Feedback</h3>
+                <button onClick={handleFeedbackClose} className="text-xl font-bold text-gray-500">
+                  X
+                </button>
               </div>
 
-              <div>
-                <h3 className="text-xl font-semibold mb-4 flex items-center">
-                  <FaNotesMedical className="mr-2 text-red-500" /> Medical Information
-                </h3>
-                <p className="mb-2"><strong>Blood Pressure:</strong> {selectedUser.medicalInfo.bloodPressure}</p>
-                <p className="mb-2"><strong>Heart Rate:</strong> {selectedUser.medicalInfo.heartRate}</p>
-                <p className="mb-2"><strong>Blood Type:</strong> {selectedUser.medicalInfo.bloodType}</p>
-                <p className="mb-2"><strong>Allergies:</strong> {selectedUser.medicalInfo.allergies.join(", ")}</p>
+              <div className="space-y-4 mb-6">
+                {selectedUser.feedbackList.map((feedback) => (
+                  <div key={feedback.id} className="border-b py-2">
+                    <div className="text-md font-semibold">{feedback.content}</div>
+                    <div className="text-sm text-gray-500">{feedback.date}</div>
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm">Sentiment: {feedback.sentimentCategory}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <div>
-                <h3 className="text-xl font-semibold mb-4 flex items-center">
-                  <FaFilePdf className="mr-2 text-red-500" /> Feedback
-                </h3>
-                <p className="mb-2"><strong>Content:</strong> {selectedUser.latestFeedback.content}</p>
-                <p className="mb-2"><strong>Date:</strong> {selectedUser.latestFeedback.date}</p>
-                <p className="mb-2"><strong>Recommended Follow-up:</strong> {selectedUser.latestFeedback.recommendedFollowUp}</p>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-semibold mb-4 flex items-center">
-                  <FaMapMarkerAlt className="mr-2 text-red-500" /> Sentiment Analysis
-                </h3>
-                <p className="mb-2"><strong>Category:</strong> {selectedUser.sentimentCategory}</p>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-4">
-              <button
-                className="px-4 py-2 bg-gray-300 text-black rounded-lg hover:bg-gray-400 transition-all"
-                onClick={() => setSelectedUser(null)}
-              >
-                Close
-              </button>
-              <button
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
-                onClick={() => generateUserPDF(selectedUser)}
-              >
-                Generate PDF
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {editMode && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-20 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+              <h3 className="text-xl font-semibold text-black mb-4">Edit User</h3>
+
+              <label className="block text-md mb-2">Name</label>
+              <input
+                type="text"
+                name="user"
+                value={editedUser.user}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 mb-4 border-2 border-gray-300 rounded-lg"
+              />
+
+              <label className="block text-md mb-2">Age</label>
+              <input
+                type="number"
+                name="age"
+                value={editedUser.age}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 mb-4 border-2 border-gray-300 rounded-lg"
+              />
+
+              <label className="block text-md mb-2">Gender</label>
+              <input
+                type="text"
+                name="gender"
+                value={editedUser.gender}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 mb-4 border-2 border-gray-300 rounded-lg"
+              />
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={handleCancelEdit}
+                  className="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveUser}
+                  className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 };
 
 export default Users;
-

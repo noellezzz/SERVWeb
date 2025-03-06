@@ -8,11 +8,13 @@ import Layout from './layouts/user/Layout';
 import AdminLayout from './layouts/admin/AdminLayout';
 
 // USER PAGES
-import Home from './pages/users/Home';
-import Evaluation from './pages/users/Evaluation/index.jsx';
-import Services from './pages/users/Services';
-import About from './pages/users/About';
-import Contact from './pages/users/Contact';
+import Home from "./pages/users/Home";
+import Evaluation from "./pages/users/Evaluation/index.jsx";
+import AfterEval from "./pages/users/Evaluation/AfterEval.jsx"; // Added AfterEval.jsx
+import Services from "./pages/users/Services";
+import About from "./pages/users/About";
+import Contact from "./pages/users/Contact";
+import Test from "./pages/users/test.jsx"; // Added test.jsx
 
 // ADMIN PAGES
 import Dashboard from './pages/admin/Dashboard';
@@ -42,9 +44,11 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="evaluation" element={<Evaluation />} />
+        <Route path="evaluation/after" element={<AfterEval />} /> {/* Added AfterEval route */}
         <Route path="services" element={<Services />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="test" element={<Test />} /> {/* Added Test route */}
       </Route>
 
       {/* Admin Login Route */}
