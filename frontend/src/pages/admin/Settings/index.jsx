@@ -4,13 +4,13 @@ import Profile from '@/layouts/admin/Settings/Profile';
 
 const Settings = () => {
     return (
-        <div className='flex-1 overflow-auto relative z-10 '>
+        <div className='flex-1 overflow-auto relative z-10 bg-gray-50'>
             <main className='max-w-4xl mx-auto py-6 px-4 lg:px-8'>
                 <Profile />
-
             </main>
         </div>
     );
 };
+
 
 export default Settings;
