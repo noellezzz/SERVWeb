@@ -63,7 +63,7 @@ const getColumns = (searchTerm) => [
     headerName: 'Sentiment',
     width: 170,
     renderCell: (params) => {
-      if (!params.value || params.value.length === 0) return <span>No data</span>;
+      if (!params.value || params.value?.length === 0) return <span>No data</span>;
       
       const sentiment = params.value[0].sentiment;
       const score = params.value[0].score;
@@ -99,7 +99,7 @@ const getColumns = (searchTerm) => [
     headerName: 'V-A-D',
     width: 120,
     renderCell: (params) => {
-      if (!params.row.sentiment_results || params.row.sentiment_results.length === 0) return <span>No data</span>;
+      if (!params.row.sentiment_results || params.row.sentiment_results?.length === 0) return <span>No data</span>;
       
       const details = params.row.sentiment_results[0].details;
       if (!details) return <span>No details</span>;
@@ -139,7 +139,7 @@ const getColumns = (searchTerm) => [
     headerName: 'Services',
     width: 180,
     renderCell: (params) => {
-      if (!params.value || params.value.length === 0) return <span className="text-gray-400">No services</span>;
+      if (!params.value || params.value?.length === 0) return <span className="text-gray-400">No services</span>;
       
       return (
         <Tooltip title={params.value.map(service => service.name).join(', ')}>
@@ -152,9 +152,9 @@ const getColumns = (searchTerm) => [
                 className="truncate max-w-[80px]"
               />
             ))}
-            {params.value.length > 2 && (
+            {params.value?.length > 2 && (
               <Chip 
-                label={`+${params.value.length - 2}`} 
+                label={`+${params.value?.length - 2}`} 
                 size="small" 
                 variant="outlined"
               />
@@ -169,7 +169,7 @@ const getColumns = (searchTerm) => [
     headerName: 'Employees',
     width: 180,
     renderCell: (params) => {
-      if (!params.value || params.value.length === 0) return <span className="text-gray-400">No employees</span>;
+      if (!params.value || params.value?.length === 0) return <span className="text-gray-400">No employees</span>;
       
       // Check if the search term matches any employee names
       const highlightEmployee = (employee) => {
@@ -188,9 +188,9 @@ const getColumns = (searchTerm) => [
                 className="truncate max-w-[80px]"
               />
             ))}
-            {params.value.length > 2 && (
+            {params.value?.length > 2 && (
               <Chip 
-                label={`+${params.value.length - 2}`} 
+                label={`+${params.value?.length - 2}`} 
                 size="small" 
                 variant="outlined"
               />
@@ -256,7 +256,7 @@ export default function VisualizeTable({ search = '' }) {
   // Enhanced row click handler with detailed information
   const handleRowClick = (params) => {
     const feedback = params.row;
-    const sentimentInfo = feedback.sentiment_results && feedback.sentiment_results.length > 0 
+    const sentimentInfo = feedback.sentiment_results && feedback.sentiment_results?.length > 0 
       ? feedback.sentiment_results[0] 
       : null;
     
@@ -289,7 +289,7 @@ export default function VisualizeTable({ search = '' }) {
             Loading feedback data...
           </Typography>
         </Box>
-      ) : feedbackData.length === 0 ? (
+      ) : feedbackData?.length === 0 ? (
         <Box className="h-96 flex items-center justify-center">
           <Typography variant="body1" color="textSecondary">
             No feedback data available. Please search for feedback to visualize.
@@ -301,7 +301,7 @@ export default function VisualizeTable({ search = '' }) {
             <Typography variant="h6" className="text-gray-700">
               Feedback Analysis Table 
               <span className="text-sm font-normal ml-2 text-gray-500">
-                ({feedbackData.length} results)
+                ({feedbackData?.length} results)
                 {search && (
                   <span className="ml-1">
                     for "<span className="font-medium text-blue-600">{search}</span>"
