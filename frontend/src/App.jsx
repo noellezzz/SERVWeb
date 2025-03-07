@@ -1,20 +1,18 @@
-import './App.css';
-import 'regenerator-runtime/runtime';
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import "./App.css";
+import 'regenerator-runtime/runtime'
+
+import { Routes, Route } from "react-router-dom";
 
 // Layouts
 import Layout from './layouts/user/Layout';
 import AdminLayout from './layouts/admin/AdminLayout';
 
 // USER PAGES
-import Home from "./pages/users/Home";
-import Evaluation from "./pages/users/Evaluation/index.jsx";
-import AfterEval from "./pages/users/Evaluation/AfterEval.jsx"; // Added AfterEval.jsx
-import Services from "./pages/users/Services";
-import About from "./pages/users/About";
-import Contact from "./pages/users/Contact";
-import Test from "./pages/users/test.jsx"; // Added test.jsx
+import Home from './pages/users/Home';
+import Evaluation from './pages/users/Evaluation/index.jsx';
+import Services from './pages/users/Services';
+import About from './pages/users/About';
+import Contact from './pages/users/Contact';
 
 // ADMIN PAGES
 import Dashboard from './pages/admin/Dashboard';
@@ -51,24 +49,24 @@ function App() {
         <Route path="test" element={<Test />} /> {/* Added Test route */}
       </Route>
 
-      {/* Admin Login Route */}
-      <Route path="/admin/login" element={<Login />} />
+      {/* Admin Routes */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Dashboard />} />
 
-      {/* Protected Admin Routes */}
-      <Route element={<ProtectedRoute />}>
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
-          <Route path="assessments" element={<AssessmenstPage />} />
-          <Route path="assessments/:assessmentId" element={<AsssessmentView />} />
-          <Route path="feedbacks" element={<FeedbacksPage />} />
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="visualizer" element={<Visualizer />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="notifications" element={<Notifications />} />
-          <Route path="profile" element={<Profile />} />
-        </Route>
+        <Route path="users" element={<Users />} />
+        <Route path="assessments" element={<AssessmenstPage />} />
+        <Route path="assessments/:assessmentId" element={<AsssessmentView />} />
+
+        
+        <Route path="feedbacks" element={<FeedbacksPage />} />
+        <Route path="reports" element={<ReportsPage />} />
+        <Route path="analytics" element={<Analytics />} />
+        <Route path="visualizer" element={<Visualizer />} />
+        <Route path="settings" element={<Settings />} />
+
+
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>
   );
