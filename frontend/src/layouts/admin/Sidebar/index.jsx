@@ -61,7 +61,7 @@ export default function Sidebar() {
                     className="w-full py-2 bg-red-500 text-white rounded-md"
                     onClick={() => {
                         localStorage.removeItem("token");
-                        navigate("/login");
+                        navigate("/admin/login");
                     }}
                 >
                     Logout

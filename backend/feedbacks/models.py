@@ -1,7 +1,8 @@
 from django.db import models
 from django.urls import reverse
 from django.conf import settings
-
+from users.models import EmployeeInfo, SeniorCitizenInfo, User
+from dashboard.models import Service
 
 
 class Feedback(models.Model):
@@ -11,7 +12,11 @@ class Feedback(models.Model):
     
     
     content = models.TextField(blank=True, null=True)
-    user_nid = models.TextField(blank=True, null=True)
+    rating = models.IntegerField(blank=True, null=True)
+
+    user = models.ForeignKey(SeniorCitizenInfo, on_delete=models.SET_NULL, blank=True, null=True, related_name='seniorcitizeninfo')
+    employees = models.ManyToManyField(EmployeeInfo, related_name='employeeinfo', blank=True)
+    services = models.ManyToManyField(Service, related_name='services', blank=True)
     
     class Meta:
         pass

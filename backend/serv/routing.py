@@ -1,5 +1,5 @@
 from django.conf.urls import url
-
+from django.urls import re_path
 from channels.routing import ChannelNameRouter, ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 
@@ -16,7 +16,7 @@ application = ProtocolTypeRouter({
     # WebSocket handler
     "websocket": AuthMiddlewareStack(
         URLRouter([
-            url(r"^ws/$", serv_WebSocketConsumer.as_asgi()),
+            re_path(r"ws/sentiment/(?P<channel_name>\w+)/$", sentiment_testsConsumer.as_asgi()),
         ])
     ),
     "channel": ChannelNameRouter({

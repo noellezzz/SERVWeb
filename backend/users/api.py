@@ -4,8 +4,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
-from .serializers import UserSerializer, BasicInformationSerializer, SeniorCitizenInfoSerializer, EmployeeInfoSerializer
-from .models import BasicInformation, SeniorCitizenInfo, EmployeeInfo
+from .serializers import UserSerializer, SeniorCitizenInfoSerializer, EmployeeInfoSerializer
+from .models import SeniorCitizenInfo, EmployeeInfo
 
 
 class UserAPI(generics.RetrieveAPIView):
@@ -14,11 +14,6 @@ class UserAPI(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
-
-class BasicInformationViewSet(viewsets.ModelViewSet):
-    queryset = BasicInformation.objects.all()
-    serializer_class = BasicInformationSerializer
-    # permission_classes = [permissions.IsAuthenticated]
 
 class SeniorCitizenInfoViewSet(viewsets.ModelViewSet):
     queryset = SeniorCitizenInfo.objects.all()

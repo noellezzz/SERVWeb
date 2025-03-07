@@ -20,7 +20,6 @@ export default function FeedbacksPage() {
                 <div className='lg:w-3/4 lg:mr-4 flex flex-col gap-8'>
                     <FeedbackTable />
                     
-                    <EvaluationTable />
                 </div>
 
                 <div className='lg:w-1/4'>

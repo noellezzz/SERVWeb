@@ -5,10 +5,13 @@ import useEdgeTTSApi from '@/hooks/useEdgeTTSApi';
 import DEFAULT_QUESTIONS from '@/assets/data/questions_sample.js';
 
 import QuestionCard from './QuestionCard';
-import Actions from './Actions';
 import swal from 'sweetalert';
 
-export default function Questions({ info, onFinish }) {
+export default function Questions({ 
+  info, 
+  onFinish = () => { },
+  setStep = () => { }, 
+}) {
   const mainContentRef = useRef(null);
 
   // ################################################################
@@ -41,7 +44,7 @@ export default function Questions({ info, onFinish }) {
   // ################################################################
   
   const handleTranscript = (transcript) => {
-    console.log('Transcript:', transcript);
+    // console.log('Transcript:', transcript);
   }
 
   const handleRepeat = () => {
@@ -49,7 +52,15 @@ export default function Questions({ info, onFinish }) {
   };
   
   const handleDone = () => {
-    onFinish();
+    const payload = {
+      user_info: info,
+      evaluation: questions,
+      multiple: true,
+      is_new_feedback: true,
+    }
+    doStore(payload).then(() => {
+      onFinish();
+    });
   };
 
   const handleNext = () => {
@@ -73,6 +84,8 @@ export default function Questions({ info, onFinish }) {
   const handlePrev = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
+    } else {
+      setStep(0);
     }
   };
 
@@ -108,44 +121,33 @@ export default function Questions({ info, onFinish }) {
     }
   }, [currentQuestionIndex, lang]);
 
-
-
+  useEffect(() => {
+    // console.log(questions)
+  }, [questions]);
 
   return (
-    <div className='py-12 p-4 flex flex-col items-center justify-center min-h-screen' ref={mainContentRef}>
+    <div className='py-6 md:py-12 px-2 md:px-4 flex flex-col items-center justify-center min-h-screen w-full' ref={mainContentRef}>
       <LoadingScreen loading={loading} />
       {/* CONTENT */}
       {!loading && (
-        <div className='flex flex-col items-center w-full max-w-4xl white'>
-
+        <div className='flex flex-col items-center w-full max-w-4xl'>
           {/* QUESTION */}
           <QuestionCard
-            question={questions[currentQuestionIndex][`question_text_${lang}`]}
-            onChange={handleTranscript}
             lang={lang}
             speak={speak}
-            handleNext={handleNext}
-            handlePrev={handlePrev}
-            handleDone={handleDone}
-           />
-
-          {/* ACTIONS */}
-          <Actions
-            lang={lang}
-            setLang={setLang}
-            handleRepeat={handleRepeat}
-            currentQuestionIndex={currentQuestionIndex}
-            setCurrentQuestionIndex={setCurrentQuestionIndex}
+            question={questions[currentQuestionIndex]}
             questions={questions}
+            currentQuestionIndex={currentQuestionIndex}
+            setQuestions={setQuestions}
+            setLang={setLang}
+            onChange={handleTranscript}
             handleNext={handleNext}
             handlePrev={handlePrev}
             handleDone={handleDone}
+            handleRepeat={handleRepeat}
           />
-
         </div>
       )}
-
-      {/* AUDIO */}
     </div>
   );
 }

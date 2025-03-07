@@ -8,3 +8,10 @@ class ReportViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["get"])
     def employeeReports(self, request):
         pass
+
+    @action(detail=False, methods=["get"])
+    def serviceReports(self, request):
+        pass
+    @action(detail=False, methods=["get"])
+    def userReports(self, request):
+        pass

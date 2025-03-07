@@ -1,18 +1,15 @@
 from rest_framework import serializers
-from .models import BasicInformation, SeniorCitizenInfo, EmployeeInfo, User
+from .models import SeniorCitizenInfo, EmployeeInfo, User
 from dashboard.serializers import ServiceSerializer
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
 
-class BasicInformationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BasicInformation
-        fields = '__all__'
-
 class SeniorCitizenInfoSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
     class Meta:
         model = SeniorCitizenInfo
         fields = '__all__'

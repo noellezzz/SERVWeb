@@ -1,0 +1,520 @@
+{% load static %}
+{% load mathfilters %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ service.name }} - Service Report</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 2cm;
+
+        @top-center {
+          content: "SERV Service Performance Report";
+          font-size: 10pt;
+        }
+
+        @bottom-center {
+          content: "Page " counter(page) " of " counter(pages);
+          font-size: 10pt;
+        }
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        color: #333;
+        line-height: 1.5;
+        margin: 0;
+        padding: 0;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #0056b3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .header img {
+        height: 60px;
+        margin-right: 20px;
+      }
+
+      .header h1 {
+        margin: 0;
+        color: #0056b3;
+        font-size: 24px;
+      }
+
+      .report-date {
+        text-align: right;
+        font-style: italic;
+        margin-bottom: 20px;
+        font-size: 12px;
+      }
+
+      .section {
+        margin-bottom: 30px;
+      }
+
+      .section-title {
+        background-color: #0056b3;
+        color: white;
+        padding: 8px 15px;
+        font-size: 18px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+      }
+
+      .service-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .info-group {
+        margin-bottom: 10px;
+      }
+
+      .info-label {
+        font-weight: bold;
+        color: #555;
+        font-size: 14px;
+        margin-bottom: 3px;
+      }
+
+      .info-value {
+        font-size: 16px;
+      }
+
+      .services-list {
+        margin-top: 15px;
+      }
+
+      .service-item {
+        background-color: #f5f5f5;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        border-left: 4px solid #0056b3;
+      }
+
+      .service-name {
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+
+      .service-description {
+        font-size: 14px;
+        color: #555;
+      }
+
+      .service-category {
+        font-size: 12px;
+        color: #777;
+        font-style: italic;
+        margin-top: 5px;
+      }
+
+      .feedback-section {
+        margin-top: 30px;
+      }
+
+      .feedback-card {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+      }
+
+      .positive-feedback {
+        border-left: 5px solid #4caf50;
+      }
+
+      .negative-feedback {
+        border-left: 5px solid #f44336;
+      }
+
+      .feedback-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .feedback-from {
+        font-weight: bold;
+      }
+
+      .feedback-date {
+        font-size: 12px;
+        color: #777;
+      }
+
+      .feedback-rating {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+
+      .feedback-content {
+        margin-top: 10px;
+        font-style: italic;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+      }
+
+      .sentiment-results {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+      }
+
+      .sentiment-label {
+        font-weight: bold;
+        color: #555;
+      }
+
+      .very-negative {
+        color: #d32f2f;
+      }
+
+      .negative {
+        color: #f44336;
+      }
+
+      .neutral {
+        color: #757575;
+      }
+
+      .positive {
+        color: #4caf50;
+      }
+
+      .very-positive {
+        color: #2e7d32;
+      }
+
+      .performance-summary {
+        margin-top: 30px;
+        padding: 15px;
+        background-color: #e3f2fd;
+        border-radius: 4px;
+        border-left: 5px solid #0056b3;
+      }
+
+      .score-display {
+        display: flex;
+        align-items: center;
+        margin: 15px 0;
+      }
+
+      .score-meter {
+        flex-grow: 1;
+        height: 20px;
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 0 15px;
+      }
+
+      .score-fill {
+        height: 100%;
+        background-color: #0056b3;
+      }
+
+      .score-number {
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .no-data {
+        text-align: center;
+        padding: 20px;
+        color: #777;
+        font-style: italic;
+      }
+
+      .subsection-title {
+        background-color: #e0e0e0;
+        color: #333;
+        padding: 5px 15px;
+        font-size: 16px;
+        margin: 20px 0 15px 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .sentiment-score-comparison {
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 20px;
+      }
+
+      .score-diff-positive {
+        color: #4caf50;
+      }
+
+      .score-diff-negative {
+        color: #f44336;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <img src="{% static 'images/logo.png' %}" alt="SERV Logo" />
+      <h1>SERV Sentiment Analysis: {{ service.name }}</h1>
+    </div>
+
+    <div class="report-date">
+      Report generated on: {{ now|date:"F d, Y" }}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Service Information</div>
+      <div class="service-info">
+        <div>
+          <div class="info-group">
+            <div class="info-label">Service Name</div>
+            <div class="info-value">{{ service.name }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Description</div>
+            <div class="info-value">{{ service.description }}</div>
+          </div>
+        </div>
+        <div>
+          <div class="info-group">
+            <div class="info-label">Category</div>
+            <div class="info-value">{{ service.category }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Created On</div>
+            <div class="info-value">{{ service.created_at|date:"F d, Y" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Performance Evaluation</div>
+      <div class="score-display">
+        <span>Sentiment Score:</span>
+        <div class="score-meter">
+          <div class="score-fill" style="width: {{ average_sentiment_score|floatformat:2 }}%;"></div>
+        </div>
+        <span class="score-number">{{ average_sentiment_score|floatformat:2 }}/100</span>
+      </div>
+      <div class="score-display">
+        <span>User Rating:</span>
+        <div class="score-meter">
+          <div class="score-fill" style="width: {{ average_performance_score|floatformat:2 }}%;"></div>
+        </div>
+        <span class="score-number">{{ average_performance_score|floatformat:2 }}/100</span>
+      </div>
+
+      {% if score_difference %}
+      <div class="sentiment-score-comparison">
+        <p><strong>Score Comparison:</strong> The sentiment-based score is
+          {% if score_difference > 0 %}
+          <span class="score-diff-positive">{{ score_difference|floatformat:2 }} points higher</span>
+          {% elif score_difference < 0 %}
+          <span class="score-diff-negative">{{ score_difference|mul:-1|floatformat:2 }} points lower</span>
+          {% else %}
+          equal
+          {% endif %}
+          than the user rating (normalized to same scale).
+        </p>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="section feedback-section">
+      <div class="section-title">Customer Feedback Analysis ({{ total_feedbacks }} Total Feedbacks)</div>
+
+      <!-- Positive Feedbacks -->
+      <div class="subsection-title">Top Positive Feedbacks</div>
+      {% if positive_feedbacks %}
+      {% for feedback in positive_feedbacks %}
+      <div class="feedback-card positive-feedback">
+        <div class="feedback-header">
+          <div class="feedback-from">From: {{ feedback.user.user.first_name }} {{ feedback.user.user.last_name }}</div>
+          <div class="feedback-date">{{ feedback.created|date:"F d, Y" }}</div>
+        </div>
+
+        <div class="feedback-rating">
+          Rating: {{ feedback.rating }}/5
+        </div>
+
+        <div class="feedback-content">
+          "{{ feedback.content }}"
+          {% if feedback.sentiment_results.0.details.translated_text %}
+          <br><small>(Translated: "{{ feedback.sentiment_results.0.details.translated_text }}")</small>
+          {% endif %}
+        </div>
+
+        {% if feedback.sentiment_results %}
+        <div class="sentiment-results">
+          <div>
+            <span class="sentiment-label">Sentiment:</span>
+            {% with sentiment=feedback.sentiment_results.0.details.prediction.label %}
+            <span class="
+                    {% if sentiment == 'Very Negative' %}very-negative
+                    {% elif sentiment == 'Negative' %}negative
+                    {% elif sentiment == 'Neutral' %}neutral
+                    {% elif sentiment == 'Positive' %}positive
+                    {% elif sentiment == 'Very Positive' %}very-positive
+                    {% endif %}
+                  ">
+              {{ sentiment }}
+            </span>
+            (Score: {{ feedback.sentiment_results.0.details.prediction.score|floatformat:2 }})
+            {% endwith %}
+          </div>
+          <div>
+            <span class="sentiment-label">Emotion Values:</span>
+            Valence: {{ feedback.sentiment_results.0.details.valence|floatformat:2 }},
+            Arousal: {{ feedback.sentiment_results.0.details.arousal|floatformat:2 }},
+            Dominance: {{ feedback.sentiment_results.0.details.dominance|floatformat:2 }}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="no-data">No positive feedback data available for this service.</div>
+      {% endif %}
+
+      <!-- Negative Feedbacks -->
+      <div class="subsection-title">Top Negative Feedbacks</div>
+      {% if negative_feedbacks %}
+      {% for feedback in negative_feedbacks %}
+      <div class="feedback-card negative-feedback">
+        <div class="feedback-header">
+          <div class="feedback-from">From: {{ feedback.user.user.first_name }} {{ feedback.user.user.last_name }}</div>
+          <div class="feedback-date">{{ feedback.created|date:"F d, Y" }}</div>
+        </div>
+
+        <div class="feedback-rating">
+          Rating: {{ feedback.rating }}/5
+        </div>
+
+        <div class="feedback-content">
+          "{{ feedback.content }}"
+          {% if feedback.sentiment_results.0.details.translated_text %}
+          <br><small>(Translated: "{{ feedback.sentiment_results.0.details.translated_text }}")</small>
+          {% endif %}
+        </div>
+
+        {% if feedback.sentiment_results %}
+        <div class="sentiment-results">
+          <div>
+            <span class="sentiment-label">Sentiment:</span>
+            {% with sentiment=feedback.sentiment_results.0.details.prediction.label %}
+            <span class="
+                    {% if sentiment == 'Very Negative' %}very-negative
+                    {% elif sentiment == 'Negative' %}negative
+                    {% elif sentiment == 'Neutral' %}neutral
+                    {% elif sentiment == 'Positive' %}positive
+                    {% elif sentiment == 'Very Positive' %}very-positive
+                    {% endif %}
+                  ">
+              {{ sentiment }}
+            </span>
+            (Score: {{ feedback.sentiment_results.0.details.prediction.score|floatformat:2 }})
+            {% endwith %}
+          </div>
+          <div>
+            <span class="sentiment-label">Emotion Values:</span>
+            Valence: {{ feedback.sentiment_results.0.details.valence|floatformat:2 }},
+            Arousal: {{ feedback.sentiment_results.0.details.arousal|floatformat:2 }},
+            Dominance: {{ feedback.sentiment_results.0.details.dominance|floatformat:2 }}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="no-data">No negative feedback data available for this service.</div>
+      {% endif %}
+    </div>
+
+    <div class="performance-summary">
+      <h3 style="margin-top: 0;">Performance Summary</h3>
+      <p>This report summarizes the performance metrics and customer feedback for {{ service.name }}.</p>
+
+      {% if total_feedbacks > 0 %}
+      <p>Based on {{ total_feedbacks }} customer feedback{% if total_feedbacks != 1 %}s{% endif %}, the overall
+        sentiment score is
+        <strong>{{ average_sentiment_score|floatformat:2 }}/100</strong>, which indicates
+        {% if avg_sentiment_score >= 0.8 %}
+        excellent customer satisfaction.
+        {% elif avg_sentiment_score >= 0.6 %}
+        good customer satisfaction.
+        {% elif avg_sentiment_score >= 0.4 %}
+        average customer satisfaction.
+        {% elif avg_sentiment_score >= 0.2 %}
+        below average customer satisfaction.
+        {% else %}
+        poor customer satisfaction.
+        {% endif %}
+      </p>
+
+      {% if score_difference %}
+      <p>
+        {% if score_difference > 10 %}
+        The sentiment analysis suggests that users' written feedback is more positive than their numerical ratings
+        indicate.
+        {% elif score_difference < -10 %}
+        The sentiment analysis suggests that users' written feedback is more negative than their numerical ratings
+        indicate.
+        {% else %}
+        The sentiment analysis generally aligns with users' numerical ratings.
+        {% endif %}
+      </p>
+      {% endif %}
+
+      {% else %}
+      <p>No customer feedback is available at this time. Future evaluations will incorporate customer feedback as it
+        becomes available.</p>
+      {% endif %}
+    </div>
+    <div style="page-break-before: always;"></div>
+
+    <div class="section">
+      <div class="section-title">References</div>
+      <div style="font-size: 14px; margin-bottom: 20px;">
+        <p><strong>Sentiment Analysis Model:</strong><br>
+          TabularisAI. (2023). <em>Multilingual Sentiment Analysis</em>. Hugging Face.<br>
+          <a
+            href="https://huggingface.co/tabularisai/multilingual-sentiment-analysis">https://huggingface.co/tabularisai/multilingual-sentiment-analysis</a>
+        </p>
+
+        <p><strong>Emotion Analysis Dataset:</strong><br>
+          Mohammad, S. M. (2018). <em>NRC Valence, Arousal, and Dominance Lexicon</em>. National Research Council
+          Canada.<br>
+          Version: 1, Released: July 2018<br>
+          <a href="http://saifmohammad.com/WebPages/nrc-vad.html">http://saifmohammad.com/WebPages/nrc-vad.html</a>
+        </p>
+
+        <div style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 20px; font-size: 12px; color: #777;">
+          <p>Note: This report uses sentiment analysis based on machine learning models and datasets. Results should be
+            interpreted as supplementary information and not as a definitive evaluation. The NRC-VAD Lexicon is used for
+            non-commercial, research and educational purposes only.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+
+</html>

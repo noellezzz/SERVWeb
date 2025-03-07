@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Tabs, Tab, Box, TextField, Button } from '@mui/material';
-import SampleScatter from './samples/scatter';
-import WordCloud from './samples/wordcloud'; // Updated import
-import Timeline from './samples/timeline'; // Import the Timeline chart
+import { Tabs, Tab, Box, TextField, Button, Typography, Link } from '@mui/material';
+
+import VisualizeScatter from './scatter';
+import VisualizeWordCloud from './wordcloud';
+import VisualizeTimeline from './timeline';
+import VisualizeTable from './table';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -30,18 +32,8 @@ export default function Visualizer() {
   };
 
   const handleSearch = () => {
-    setFilteredTerm(searchTerm.toLowerCase()); // Filter charts by search term
+    setFilteredTerm(searchTerm.toLowerCase()); 
   };
-
-  // Example data for the Timeline chart (replace with dynamic data if needed)
-  const timelineData = [
-    { time: 'Feb 14 8:00am', relaxed: 5, happy: 3, unhappy: 1, upset: 0 },
-    { time: 'Feb 14 9:00am', relaxed: 10, happy: 4, unhappy: 2, upset: 1 },
-    { time: 'Feb 14 10:00am', relaxed: 8, happy: 6, unhappy: 3, upset: 0 },
-    { time: 'Feb 14 11:00am', relaxed: 12, happy: 8, unhappy: 1, upset: 2 },
-    { time: 'Feb 14 12:00pm', relaxed: 30, happy: 10, unhappy: 2, upset: 1 },
-    { time: 'Feb 14 1:00pm', relaxed: 8, happy: 4, unhappy: 3, upset: 0 },
-  ];
 
   return (
     <div className="m-8">
@@ -64,20 +56,66 @@ export default function Visualizer() {
 
       <div className="rounded border shadow-md p-4">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
+          <Tab label="Feedbacks Table" />
           <Tab label="Scatter Chart" />
           <Tab label="Word Cloud" />
-          <Tab label="Timeline Chart" /> {/* Add a new tab for Timeline */}
+          <Tab label="Timeline Chart" />
         </Tabs>
 
         <TabPanel value={value} index={0}>
-          <SampleScatter searchTerm={filteredTerm} />
+          <VisualizeTable search={filteredTerm} />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          <WordCloud searchTerm={filteredTerm} />
+          <VisualizeScatter search={filteredTerm} />          
         </TabPanel>
+
         <TabPanel value={value} index={2}>
-          <Timeline data={timelineData} /> {/* Render the Timeline chart */}
+        <VisualizeWordCloud search={filteredTerm} />
         </TabPanel>
+
+        <TabPanel value={value} index={3}>
+          <VisualizeTimeline search={filteredTerm} />
+        </TabPanel>
+      </div>
+      
+      {/* References Footer */}
+      <div className="mt-8 pt-4 border-t border-gray-200">
+        <Typography variant="h6" className="mb-2 font-bold text-gray-700">References</Typography>
+        
+        <div className="text-sm text-gray-600 mb-4">
+          <Typography variant="subtitle2" className="font-bold">Sentiment Analysis Model:</Typography>
+          <Typography variant="body2" className="mb-1">
+            TabularisAI. (2023). <em>Multilingual Sentiment Analysis</em>. Hugging Face.
+            <Link href="https://huggingface.co/tabularisai/multilingual-sentiment-analysis" target="_blank" className="ml-1 text-blue-600">
+              https://huggingface.co/tabularisai/multilingual-sentiment-analysis
+            </Link>
+          </Typography>
+        </div>
+        
+        <div className="text-sm text-gray-600 mb-4">
+          <Typography variant="subtitle2" className="font-bold">Emotion Analysis Dataset:</Typography>
+          <Typography variant="body2" className="mb-1">
+            Mohammad, S. M. (2018). <em>NRC Valence, Arousal, and Dominance Lexicon</em>. National Research Council Canada.
+            Version: 1, Released: July 2018
+            <Link href="http://saifmohammad.com/WebPages/nrc-vad.html" target="_blank" className="ml-1 text-blue-600">
+              http://saifmohammad.com/WebPages/nrc-vad.html
+            </Link>
+          </Typography>
+        </div>
+        
+        <div className="text-sm text-gray-600 mb-4">
+          <Typography variant="subtitle2" className="font-bold">Visualization Inspiration:</Typography>
+          <Typography variant="body2" className="mb-1">
+            Stojanovski, D., Dimitrovski, I., & Madjarov, G. (2014). <em>TweetViz: Twitter Data Visualization</em>.
+            <Link href="https://www.csc2.ncsu.edu/faculty/healey/social-media-viz/production/" target="_blank" className="ml-1 text-blue-600">
+              https://www.csc2.ncsu.edu/faculty/healey/social-media-viz/production/
+            </Link>
+          </Typography>
+        </div>
+        
+        <Typography variant="caption" className="block mt-4 pt-2 border-t border-gray-100 text-gray-500">
+          Note: The NRC-VAD Lexicon is used for non-commercial, research and educational purposes only. This visualization tool implements sentiment analysis based on machine learning models and datasets. Results should be interpreted as supplementary information.
+        </Typography>
       </div>
     </div>
   );

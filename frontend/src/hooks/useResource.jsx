@@ -362,6 +362,7 @@ export default function useResource(resourceName, isPublic = false) {
         // STATES
         states: {
             data,
+            resourceEndpoints,
             refresh,
             meta,
             current,

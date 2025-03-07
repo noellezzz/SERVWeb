@@ -8,26 +8,12 @@ class User(AbstractUser):
         ('employee', 'Employee'),
         ('user', 'User'),
     ]
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user')
-    
-    
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user', null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')] , null=True, blank=True)
+    address = models.TextField( null=True, blank=True)
+    contact_number = models.CharField(max_length=20, null=True, blank=True)
 
-
-
-class BasicInformation(models.Model):
-    """Model for storing basic information"""
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    date_of_birth = models.DateField()
-    gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')])
-    contact_number = models.CharField(max_length=20)
-    address = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return self.user.username
 
 class SeniorCitizenInfo(models.Model):
     """Model for storing senior citizen information"""
