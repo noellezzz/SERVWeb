@@ -15,9 +15,12 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         seeder_arg = kwargs['seeder']
         seeders = [
-            'dashboard.seeders.tests_seeder',
-            'dashboard.seeders.feedbacks_seeder',
-            'dashboard.seeders.results_seeder'
+            'dashboard.seeders.seeder001',
+            # 'dashboard.seeders.tests_seeder',
+            # 'dashboard.seeders.services_seeder',
+            # 'dashboard.seeders.users_seeder',
+            # 'dashboard.seeders.feedbacks_seeder',
+            # 'dashboard.seeders.results_seeder'
         ]
 
         if seeder_arg:

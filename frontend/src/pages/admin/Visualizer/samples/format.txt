@@ -1,0 +1,213 @@
+[
+    {
+        "id": 52,
+        "user": {
+            "id": 1,
+            "user": {
+                "id": 7,
+                "password": "",
+                "last_login": null,
+                "is_superuser": false,
+                "username": "user1",
+                "first_name": "Grace",
+                "last_name": "Green",
+                "email": "user1@example.com",
+                "is_staff": false,
+                "is_active": true,
+                "date_joined": "2025-03-02T15:05:18.256245Z",
+                "role": "user",
+                "date_of_birth": "1995-12-05",
+                "gender": "F",
+                "address": "101 Main Avenue, Cebu City",
+                "contact_number": "+639194567890",
+                "groups": [],
+                "user_permissions": []
+            },
+            "nid": "1234",
+            "created_at": "2025-03-02T15:05:18.257894Z"
+        },
+        "employees": [
+            {
+                "id": 2,
+                "user": {
+                    "id": 3,
+                    "password": "",
+                    "last_login": null,
+                    "is_superuser": false,
+                    "username": "employee2",
+                    "first_name": "Charlie",
+                    "last_name": "Carter",
+                    "email": "employee2@example.com",
+                    "is_staff": false,
+                    "is_active": true,
+                    "date_joined": "2025-03-02T15:05:18.247539Z",
+                    "role": "employee",
+                    "date_of_birth": "1990-09-22",
+                    "gender": "M",
+                    "address": "789 Engineer Road, Makati",
+                    "contact_number": "+639183456789",
+                    "groups": [],
+                    "user_permissions": []
+                },
+                "services": [
+                    {
+                        "id": 4,
+                        "name": "Finance & Accounting",
+                        "description": "Oversees company finances, including payroll and financial reporting.",
+                        "category": "Finance",
+                        "image_url": null,
+                        "created_at": "2025-03-02T15:04:56.655875Z"
+                    }
+                ],
+                "employee_id": "EMP002",
+                "score": 90,
+                "created_at": "2025-03-02T15:05:18.248959Z"
+            }
+        ],
+        "services": [
+            {
+                "id": 8,
+                "name": "Software Development",
+                "description": "Develops and maintains software applications for internal and external use.",
+                "category": "Technology",
+                "image_url": null,
+                "created_at": "2025-03-02T15:04:56.661463Z"
+            }
+        ],
+        "sentiment_results": [
+            {
+                "id": 40,
+                "created": "2025-03-02T20:39:30.636296Z",
+                "last_updated": "2025-03-02T20:39:30.636296Z",
+                "deleted_at": null,
+                "mode": "anew",
+                "sentiment": "positive",
+                "score": 0.05412,
+                "words": [
+                    {
+                        "word": "item",
+                        "sentiment": "positive",
+                        "score": 0.594,
+                        "details": {
+                            "valence": 0.594,
+                            "arousal": 0.27,
+                            "dominance": 0.465
+                        }
+                    },
+                    {
+                        "word": "legit",
+                        "sentiment": "negative",
+                        "score": -0.5527799999999999,
+                        "details": {
+                            "valence": 0.747,
+                            "arousal": 0.427,
+                            "dominance": 0.849
+                        }
+                    },
+                    {
+                        "word": "LEGIT",
+                        "sentiment": "negative",
+                        "score": -0.5527799999999999,
+                        "details": {
+                            "valence": 0.747,
+                            "arousal": 0.427,
+                            "dominance": 0.849
+                        }
+                    },
+                    {
+                        "word": "LEGIT",
+                        "sentiment": "positive",
+                        "score": 0.40905719999999995,
+                        "details": {
+                            "valence": 0.747,
+                            "arousal": 0.427,
+                            "dominance": 0.849
+                        }
+                    },
+                    {
+                        "word": "disappointed",
+                        "sentiment": "positive",
+                        "score": 0.45499999999999996,
+                        "details": {
+                            "valence": 0.071,
+                            "arousal": 0.472,
+                            "dominance": 0.241
+                        }
+                    },
+                    {
+                        "word": "item",
+                        "sentiment": "positive",
+                        "score": 0.594,
+                        "details": {
+                            "valence": 0.594,
+                            "arousal": 0.27,
+                            "dominance": 0.465
+                        }
+                    },
+                    {
+                        "word": "legit",
+                        "sentiment": "negative",
+                        "score": -0.5527799999999999,
+                        "details": {
+                            "valence": 0.747,
+                            "arousal": 0.427,
+                            "dominance": 0.849
+                        }
+                    },
+                    {
+                        "word": "legit",
+                        "sentiment": "negative",
+                        "score": -0.5527799999999999,
+                        "details": {
+                            "valence": 0.747,
+                            "arousal": 0.427,
+                            "dominance": 0.849
+                        }
+                    },
+                    {
+                        "word": "legit",
+                        "sentiment": "positive",
+                        "score": 0.40905719999999995,
+                        "details": {
+                            "valence": 0.747,
+                            "arousal": 0.427,
+                            "dominance": 0.849
+                        }
+                    },
+                    {
+                        "word": "disappointed",
+                        "sentiment": "positive",
+                        "score": 0.45499999999999996,
+                        "details": {
+                            "valence": 0.071,
+                            "arousal": 0.472,
+                            "dominance": 0.241
+                        }
+                    }
+                ],
+                "details": {
+                    "translated_text": "Tested charging. But the item is not legit from thier disciption. Not legit, not legit, so disappointed",
+                    "prediction": {
+                        "label": "Neutral",
+                        "score": 0
+                    },
+                    "polarity": {
+                        "neg": 0.175,
+                        "neu": 0.576,
+                        "pos": 0.249,
+                        "compound": 0.1353
+                    },
+                    "valence": 0.5811999999999999,
+                    "arousal": 0.4046,
+                    "dominance": 0.6506000000000001
+                },
+                "sentiment_test": 3,
+                "feedback": 52
+            }
+        ],
+        "created": "2025-03-02T20:39:04.612966Z",
+        "last_updated": "2025-03-02T20:39:04.612966Z",
+        "content": "Tested charging. But the item is not legit from thier discription. NOT LEGIT, NOT LEGIT, so disappointed",
+        "rating": 1
+    }
+]

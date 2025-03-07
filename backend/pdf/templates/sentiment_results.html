@@ -1,29 +1,507 @@
 {% load static %}
-<!doctype html>
-<html>
+{% load mathfilters %}
+<!DOCTYPE html>
+<html lang="en">
 
   <head>
-    <!-- Use "static" template tag and configure STATIC_URL as usual. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SERV Feedback Report</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+    <style>
+      @page {
+        size: A4;
+        margin: 2cm;
+
+        @top-center {
+          content: "SERV Feedback Report";
+          font-size: 10pt;
+        }
+
+        @bottom-center {
+          content: "Page " counter(page) " of " counter(pages);
+          font-size: 10pt;
+        }
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        color: #333;
+        line-height: 1.5;
+        margin: 0;
+        padding: 0;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #0056b3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .header img {
+        height: 60px;
+        margin-right: 20px;
+      }
+
+      .header h1 {
+        margin: 0;
+        color: #0056b3;
+        font-size: 24px;
+      }
+
+      .report-date {
+        text-align: right;
+        font-style: italic;
+        margin-bottom: 20px;
+        font-size: 12px;
+      }
+
+      .section {
+        margin-bottom: 30px;
+      }
+
+      .section-title {
+        background-color: #0056b3;
+        color: white;
+        padding: 8px 15px;
+        font-size: 18px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+      }
+
+      .info-group {
+        margin-bottom: 15px;
+      }
+
+      .info-label {
+        font-weight: bold;
+        color: #555;
+        font-size: 14px;
+        margin-bottom: 3px;
+      }
+
+      .info-value {
+        font-size: 16px;
+      }
+
+      .score-display {
+        display: flex;
+        align-items: center;
+        margin: 15px 0;
+      }
+
+      .score-meter {
+        flex-grow: 1;
+        height: 20px;
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 0 15px;
+      }
+
+      .score-fill {
+        height: 100%;
+        background-color: #0056b3;
+      }
+
+      .score-number {
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .polarity-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-top: 15px;
+      }
+
+      .polarity-card {
+        padding: 15px;
+        border-radius: 4px;
+        text-align: center;
+      }
+
+      .polarity-card-pos {
+        background-color: #e8f5e9;
+        border-left: 4px solid #4caf50;
+      }
+
+      .polarity-card-neg {
+        background-color: #ffebee;
+        border-left: 4px solid #f44336;
+      }
+
+      .polarity-card-neu {
+        background-color: #f5f5f5;
+        border-left: 4px solid #9e9e9e;
+      }
+
+      .polarity-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .polarity-value {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .sentiment-box {
+        padding: 15px;
+        background-color: #e3f2fd;
+        border-radius: 4px;
+        border-left: 5px solid #0056b3;
+        margin-top: 15px;
+      }
+
+      .sentiment-type {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-transform: capitalize;
+      }
+
+      .very-negative {
+        color: #d32f2f;
+        background-color: #ffebee;
+        border-color: #d32f2f;
+      }
+
+      .negative {
+        color: #f44336;
+        background-color: #ffebee;
+        border-color: #f44336;
+      }
+
+      .neutral {
+        color: #757575;
+        background-color: #f5f5f5;
+        border-color: #757575;
+      }
+
+      .positive {
+        color: #4caf50;
+        background-color: #e8f5e9;
+        border-color: #4caf50;
+      }
+
+      .very-positive {
+        color: #2e7d32;
+        background-color: #e8f5e9;
+        border-color: #2e7d32;
+      }
+
+      .user-info-card {
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+
+      .employee-card {
+        background-color: #e8f5e9;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid #4caf50;
+      }
+
+      .service-card {
+        background-color: #e3f2fd;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-left: 4px solid #0056b3;
+      }
+
+      .rating-display {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      .star {
+        color: #ffc107;
+        font-size: 24px;
+        margin-right: 5px;
+      }
+
+      .star-empty {
+        color: #e0e0e0;
+        font-size: 24px;
+        margin-right: 5px;
+      }
+    </style>
   </head>
 
   <body>
-    <h1>Analysis Report</h1>
-    <p><strong>ID:</strong> {{ object.id }}</p>
-    <p><strong><span style="text-transform: uppercase;">{{ object.mode }}</span> Analysis</strong></p>
-    <p><strong>Sentiment:</strong> {{ object.sentiment }}</p>
-    <p><strong>Score:</strong> {{object.score}} </p>
+    <div class="header">
+      <img src="{% static 'images/logo.png' %}" alt="SERV Logo" />
+      <h1>SERV Feedback Report: {{ object.id }}</h1>
+    </div>
 
-    <!-- Polarity Scores -->
-    <p><strong>Polarity Scores:</strong></p>
-    <ul>
-      <li><strong>Positive:</strong> {{ object.details.positive }}</li>
-      <li><strong>Negative:</strong> {{ object.details.negative }}</li>
-      <li><strong>Neutral:</strong> {{ object.details.neutral }}</li>
-    </ul>
+    <div class="report-date">
+      Report generated on: {% now "F d, Y" %}
+    </div>
 
-    <p><strong>Created At:</strong> {{ object.created_at }}</p>
-    <p><strong>Updated At:</strong> {{ object.updated_at }}</p>
+    <div class="section">
+      <div class="section-title">User Information</div>
+      <div class="user-info-card">
+        <div class="info-group">
+          <div class="info-label">User ID</div>
+          <div class="info-value">{{ object.user.user.id }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Name</div>
+          <div class="info-value">{{ object.user.user.first_name }} {{ object.user.user.last_name }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">NID</div>
+          <div class="info-value">{{ object.user.nid }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Contact</div>
+          <div class="info-value">{{ object.user.user.contact_number }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Email</div>
+          <div class="info-value">{{ object.user.user.email }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Feedback Overview</div>
+
+      <div class="info-group">
+        <div class="info-label">Feedback Content</div>
+        <div class="info-value"
+          style="font-style: italic; padding: 10px; background-color: #f9f9f9; border-radius: 4px;">
+          "{{ object.content }}"
+        </div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-label">Rating</div>
+        <div class="rating-display">
+          {% for i in "12345" %}
+          {% if forloop.counter <= object.rating %}
+          <span class="star">★</span>
+          {% else %}
+          <span class="star-empty">★</span>
+          {% endif %}
+          {% endfor %}
+          <span style="margin-left: 10px; font-weight: bold;">{{ object.rating }}/5</span>
+        </div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-label">Created</div>
+        <div class="info-value">{{ object.created|date:"F d, Y H:i" }}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Services</div>
+      {% for service in object.services %}
+      <div class="service-card">
+        <div class="info-group">
+          <div class="info-label">Service Name</div>
+          <div class="info-value">{{ service.name }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Category</div>
+          <div class="info-value">{{ service.category }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Description</div>
+          <div class="info-value">{{ service.description }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Employees</div>
+      {% for employee in object.employees %}
+      <div class="employee-card">
+        <div class="info-group">
+          <div class="info-label">Name</div>
+          <div class="info-value">{{ employee.user.first_name }} {{ employee.user.last_name }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Employee ID</div>
+          <div class="info-value">{{ employee.employee_id }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Score</div>
+          <div class="info-value">{{ employee.score }}</div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">Services</div>
+          <div class="info-value">
+            {% for service in employee.services %}
+            <div style="margin-bottom: 5px;">{{ service.name }} ({{ service.category }})</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% for sentiment_result in object.sentiment_results %}
+    <div class="section">
+      <div class="section-title">Sentiment Analysis</div>
+
+      <div class="info-group">
+        <div class="info-label">Analysis Mode</div>
+        <div class="info-value" style="text-transform: uppercase;">{{ sentiment_result.mode }}</div>
+      </div>
+
+      <div
+        class="sentiment-box {% if sentiment_result.sentiment == 'very negative' %}very-negative{% elif sentiment_result.sentiment == 'negative' %}negative{% elif sentiment_result.sentiment == 'neutral' %}neutral{% elif sentiment_result.sentiment == 'positive' %}positive{% elif sentiment_result.sentiment == 'very positive' %}very-positive{% endif %}">
+        <div class="sentiment-type">{{ sentiment_result.sentiment }}</div>
+      </div>
+
+      <div class="score-display">
+        <span>Sentiment Score:</span>
+        <div class="score-meter">
+          <!-- Calculate the percentage for the score (assumes score between -1 and 1) -->
+          <div class="score-fill" style="width: {{ sentiment_result.score|mul:100|abs }}%;">
+          </div>
+        </div>
+        <span class="score-number">{{ sentiment_result.score|mul:100|floatformat:2 }}%</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Polarity Analysis</div>
+
+      <div class="polarity-grid">
+        <div class="polarity-card polarity-card-pos">
+          <div class="polarity-label">Positive</div>
+          <div class="polarity-value">{{ sentiment_result.details.polarity.pos|floatformat:3 }}</div>
+        </div>
+
+        <div class="polarity-card polarity-card-neg">
+          <div class="polarity-label">Negative</div>
+          <div class="polarity-value">{{ sentiment_result.details.polarity.neg|floatformat:3 }}</div>
+        </div>
+
+        <div class="polarity-card polarity-card-neu">
+          <div class="polarity-label">Neutral</div>
+          <div class="polarity-value">{{ sentiment_result.details.polarity.neu|floatformat:3 }}</div>
+        </div>
+      </div>
+    </div>
+
+    {% if sentiment_result.details.arousal or sentiment_result.details.dominance or sentiment_result.details.valence %}
+    <div class="section">
+      <div class="section-title">Emotional Dimensions</div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+        {% if sentiment_result.details.valence %}
+        <div class="info-group">
+          <div class="info-label">Valence</div>
+          <div class="info-value">{{ sentiment_result.details.valence|floatformat:3 }}</div>
+        </div>
+        {% endif %}
+
+        {% if sentiment_result.details.arousal %}
+        <div class="info-group">
+          <div class="info-label">Arousal</div>
+          <div class="info-value">{{ sentiment_result.details.arousal|floatformat:3 }}</div>
+        </div>
+        {% endif %}
+
+        {% if sentiment_result.details.dominance %}
+        <div class="info-group">
+          <div class="info-label">Dominance</div>
+          <div class="info-value">{{ sentiment_result.details.dominance|floatformat:3 }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if sentiment_result.details.translated_text %}
+    <div class="section">
+      <div class="section-title">Text Analysis</div>
+
+      <div class="info-group">
+        <div class="info-label">Original Text</div>
+        <div class="info-value"
+          style="font-style: italic; padding: 10px; background-color: #f9f9f9; border-radius: 4px;">
+          "{{ object.content }}"
+        </div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-label">Translated Text</div>
+        <div class="info-value"
+          style="font-style: italic; padding: 10px; background-color: #f9f9f9; border-radius: 4px;">
+          "{{ sentiment_result.details.translated_text }}"
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if sentiment_result.details.prediction %}
+    <div class="section">
+      <div class="section-title">Prediction Details</div>
+
+      <div class="info-group">
+        <div class="info-label">Predicted Label</div>
+        <div class="info-value">{{ sentiment_result.details.prediction.label }}</div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-label">Prediction Score</div>
+        <div class="info-value">{{ sentiment_result.details.prediction.score|floatformat:3 }}</div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if sentiment_result.words %}
+    <div class="section">
+      <div class="section-title">Word Analysis</div>
+
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Word</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Sentiment</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Score</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Valence</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Arousal</th>
+            <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ddd;">Dominance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for word in sentiment_result.words %}
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ word.word }}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">{{ word.sentiment }}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">{{ word.score|floatformat:3 }}
+            </td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">
+              {{ word.details.valence|default:"-"|floatformat:3 }}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">
+              {{ word.details.arousal|default:"-"|floatformat:3 }}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">
+              {{ word.details.dominance|default:"-"|floatformat:3 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+    {% endfor %}
   </body>
 
 </html>

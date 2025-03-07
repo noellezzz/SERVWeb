@@ -2,10 +2,18 @@ import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
 
+const timelineData = [
+  { time: 'Feb 14 8:00am', relaxed: 5, happy: 3, unhappy: 1, upset: 0 },
+  { time: 'Feb 14 9:00am', relaxed: 10, happy: 4, unhappy: 2, upset: 1 },
+  { time: 'Feb 14 10:00am', relaxed: 8, happy: 6, unhappy: 3, upset: 0 },
+  { time: 'Feb 14 11:00am', relaxed: 12, happy: 8, unhappy: 1, upset: 2 },
+  { time: 'Feb 14 12:00pm', relaxed: 30, happy: 10, unhappy: 2, upset: 1 },
+  { time: 'Feb 14 1:00pm', relaxed: 8, happy: 4, unhappy: 3, upset: 0 },
+];
 // Registering required components for Chart.js
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
-const Timeline = ({ data }) => {
+const Timeline = ({ data=timelineData }) => {
   // Preparing the chart data
   const chartData = {
     labels: data.map(item => item.time), // Time labels (X-axis)

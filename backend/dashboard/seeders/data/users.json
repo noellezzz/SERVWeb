@@ -1,0 +1,228 @@
+[
+    {
+        "username": "admin_user",
+        "email": "admin@example.com",
+        "role": "admin",
+        "first_name": "Alice",
+        "last_name": "Admin",
+        "date_of_birth": "1980-01-01",
+        "gender": "F",
+        "contact_number": "+639171234567",
+        "address": "123 Admin Street, Metro Manila"
+    },
+    {
+        "username": "employee1",
+        "email": "employee1@example.com",
+        "role": "employee",
+        "first_name": "Bob",
+        "last_name": "Builder",
+        "date_of_birth": "1985-06-15",
+        "gender": "M",
+        "contact_number": "+639172345678",
+        "address": "456 Worker Lane, Quezon City",
+        "employee_info": {
+            "employee_id": "EMP001",
+            "score": 85
+        }
+    },
+    {
+        "username": "employee2",
+        "email": "employee2@example.com",
+        "role": "employee",
+        "first_name": "Charlie",
+        "last_name": "Carter",
+        "date_of_birth": "1990-09-22",
+        "gender": "M",
+        "contact_number": "+639183456789",
+        "address": "789 Engineer Road, Makati",
+        "employee_info": {
+            "employee_id": "EMP002",
+            "score": 90
+        }
+    },
+    {
+        "username": "employee3",
+        "email": "employee3@example.com",
+        "role": "employee",
+        "first_name": "David",
+        "last_name": "Dover",
+        "date_of_birth": "1988-03-12",
+        "gender": "M",
+        "contact_number": "+639184567890",
+        "address": "123 Worker Street, Pasig",
+        "employee_info": {
+            "employee_id": "EMP003",
+            "score": 88
+        }
+    },
+    {
+        "username": "employee4",
+        "email": "employee4@example.com",
+        "role": "employee",
+        "first_name": "Eve",
+        "last_name": "Evans",
+        "date_of_birth": "1992-07-19",
+        "gender": "F",
+        "contact_number": "+639185678901",
+        "address": "456 Engineer Lane, Taguig",
+        "employee_info": {
+            "employee_id": "EMP004",
+            "score": 92
+        }
+    },
+    {
+        "username": "employee5",
+        "email": "employee5@example.com",
+        "role": "employee",
+        "first_name": "Frank",
+        "last_name": "Foster",
+        "date_of_birth": "1987-11-23",
+        "gender": "M",
+        "contact_number": "+639186789012",
+        "address": "789 Builder Road, Manila",
+        "employee_info": {
+            "employee_id": "EMP005",
+            "score": 87
+        }
+    },
+    {
+        "username": "user1",
+        "email": "user1@example.com",
+        "role": "user",
+        "first_name": "Grace",
+        "last_name": "Green",
+        "date_of_birth": "1995-12-05",
+        "gender": "F",
+        "contact_number": "+639194567890",
+        "address": "101 Main Avenue, Cebu City",
+        "senior_info": {
+            "nid": "1234"
+        }
+    },
+    {
+        "username": "user2",
+        "email": "user2@example.com",
+        "role": "user",
+        "first_name": "Hank",
+        "last_name": "Hill",
+        "date_of_birth": "1993-04-17",
+        "gender": "M",
+        "contact_number": "+639195678901",
+        "address": "202 Second Street, Davao City",
+        "senior_info": {
+            "nid": "5678"
+        }
+    },
+    {
+        "username": "user3",
+        "email": "user3@example.com",
+        "role": "user",
+        "first_name": "Ivy",
+        "last_name": "Ivers",
+        "date_of_birth": "1991-08-29",
+        "gender": "F",
+        "contact_number": "+639196789012",
+        "address": "303 Third Avenue, Baguio City",
+        "senior_info": {
+            "nid": "9101"
+        }
+    },
+    {
+        "username": "user4",
+        "email": "user4@example.com",
+        "role": "user",
+        "first_name": "Jack",
+        "last_name": "Jones",
+        "date_of_birth": "1990-02-14",
+        "gender": "M",
+        "contact_number": "+639197890123",
+        "address": "404 Fourth Street, Iloilo City",
+        "senior_info": {
+            "nid": "1121"
+        }
+    },
+    {
+        "username": "user5",
+        "email": "user5@example.com",
+        "role": "user",
+        "first_name": "Kate",
+        "last_name": "King",
+        "date_of_birth": "1989-06-21",
+        "gender": "F",
+        "contact_number": "+639198901234",
+        "address": "505 Fifth Avenue, Bacolod City",
+        "senior_info": {
+            "nid": "3141"
+        }
+    },
+    {
+        "username": "user6",
+        "email": "user6@example.com",
+        "role": "user",
+        "first_name": "Leo",
+        "last_name": "Lewis",
+        "date_of_birth": "1988-10-30",
+        "gender": "M",
+        "contact_number": "+639199012345",
+        "address": "606 Sixth Street, Zamboanga City",
+        "senior_info": {
+            "nid": "5161"
+        }
+    },
+    {
+        "username": "user7",
+        "email": "user7@example.com",
+        "role": "user",
+        "first_name": "Mia",
+        "last_name": "Miller",
+        "date_of_birth": "1987-03-25",
+        "gender": "F",
+        "contact_number": "+639200123456",
+        "address": "707 Seventh Avenue, Cagayan de Oro",
+        "senior_info": {
+            "nid": "7181"
+        }
+    },
+    {
+        "username": "user8",
+        "email": "user8@example.com",
+        "role": "user",
+        "first_name": "Nate",
+        "last_name": "Nelson",
+        "date_of_birth": "1986-07-12",
+        "gender": "M",
+        "contact_number": "+639201234567",
+        "address": "808 Eighth Street, General Santos",
+        "senior_info": {
+            "nid": "9201"
+        }
+    },
+    {
+        "username": "user9",
+        "email": "user9@example.com",
+        "role": "user",
+        "first_name": "Olivia",
+        "last_name": "Olsen",
+        "date_of_birth": "1985-11-18",
+        "gender": "F",
+        "contact_number": "+639202345678",
+        "address": "909 Ninth Avenue, Bohol",
+        "senior_info": {
+            "nid": "1221"
+        }
+    },
+    {
+        "username": "user10",
+        "email": "user10@example.com",
+        "role": "user",
+        "first_name": "Paul",
+        "last_name": "Parker",
+        "date_of_birth": "1984-05-09",
+        "gender": "M",
+        "contact_number": "+639203456789",
+        "address": "1010 Tenth Street, Palawan",
+        "senior_info": {
+            "nid": "3241"
+        }
+    }
+]

@@ -10,6 +10,13 @@ export const feedbackColumns = [
     {
         field: 'user',
         headerName: 'user',
+        renderCell: (params) => {
+            return (
+                <div className="flex-1 flex items-center">
+                    <span className="truncate">{params.value?.user?.username}</span>
+                </div>
+            );
+        }
     },
     {
         field: 'content',

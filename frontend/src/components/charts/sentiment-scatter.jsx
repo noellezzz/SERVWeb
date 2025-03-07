@@ -7,6 +7,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import faker from 'faker';
 import { Scatter } from 'react-chartjs-2';
 import annotationPlugin from 'chartjs-plugin-annotation';
 
@@ -75,15 +76,30 @@ const generateAnnotations = (axisLabels=_axisLabels, quadrantLabels=_quadrantLab
 };
 
 const SentimentScatterChart = ({ 
-  data, 
-  axisLabels, 
-  quadrantLabels, 
+  data =  {
+    datasets: [
+      {
+        label: 'A dataset',
+        data: Array.from({ length: 100 }, () => ({
+          x: faker.datatype.number({ min: Math.random() * 100, max: Math.random() * 50 }),
+          y: faker.datatype.number({ min: Math.random() * 100, max: Math.random() * 100 - 50 }),
+        })),
+        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+      },
+    ],
+  }, 
+  axisLabels = _axisLabels, 
+  quadrantLabels = _quadrantLabels, 
   title,
+  legend = false, 
   xMin = -100,
   xMax = 100,
   yMin = -100,
   yMax = 100
 }) => {
+
+  if (!data) return null;
+
   const options = {
     responsive: true,
     layout: {
@@ -95,7 +111,7 @@ const SentimentScatterChart = ({
       }
     },
     plugins: {
-      legend: {
+      legend: legend && {
         position: 'bottom',
       },
       title: {

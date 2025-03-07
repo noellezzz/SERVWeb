@@ -5,6 +5,7 @@ from channels.consumer import SyncConsumer
 class serv_WebSocketConsumer(WebsocketConsumer):
 
     def connect(self):
+        self.channel_name = self.scope['url_route']['kwargs']['channel_name']
         self.accept()
 
     def receive(self, text_data=None, bytes_data=None):

@@ -18,6 +18,14 @@ const feedbacksApi = apiSlice.injectEndpoints({
                 headers,
             }),
         }),
+        searchFeedbacks: build.query({
+            query: (searchTerm) => ({
+                url: `${apiUrl}/search`,
+                method: 'GET',
+                headers,
+                params: { q: searchTerm },
+            }),
+        }),
     }),
 });
 

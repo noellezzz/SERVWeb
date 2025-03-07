@@ -7,10 +7,45 @@ const resources = [
     'results',
     'tests',
     'users',
+    'employee-info',
+    'services'
 ];
 
 const customEndpoints = {
-
+    feedbacks: (build) => ({
+        getSentimentResults: build.mutation({
+            query: (id) => ({
+                url: `/feedbacks/${id}/sentiment_results`,
+                method: 'GET',
+                headers: {
+                    resource: 'feedbacks',
+                    tags: ['feedbacks'],
+                },
+            }),
+        }),
+        searchFeedbacks: build.mutation({
+            query: (searchTerm) => ({
+                url: `/feedbacks/search`,
+                method: 'GET',
+                headers: {
+                    resource: 'feedbacks',
+                    tags: ['feedbacks'],
+                },
+                params: { q: searchTerm },
+            }),
+        }),
+        filterFeedbacks: build.mutation({
+            query: (filter) => ({
+                url: `/feedbacks/filter`,
+                method: 'GET',
+                headers: {
+                    resource: 'feedbacks',
+                    tags: ['feedbacks'],
+                },
+                params: filter,
+            }),
+        }),
+    }),
 }
 
 const resourceEndpoints = resources.reduce((acc, resource) => {
