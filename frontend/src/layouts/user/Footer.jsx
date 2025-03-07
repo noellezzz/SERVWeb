@@ -11,9 +11,18 @@ const Footer = () => {
         </div>
         
         {/* Head Office */}
-        <div className="flex flex-col items-center">
-          <h2 className="text-lg font-bold">Head Office</h2>
-          <p className="text-white">TUP-Taguig</p>
+        <div className="flex flex-col items-center"> 
+
+
+
+
+
+
+
+
+
+
+          
           <h3 className="text-lg font-bold mt-2">Locations</h3>
           <p className="text-white">Km. 14 East Service Road,</p>
           <p className="text-white">South Super Highway, Taguig, Metro Manila.</p>

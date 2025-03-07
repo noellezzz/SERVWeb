@@ -14,6 +14,10 @@ import Services from './pages/users/Services';
 import About from './pages/users/About';
 import Contact from './pages/users/Contact';
 
+// New User Pages
+import AfterFeedback from './pages/users/Evaluation/AfterFeedback';  // New Import
+import Test from './pages/users/test';  // Ensure the Test component is imported correctly
+
 // ADMIN PAGES
 import Dashboard from './pages/admin/Dashboard';
 import AssessmenstPage from './pages/admin/Assessments';
@@ -42,9 +46,11 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="evaluation" element={<Evaluation />} />
+        <Route path="evaluation/after-feedback" element={<AfterFeedback />} /> {/* New Route */}
         <Route path="services" element={<Services />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="test" element={<Test />} /> {/* New Route */}
       </Route>
 
       {/* Admin Login Route */}
