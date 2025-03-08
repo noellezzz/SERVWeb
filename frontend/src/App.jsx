@@ -34,7 +34,9 @@ import Login from './pages/admin/Login';
 
 // Protected Route Component using Redux state
 const ProtectedRoute = () => {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector((state) => state?.auth?.isAuthenticated);
+
+  if (isAuthenticated === undefined) return <div>Loading...</div>; // Handle undefined state
 
   return isAuthenticated ? <Outlet /> : <Navigate to='/admin/login' replace />;
 };
