@@ -1,9 +1,13 @@
-from django.urls import path
-from rest_framework.routers import DefaultRouter
-from .api.charts import ChartViewSet
+from django.urls import path, include
+from rest_framework import routers
 
-# Create a router and register our viewsets
-router = DefaultRouter()
-router.register(r'charts', ChartViewSet, basename='charts')
+from .api import services, charts, reports
 
-urlpatterns = router.urls
+router = routers.DefaultRouter()
+router.register("services", services.ServiceViewSet, basename="services")
+router.register("charts", charts.ChartViewSet, basename="charts")
+# router.register("reports", reports.ReportViewSet, basename="reports")
+
+urlpatterns = (
+    path("", include(router.urls)),
+)
