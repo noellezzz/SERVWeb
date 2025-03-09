@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../../../states/slices/auth.slice';
+import { loginRequest, loginSuccess, loginFailure } from '../../../states/slices/auth.slice';
 import { TextField, Button, Container, Typography, Box, FormControlLabel, Checkbox } from '@mui/material';
 import Gradient from '../../../components/Gradient';
 import SERV from '../../../assets/SERV_Logo.png';
@@ -26,6 +27,8 @@ const Login = () => {
       return;
     }
 
+    dispatch(loginRequest());
+
     try {
       const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login/', {
         method: 'POST',
@@ -38,15 +41,16 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || 'We encountered an error. Please try again.');
       }
 
       // ✅ Update Redux State
-      dispatch(loginSuccess({ token: data.token }));
+      dispatch(loginSuccess({ token: data.token, user: data.user }));
 
       navigate('/admin', { replace: true }); // Redirect to /admin
     } catch (error) {
       setError(error.message);
+      dispatch(loginFailure(error.message));
     } finally {
       setLoading(false);
     }
@@ -59,7 +63,6 @@ const Login = () => {
       </div>
       <Container maxWidth='xs'>
         <Box sx={{ p: 4, borderRadius: 2, boxShadow: 3, textAlign: 'center', bgcolor: '#FFF0F3', backdropFilter: 'blur(10px)', border: '2px solid rgba(255, 117, 143, 0.3)', fontFamily: 'Poppins, sans-serif' }}>
-         
           <img src={SERV} alt='Login' style={{ width: '100px', margin: '10px auto' }} />
           <form onSubmit={handleSubmit}>
             <TextField fullWidth label='Username' variant='outlined' margin='normal' value={username} onChange={(e) => setUsername(e.target.value)} />
@@ -83,3 +86,4 @@ const Login = () => {
 };
 
 export default Login;
+
