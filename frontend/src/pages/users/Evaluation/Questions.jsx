@@ -7,14 +7,8 @@ import DEFAULT_QUESTIONS from '@/assets/data/questions_sample.js';
 import QuestionCard from './QuestionCard';
 import swal from 'sweetalert';
 
-export default function Questions({ 
-  info, 
-  onFinish = () => { },
-  setStep = () => { }, 
-}) {
+export default function Questions({ info, onFinish = () => {}, setStep = () => {} }) {
   const mainContentRef = useRef(null);
-
-  // ################################################################
 
   const [lang, setLang] = useState('tl');
   const [questions, setQuestions] = useState(DEFAULT_QUESTIONS);
@@ -22,45 +16,41 @@ export default function Questions({
 
   const { speak } = useEdgeTTSApi();
   const {
-    actions: {
-      fetchDatas,
-    },
-    states: {
-      data,
-      loading
-    }
+    actions: { fetchDatas },
+    states: { data, loading },
   } = useResource('tests');
 
   const {
-    actions: {
-      doStore
-    },
+    actions: { doStore },
   } = useResource('results');
-  // ################################################################
-
 
   // ################################################################
   // HANDLERS
   // ################################################################
-  
+
   const handleTranscript = (transcript) => {
     // console.log('Transcript:', transcript);
-  }
+  };
 
   const handleRepeat = () => {
-    speak.repeat()
+    speak.repeat();
   };
-  
-  const handleDone = () => {
+
+  const handleDone = async () => {
     const payload = {
       user_info: info,
       evaluation: questions,
       multiple: true,
       is_new_feedback: true,
+    };
+
+    try {
+      await doStore(payload);
+      console.log('Feedback submitted, navigating to AfterFeedback');
+      onFinish(); // Ensure this is called
+    } catch (error) {
+      console.error('Error storing feedback:', error);
     }
-    doStore(payload).then(() => {
-      onFinish();
-    });
   };
 
   const handleNext = () => {
@@ -110,28 +100,21 @@ export default function Questions({
     }
     if (questions.length) {
       let text = questions[currentQuestionIndex][`question_text_${lang}`];
-      if (currentQuestionIndex < 1){
+      if (currentQuestionIndex < 1) {
         setTimeout(() => {
-        speak.play(text, lang);
+          speak.play(text, lang);
         }, 1000);
-      }
-      else {
+      } else {
         speak.play(text, lang);
       }
     }
   }, [currentQuestionIndex, lang]);
 
-  useEffect(() => {
-    // console.log(questions)
-  }, [questions]);
-
   return (
     <div className='py-6 md:py-12 px-2 md:px-4 flex flex-col items-center justify-center min-h-screen w-full' ref={mainContentRef}>
       <LoadingScreen loading={loading} />
-      {/* CONTENT */}
       {!loading && (
         <div className='flex flex-col items-center w-full max-w-4xl'>
-          {/* QUESTION */}
           <QuestionCard
             lang={lang}
             speak={speak}
