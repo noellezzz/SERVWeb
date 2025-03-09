@@ -2,6 +2,7 @@
 venv
 env
 .env
+.pyenv
 # *.sqlite3
 .logs
 __pycache__/**.*
@@ -37,3 +38,4 @@ insomnia
 .pyc
 .cpython
 staticfiles
+.vercel
