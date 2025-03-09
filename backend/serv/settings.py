@@ -83,52 +83,62 @@ JAZZMIN_SETTINGS = {
     
     # The model admin to search from the search bar
     "search_model": "auth.User",
-    
+
     # List of apps to show as dropdown
     "topmenu_links": [
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "Site", "url": "/", "new_window": True},
     ],
-    
+
     # Whether to display the side menu
     "show_sidebar": True,
-    
+
     # Whether to auto expand the menu
     "navigation_expanded": True,
-    
+
     # Custom icons for side menu apps/models
     "icons": {
         "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
-        "users.user": "fas fa-user",
+        "users": "fas fa-users",  # This is the app itself
+        "users.user": "fas fa-user",  # Try lowercase model name
+        "auth.User": "fas fa-user",  # If Django is still recognizing it under auth
         "sentiment_tests": "fas fa-chart-line",
         "feedbacks": "fas fa-comment",
         "tts": "fas fa-volume-up",
         "pdf": "fas fa-file-pdf",
+        "dashboard.Service": "fas fa-concierge-bell",  # ✅ Correct model reference 
     },
+
+    # Order of apps in the sidebar
+    "order_with_respect_to": ["auth", "users", "feedbacks", "dashboard.Service"],  # ✅ Prioritize Service
 }
 
-# UI Customizer
+
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
     "footer_small_text": False,
     "body_small_text": False,
     "brand_small_text": False,
-    "brand_colour": "navbar-success",
-    "accent": "accent-primary",
-    "navbar": "navbar-dark",
-    "sidebar": "sidebar-dark-primary",
-    "theme": "default",
+
+    # ✅ Applying Color Palette
+    "brand_colour": "navbar-danger",  # Light navbar based on base color
+    "accent": "accent-danger",  # Use tertiary color for accents
+    "navbar": "navbar-danger",  # Light navbar based on primary color
+    "sidebar": "sidebar-dark-danger",  # Use tertiary color for sidebar
+    
+    "theme": "default",  # Default Bootstrap theme
+
     "button_classes": {
-        "primary": "btn-primary",
-        "secondary": "btn-secondary",
-        "info": "btn-info",
-        "warning": "btn-warning",
-        "danger": "btn-danger",
-        "success": "btn-success",
+        "primary": "btn-light",      # Base color
+        "secondary": "btn-danger",   # Tertiary color
+        "info": "btn-warning",       # Secondary color
+        "warning": "btn-danger",     # Tertiary color
+        "danger": "btn-dark",        # Quinary color
+        "success": "btn-danger",     # Quaternary color
     },
 }
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

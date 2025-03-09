@@ -15,8 +15,8 @@ import About from './pages/users/About';
 import Contact from './pages/users/Contact';
 
 // New User Pages
-import AfterFeedback from './pages/users/Evaluation/AfterFeedback';  // New Import
-import Test from './pages/users/test';  // Ensure the Test component is imported correctly
+import AfterFeedback from './pages/users/Evaluation/AfterFeedback'; // New Import
+import Test from './pages/users/test'; // Ensure the Test component is imported correctly
 
 // ADMIN PAGES
 import Dashboard from './pages/admin/Dashboard';
@@ -34,42 +34,44 @@ import Login from './pages/admin/Login';
 
 // Protected Route Component using Redux state
 const ProtectedRoute = () => {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector((state) => state?.auth?.isAuthenticated);
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/admin/login" replace />;
+  if (isAuthenticated === undefined) return <div>Loading...</div>; // Handle undefined state
+
+  return isAuthenticated ? <Outlet /> : <Navigate to='/admin/login' replace />;
 };
 
 function App() {
   return (
     <Routes>
       {/* User Routes */}
-      <Route path="/" element={<Layout />}>
+      <Route path='/' element={<Layout />}>
         <Route index element={<Home />} />
-        <Route path="evaluation" element={<Evaluation />} />
-        <Route path="evaluation/after-feedback" element={<AfterFeedback />} /> {/* New Route */}
-        <Route path="services" element={<Services />} />
-        <Route path="about" element={<About />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="test" element={<Test />} /> {/* New Route */}
+        <Route path='evaluation' element={<Evaluation />} />
+        <Route path='evaluation/after-feedback' element={<AfterFeedback />} /> {/* New Route */}
+        <Route path='services' element={<Services />} />
+        <Route path='about' element={<About />} />
+        <Route path='contact' element={<Contact />} />
+        <Route path='test' element={<Test />} /> {/* New Route */}
       </Route>
 
       {/* Admin Login Route */}
-      <Route path="/admin/login" element={<Login />} />
+      <Route path='/admin/login' element={<Login />} />
 
       {/* Protected Admin Routes */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path='/admin' element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
-          <Route path="assessments" element={<AssessmenstPage />} />
-          <Route path="assessments/:assessmentId" element={<AsssessmentView />} />
-          <Route path="feedbacks" element={<FeedbacksPage />} />
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="visualizer" element={<Visualizer />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="notifications" element={<Notifications />} />
-          <Route path="profile" element={<Profile />} />
+          <Route path='users' element={<Users />} />
+          <Route path='assessments' element={<AssessmenstPage />} />
+          <Route path='assessments/:assessmentId' element={<AsssessmentView />} />
+          <Route path='feedbacks' element={<FeedbacksPage />} />
+          <Route path='reports' element={<ReportsPage />} />
+          <Route path='analytics' element={<Analytics />} />
+          <Route path='visualizer' element={<Visualizer />} />
+          <Route path='settings' element={<Settings />} />
+          <Route path='notifications' element={<Notifications />} />
+          <Route path='profile' element={<Profile />} />
         </Route>
       </Route>
     </Routes>
