@@ -59,8 +59,9 @@ export default function Questions({
       is_new_feedback: true,
     }
     doStore(payload).then(() => {
-      onFinish();
     });
+
+    onFinish();
   };
 
   const handleNext = () => {

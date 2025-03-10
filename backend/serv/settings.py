@@ -37,24 +37,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    
-    
+
+
     # Third-party apps
     'django_extensions',
     'rest_framework',
     'rest_framework.authtoken',
-    
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',  # For Google auth
     'dj_rest_auth',
     'dj_rest_auth.registration',
-    
+
     'corsheaders',
     'channels',
     'mathfilters',
-    
+
     # Local Apps
     'dashboard',
     'sentiment_tests',
@@ -68,19 +68,19 @@ INSTALLED_APPS = [
 JAZZMIN_SETTINGS = {
     # Title on the login screen
     "site_title": "SERV Admin",
-    
+
     # Title to show in the tab
     "site_header": "SERV",
-    
+
     # Square logo to display in the sidebar
     "site_logo": "images/logo.png",
-    
+
     # Welcome text on login screen
     "welcome_sign": "Welcome to the SERV Admin Portal",
-    
+
     # Copyright on the footer
     "copyright": "SERV 2025",
-    
+
     # The model admin to search from the search bar
     "search_model": "auth.User",
 
@@ -107,7 +107,7 @@ JAZZMIN_SETTINGS = {
         "feedbacks": "fas fa-comment",
         "tts": "fas fa-volume-up",
         "pdf": "fas fa-file-pdf",
-        "dashboard.Service": "fas fa-concierge-bell",  # ✅ Correct model reference 
+        "dashboard.Service": "fas fa-concierge-bell",  # ✅ Correct model reference
     },
 
     # Order of apps in the sidebar
@@ -126,7 +126,7 @@ JAZZMIN_UI_TWEAKS = {
     "accent": "accent-danger",  # Use tertiary color for accents
     "navbar": "navbar-danger",  # Light navbar based on primary color
     "sidebar": "sidebar-dark-danger",  # Use tertiary color for sidebar
-    
+
     "theme": "default",  # Default Bootstrap theme
 
     "button_classes": {
@@ -261,7 +261,7 @@ REST_FRAMEWORK = {
         #  'rest_framework.permissions.IsAuthenticated' ,
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100,
+    'PAGE_SIZE': 1000,
 
 }
 
