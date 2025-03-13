@@ -56,10 +56,10 @@ export default function QuestionCard({
   }, []);
 
   useEffect(() => {
-    if (transcript) {
+    if (transcript && !speak.isPlaying()) {
       answerRef.current.value = transcript;
     }
-  }, [transcript]);
+  }, [transcript, speak]);
 
   useEffect(() => {
     if (question?.answer) {
