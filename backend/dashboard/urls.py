@@ -9,4 +9,6 @@ router = DefaultRouter()
 router.register(r'charts', ChartViewSet, basename='charts')
 router.register(r'services', ServiceViewSet, basename='services')
 
-urlpatterns = router.urls
+urlpatterns = (
+    path("", include(router.urls)),
+)
