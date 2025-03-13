@@ -9,7 +9,7 @@ export const getResultColumns = ({
     // Feedback columns
     if (tabIndex === 0) {
         return [
-            { field: 'id', headerName: 'ID', width: 70 },
+            // { field: 'id', headerName: 'ID', width: 70 },
             {
                 field: 'user',
                 headerName: 'User',
@@ -63,7 +63,7 @@ export const getResultColumns = ({
     // Employee columns
     if (tabIndex === 1) {
         return [
-            { field: 'id', headerName: 'ID', width: 70 },
+            // { field: 'id', headerName: 'ID', width: 70 },
             {
                 field: 'user',
                 headerName: 'Name',
@@ -127,7 +127,7 @@ export const getResultColumns = ({
     // Services columns
     if (tabIndex === 2) {
         return [
-            { field: 'id', headerName: 'ID', width: 70 },
+            // { field: 'id', headerName: 'ID', width: 70 },
             {
                 field: 'name',
                 headerName: 'Service Name',

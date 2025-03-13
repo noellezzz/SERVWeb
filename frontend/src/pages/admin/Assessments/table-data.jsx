@@ -34,11 +34,11 @@ export const getQuestionColumns = (onEdit, onDelete) => [
 ];
 
 export const getResultColumns = (onView, onDelete) => [
-    {
-        field: 'id',
-        headerName: 'ID',
-        flex: 1,
-    },
+    // {
+    //     field: 'id',
+    //     headerName: 'ID',
+    //     flex: 1,
+    // },
     {
         field: 'mode',
         headerName: 'Mode',

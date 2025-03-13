@@ -1,11 +1,11 @@
 import ActionButtons from "@/components/actions";
 
 export const feedbackColumns = [
-    {
-        field: 'id',
-        headerName: 'ID',
-        width: 70,
-    },
+    // {
+    //     field: 'id',
+    //     headerName: 'ID',
+    //     width: 70,
+    // },
 
     {
         field: 'user',
