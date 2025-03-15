@@ -1,3 +1,18 @@
+
+- [ ] text extraction
+
+
+
+
+- [ ] remove id in tables
+- [ ] filter table based on date
+- [ ] filter feature
+
+
+
+
+
+___
 REPORTS
 - [x] relate employee, services to Sentiment Results (aggregation)
 
