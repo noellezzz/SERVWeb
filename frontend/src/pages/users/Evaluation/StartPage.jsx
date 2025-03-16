@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import evaluationImg from "@/assets/evaluationImg.png";
 import { Scanner } from '@yudiel/react-qr-scanner';
-import { QrCode, ExpandMore, Check, Close, Videocam } from '@mui/icons-material';
+import { QrCode, ExpandMore, Check, Close, Videocam, CreditCard } from '@mui/icons-material';
 import useResource from '@/hooks/useResource';
 import swal from 'sweetalert';
 import { useNavigate } from 'react-router-dom';
+import DocumentScanner from '@/components/blinkid/BlinkSDK';
+import IdScanResultModal from '@/components/IdScanResultModal';
 
 export default function StartPage({ info, setInfo = () => { }, onStart }) {
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
   const serviceDropdownRef = useRef(null);
 
   const [isScanning, setIsScanning] = useState(false);
-  const [scanMode, setScanMode] = useState(null); // 'userId', 'evaluation', or null
+  const [scanMode, setScanMode] = useState(null); // 'userId', 'evaluation', 'idCard', or null
   const [employeeDropdownOpen, setEmployeeDropdownOpen] = useState(false);
   const [serviceDropdownOpen, setServiceDropdownOpen] = useState(false);
 
@@ -25,6 +27,11 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
   // Initialize local state for selections
   const [localEmployeeIds, setLocalEmployeeIds] = useState(info.employeeIds || []);
   const [localServiceIds, setLocalServiceIds] = useState(info.serviceIds || []);
+  
+  // ID scanning states
+  const [isIdScanning, setIsIdScanning] = useState(false);
+  const [idScanResult, setIdScanResult] = useState(null);
+  const [showIdScanModal, setShowIdScanModal] = useState(false);
 
   const {
     actions: {
@@ -90,6 +97,11 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
       setIsScanning(false);
       setScanMode(null);
       return;
+    }
+
+    // Stop ID scanning if active
+    if (isIdScanning) {
+      setIsIdScanning(false);
     }
 
     // Start scanning in the specified mode
@@ -440,12 +452,54 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
     const camera = cameras.find(cam => cam.deviceId === deviceId);
     return camera ? camera.label || `Camera ${cameras.indexOf(camera) + 1}` : 'Unknown Camera';
   };
+
+  // ################################################################
+  // ID SCANNING HANDLERS
+  // ################################################################
+  const handleStartIdScan = () => {
+    setIsIdScanning(true);
+    setIsScanning(false); // Stop QR scanning if active
+  };
+
+  const handleIdScanComplete = (result) => {
+    console.log("ID scan completed:", result);
+
+    setIdScanResult(result);
+    setIsIdScanning(false);
+    setShowIdScanModal(true);
+  };
+
+  const handleIdScanError = (error) => {
+    console.error("ID scan error:", error);
+    swal('Error', 'Failed to scan ID: ' + error.message, 'error');
+    setIsIdScanning(false);
+  };
+
+  const handleConfirmIdScan = (idNumber) => {
+    
+    if (!idNumber) {
+      swal('Error', 'Failed to scan ID: No ID number found', 'error');
+      setIsIdScanning(false);
+      return;
+    }
+
+    if (idNumber) {
+      setInfo((prev) => ({ ...prev, userId: idNumber }));
+      swal('Success', 'ID number captured successfully', 'success');
+    }
+    setShowIdScanModal(false);
+  };
+
+  const handleCloseIdScanModal = () => {
+    setShowIdScanModal(false);
+  };
+
   return (
     <div className='flex flex-col items-center justify-center min-h-screen w-full' ref={mainContentRef}>
       <div className='hero-section w-full lg:min-h-[calc(100vh-80px)] bg-white flex flex-col-reverse lg:flex-row items-start justify-between px-4 py-6 lg:py-10'>
 
         <div className='relative w-full lg:w-1/2 flex flex-col justify-center items-center mt-6 lg:mt-0'>
-          {/* CAMERA FOR SCANNING QR CODE */}
+          {/* CAMERA FOR SCANNING QR CODE OR ID */}
           <div className="w-full flex flex-col items-center justify-center">
             {isScanning && (
               <>
@@ -512,23 +566,56 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
                 )}
               </>
             )}
-            {!isScanning && (
+            {isIdScanning && (
+              <div className="w-full max-w-md">
+                <div className="bg-gray-100 px-4 py-2 rounded-lg mb-4 flex items-center justify-between">
+                  <span className="text-gray-700 font-medium">Scanning ID Card...</span>
+                  <button
+                    onClick={() => setIsIdScanning(false)}
+                    className="text-gray-500 hover:text-red-600"
+                  >
+                    <Close />
+                  </button>
+                </div>
+                
+                <DocumentScanner
+                  licenseKey={import.meta.env.VITE_APP_BLINK_API_LISCENCE}
+                  onScanComplete={handleIdScanComplete}
+                  onError={handleIdScanError}
+                  recognizerType="BlinkIdSingleSide"
+                  engineLocation="/resources/"
+                  scanButtonText="Start ID Scanning"
+                  cancelButtonText="Cancel Scan"
+                  instructions="Position your ID card within the frame"
+                  showLoadingProgress={true}
+                />
+              </div>
+            )}
+            {!isScanning && !isIdScanning && (
               <img src={evaluationImg} alt='Evaluation' className='w-full max-w-md h-auto' />
             )}
           </div>
-          {/* CAMERA FOR SCANNING QR CODE */}
+          {/* CAMERA FOR SCANNING QR CODE OR ID */}
 
-          {!isScanning && (
-            <div className='mt-4 w-full flex justify-center'>
+          {/* Scan buttons */}
+          {!isScanning && !isIdScanning && (
+            <div className='mt-4 w-full flex flex-col sm:flex-row gap-2 justify-center'>
               <button
-                className='px-6 py-3 bg-red-600 text-white text-lg rounded-md hover:bg-red-700 focus:outline-none transition-colors'
+                className='px-6 py-3 bg-red-600 text-white text-lg rounded-md hover:bg-red-700 focus:outline-none transition-colors flex items-center justify-center'
                 onClick={() => handleQrCodeScan('evaluation')}
               >
                 <QrCode className="mr-2" /> Scan Evaluation QR
               </button>
+              <button
+                className='px-6 py-3 bg-blue-600 text-white text-lg rounded-md hover:bg-blue-700 focus:outline-none transition-colors flex items-center justify-center'
+                onClick={handleStartIdScan}
+              >
+                <CreditCard className="mr-2" /> Scan ID Card
+              </button>
             </div>
           )}
-          {!isScanning && localEmployeeIds.length > 0 && (
+          
+          {!isScanning && !isIdScanning && localEmployeeIds.length > 0 && (
             <div className='mt-2 w-full flex justify-center'>
               <button
                 className='px-6 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 focus:outline-none transition-colors'
@@ -559,7 +646,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
                 Your ID
               </label>
               <p className='text-sm font-light mb-2'>
-                Enter the last four digits of your ID
+                Enter the last four digits of your ID or scan your ID card
               </p>
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
@@ -575,7 +662,7 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
                   className='w-full sm:w-auto px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none transition-colors flex items-center justify-center'
                   onClick={() => handleQrCodeScan('userId')}
                 >
-                  <QrCode className="mr-1" /> Scan ID
+                  <QrCode className="mr-1" /> Scan ID QR
                 </button>
               </div>
             </div>
@@ -699,6 +786,14 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
           </div>
         </div>
       </div>
+
+      {/* ID Scan Result Modal */}
+      <IdScanResultModal
+        isOpen={showIdScanModal}
+        onClose={handleCloseIdScanModal}
+        scanResult={idScanResult}
+        onConfirm={handleConfirmIdScan}
+      />
     </div>
   );
 }
