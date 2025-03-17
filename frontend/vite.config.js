@@ -3,13 +3,19 @@ import react from '@vitejs/plugin-react'
 import path from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths'
 import basicSsl from '@vitejs/plugin-basic-ssl'
+import Terminal from "vite-plugin-terminal";
+
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     tsconfigPaths(),
-    basicSsl()
+    basicSsl(),
+    Terminal({
+      console: 'terminal',
+      output: ['terminal', 'console']
+    }),
 
   ],
   assetsInclude: ['**/*.old'],

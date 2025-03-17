@@ -43,11 +43,12 @@ export default function Questions({ info, onFinish = () => {}, setStep = () => {
       multiple: true,
       is_new_feedback: true,
     };
+    console.log('Submitting feedback:', payload);
 
     try {
       await doStore(payload);
       console.log('Feedback submitted, navigating to AfterFeedback');
-      onFinish(); // Ensure this is called
+      onFinish(); 
     } catch (error) {
       console.error('Error storing feedback:', error);
     }

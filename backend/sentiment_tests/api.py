@@ -6,10 +6,12 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+import uuid
 
 from . import serializers, models
 from feedbacks.models import Feedback
-from users.models import SeniorCitizenInfo, EmployeeInfo
+from users.models import SeniorCitizenInfo, EmployeeInfo, User
 from dashboard.models import Service
 from serv.utils.vader import ServSentimentAnalysis
 
@@ -73,6 +75,57 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
         )
         return result
 
+    def _create_user_from_scan_data(self, user_nid, extra_data):
+        """Helper method to create a user from ID scan data."""
+        if not extra_data or not isinstance(extra_data, dict) or 'idScanResult' not in extra_data:
+            raise ValueError("ID scan data not found in the payload")
+        
+        scan_data = extra_data.get('idScanResult', {})
+        first_name = scan_data.get('firstName', '').strip()
+        last_name = scan_data.get('lastName', '').strip()
+        dob_data = scan_data.get('dateOfBirth', {})
+        address = scan_data.get('address', {}).get('latin', '')
+        
+        # Check if we have enough data to create a user
+        if not (first_name or last_name) or not dob_data:
+            raise ValueError("Insufficient data to create a user")
+        
+        # Process first name (sometimes contains both first and middle names)
+        name_parts = first_name.split()
+        processed_first_name = name_parts[0] if name_parts else ''
+        
+        # Create a random username if needed
+        username = f"{processed_first_name.lower()}.{last_name.lower()}".replace(' ', '')
+        if User.objects.filter(username=username).exists():
+            username = f"{username}_{uuid.uuid4().hex[:8]}"
+        
+        # Create date of birth string if available
+        dob = None
+        if dob_data.get('year') and dob_data.get('month') and dob_data.get('day'):
+            try:
+                from datetime import date
+                dob = date(dob_data.get('year'), dob_data.get('month'), dob_data.get('day'))
+            except (ValueError, TypeError):
+                logger.warning(f"Invalid date of birth in scan data: {dob_data}")
+        
+        # Create the user
+        user = User.objects.create(
+            username=username,
+            first_name=processed_first_name,
+            last_name=last_name,
+            date_of_birth=dob,
+            address=address,
+            role='user'
+        )
+        
+        # Create senior citizen info
+        senior_citizen = SeniorCitizenInfo.objects.create(
+            user=user,
+            nid=user_nid
+        )
+        
+        return senior_citizen
+
     def multiCreate(self, payload, user_channel_name = 'sentiment_tests'):
         user_info = payload.get('user_info')
         evaluation = payload.get('evaluation')
@@ -85,6 +138,7 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
         user_nid = user_info.get('userId')
         employee_ids = user_info.get('employeeIds')
         service_ids = user_info.get('serviceIds')
+        extra_data = user_info.get('_extra', {})
 
         if not user_nid or not employee_ids or not service_ids:
             raise ValueError("User info must contain 'userId', 'employeeIds', and 'serviceIds'.")
@@ -99,7 +153,14 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
             raise ValueError("EmployeeIds and ServiceIds must be numeric arrays.")
 
         try:
-            user = SeniorCitizenInfo.objects.get(nid=user_nid)
+            try:
+                user = SeniorCitizenInfo.objects.get(nid=user_nid)
+            except SeniorCitizenInfo.DoesNotExist:
+                # Try to create a new user from the scan data
+                logger.info(f"SeniorCitizenInfo with nid {user_nid} not found, attempting to create from scan data")
+                user = self._create_user_from_scan_data(user_nid, extra_data)
+                logger.info(f"Created new SeniorCitizenInfo with nid {user_nid}")
+                
             employees = EmployeeInfo.objects.filter(id__in=employee_ids)
             services = Service.objects.filter(id__in=service_ids)
 
@@ -132,14 +193,15 @@ class SentimentResultViewSet(viewsets.ModelViewSet):
                     
                 results.append(result)                
 
-        except SeniorCitizenInfo.DoesNotExist:
-            raise ValueError(f"SeniorCitizenInfo with nid {user_nid} not found.")
         except EmployeeInfo.DoesNotExist:
             raise ValueError(f"One or more EmployeeInfo instances not found.")
         except Service.DoesNotExist:
             raise ValueError(f"One or more Service instances not found.")
         except models.SentimentTest.DoesNotExist:
             raise ValueError(f"SentimentTest with id {test_id} not found.")
+        except ValueError as e:
+            # Re-raise any value errors from the helper methods
+            raise e
 
     def create(self, request, *args, **kwargs):
         """Handle creation of a single sentiment result."""

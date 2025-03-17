@@ -484,7 +484,8 @@ export default function StartPage({ info, setInfo = () => { }, onStart }) {
     }
 
     if (idNumber) {
-      setInfo((prev) => ({ ...prev, userId: idNumber }));
+      delete idScanResult.rawResult;
+      setInfo((prev) => ({ ...prev, userId: idNumber, _extra: { idScanResult } }));
       swal('Success', 'ID number captured successfully', 'success');
     }
     setShowIdScanModal(false);

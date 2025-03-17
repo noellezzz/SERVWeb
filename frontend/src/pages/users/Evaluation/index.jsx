@@ -29,7 +29,7 @@ export default function Evaluation() {
         serviceIds: serviceIdsParam ? serviceIdsParam.split(',').filter(Boolean).map(Number) : [],
       };
 
-      setInfo(newInfo);
+      setInfo(prev => ({ ...prev, ...newInfo }));
     }
   }, [location]);
 
@@ -38,7 +38,7 @@ export default function Evaluation() {
   }, [step]);
 
   const handleStart = (values) => {
-    setInfo(values);
+    setInfo(prev => ({ ...prev, ...values }));
     setStep(1);
   };
 
