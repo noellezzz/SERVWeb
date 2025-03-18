@@ -7,7 +7,8 @@
 //
 // ex: useLoginMutation, useLoginQuery, useLoginSubscription
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-const baseQuery = fetchBaseQuery({ baseUrl: '/api/v1/' });
+const API_URL = import.meta.env.VITE_APP_API_URL;
+const baseQuery = fetchBaseQuery({ baseUrl: API_URL+'/api/v1/' });
 
 export const apiSlice = createApi({
     reducerPath: 'api',

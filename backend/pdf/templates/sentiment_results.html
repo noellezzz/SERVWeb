@@ -296,7 +296,7 @@
           <span class="star-empty">★</span>
           {% endif %}
           {% endfor %}
-          <span style="margin-left: 10px; font-weight: bold;">{{ object.rating }}/5</span>
+          <span style="margin-left: 10px; font-weight: bold;">{{ object.rating|floatformat:0 }}/5</span>
         </div>
       </div>
 
