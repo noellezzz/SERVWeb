@@ -10,8 +10,9 @@ import Terminal from "vite-plugin-terminal";
 export default defineConfig({
   plugins: [
     react(),
-    ...(import.meta.env.VITE_APP_ENV === 'development' && [
-      tsconfigPaths(),
+    tsconfigPaths(),
+
+    ...(import.meta.env?.VITE_APP_ENV === 'development' && [
       basicSsl(),
       Terminal({
         console: 'terminal',
