@@ -10,12 +10,14 @@ import Terminal from "vite-plugin-terminal";
 export default defineConfig({
   plugins: [
     react(),
-    tsconfigPaths(),
-    basicSsl(),
-    Terminal({
-      console: 'terminal',
-      output: ['terminal', 'console']
-    }),
+    ...(import.meta.env.VITE_APP_ENV === 'development' && [
+      tsconfigPaths(),
+      basicSsl(),
+      Terminal({
+        console: 'terminal',
+        output: ['terminal', 'console']
+      }),
+    ] || []),
 
   ],
   assetsInclude: ['**/*.old'],
