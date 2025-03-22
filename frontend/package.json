@@ -51,6 +51,7 @@
     "recharts": "^2.15.0",
     "redux-persist": "^6.0.0",
     "regenerator-runtime": "^0.14.1",
+    "select-philippines-address": "^1.0.6",
     "sweetalert": "^2.1.2",
     "vite-tsconfig-paths": "^5.1.4",
     "yup": "^1.6.1"
