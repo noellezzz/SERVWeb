@@ -16,7 +16,6 @@ import Contact from './pages/users/Contact.jsx';
 import { Login as UserLogin, Signup } from './pages/users/Auth';
 import UserInfo from './pages/users/Auth/UserInfo.jsx';
 import AfterFeedback from './pages/users/Evaluation/AfterFeedback.jsx'; 
-import Test from './pages/users/test.jsx';
 
 // ADMIN PAGES
 import Dashboard from './pages/admin/Dashboard/index.jsx';
@@ -31,6 +30,9 @@ import Settings from './pages/admin/Settings/index.jsx';
 import Notifications from './pages/admin/Notifications.jsx';
 import Profile from './pages/admin/Profile.jsx';
 import Login from './pages/admin/Login/index.jsx';
+
+// Error Page
+import ErrorPage from './components/error-page';
 
 // Protected Route Component for signup flow
 const ProtectedSignupRoute = () => {
@@ -68,7 +70,9 @@ function App() {
         <Route path='services' element={<Services />} />
         <Route path='about' element={<About />} />
         <Route path='contact' element={<Contact />} />
-        <Route path='test' element={<Test />} />
+        
+        {/* Not Found route for user section */}
+        <Route path="*" element={<ErrorPage />} />
       </Route>
 
       {/* Admin Login Route */}
@@ -88,8 +92,18 @@ function App() {
           <Route path='settings' element={<Settings />} />
           <Route path='notifications' element={<Notifications />} />
           <Route path='profile' element={<Profile />} />
+          
+          {/* Not Found route for admin section */}
+          <Route path="*" element={<ErrorPage 
+            title="Admin Page Not Found" 
+            message="Sorry, the admin page you're looking for doesn't exist." 
+            btnText="Back to Dashboard"
+          />} />
         </Route>
       </Route>
+      
+      {/* Global catch-all route */}
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
 }
