@@ -11,9 +11,9 @@ export default defineConfig({
   plugins: [
     react(),
     tsconfigPaths(),
+    basicSsl(),
 
     ...(import.meta.env?.VITE_APP_ENV === 'development' && [
-      basicSsl(),
       Terminal({
         console: 'terminal',
         output: ['terminal', 'console']
