@@ -29,6 +29,8 @@ ALLOWED_HOSTS = getEnv('ALLOWED_HOSTS', '*').split(',')
 
 # Application definition
 INSTALLED_APPS = [
+
+    'corsheaders',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,7 +53,6 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
 
-    'corsheaders',
     'channels',
     'mathfilters',
 
@@ -141,6 +142,7 @@ JAZZMIN_UI_TWEAKS = {
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -149,7 +151,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'serv.urls'
@@ -266,18 +267,22 @@ REST_FRAMEWORK = {
 }
 
 # Cors
-CORS_ORIGIN_ALLOW_ALL = bool(getEnv('CORS_ORIGIN_ALLOW_ALL', False))
-CORS_ALLOW_ALL_ORIGINS = bool(getEnv('CORS_ALLOW_ALL_ORIGINS', False))
-# ACCESS_CONTROL_ALLOW_ORIGIN = getEnv('ACCESS_CONTROL_ALLOW_ORIGIN', '*')
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://localhost:8000",
-#     "http://localhost:8080",
-#     "http://localhost:5000",
-#     "*"
-# ]
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = bool(getEnv('CORS_ALLOW_CREDENTIALS', True))
+CORS_ALLOW_ALL_ORIGINS = bool(os.getenv('CORS_ALLOW_ALL_ORIGINS', True))
+if not CORS_ALLOW_ALL_ORIGINS:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "http://localhost:8080",
+        "http://localhost:5000",
+        "https://welcomed-externally-gannet.ngrok-free.app",  
+    ]
+
+CORS_ALLOW_CREDENTIALS = bool(os.getenv('CORS_ALLOW_CREDENTIALS', True))
+
+# Allow custom headers (important for ngrok)
+CORS_ALLOW_HEADERS = [
+    "*",
+]
 
 
 

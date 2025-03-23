@@ -31,6 +31,9 @@ import Notifications from './pages/admin/Notifications.jsx';
 import Profile from './pages/admin/Profile.jsx';
 import Login from './pages/admin/Login/index.jsx';
 
+// Test Components
+import TestsPage from './components/tests/index.jsx';
+
 // Error Page
 import ErrorPage from './components/error-page';
 
@@ -54,6 +57,9 @@ const ProtectedRoute = () => {
 function App() {
   return (
     <Routes>
+      {/* Test Route - easily accessible without authentication */}
+      <Route path="/tests" element={<TestsPage />} />
+      
       {/* User Routes */}
       <Route path='/' element={<Layout />}>
         <Route index element={<Home />} />
