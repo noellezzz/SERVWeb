@@ -3,6 +3,8 @@ venv
 env
 .env
 .pyenv
+*.sock
+
 # *.sqlite3
 .logs
 __pycache__/**.*
