@@ -31,9 +31,9 @@ export const SAMPLE_CSS = `
         padding: 10px;
     }
     .e-control-wrapper.e-slider-container.e-horizontal .e-slider-track {
-        background: -webkit-linear-gradient(left, #9fdfdf 0, #79d2d2 20%, #53C6C6 40%, #39acac 60%, #339999 80%, #2d8686 100%);
-        background: linear-gradient(left, #9fdfdf 0, #79d2d2 20%, #53C6C6 40%, #39acac 60%, #339999 80%, #2d8686 100%);
-        background: -moz-linear-gradient(left, #9fdfdf 0, #79d2d2 20%, #53C6C6 40%, #39acac 60%, #339999 80%, #2d8686 100%);
+        background: -webkit-linear-gradient(left, #f1f1f1 0, #f1f1f1 20%, #FF758F 40%, #E5383B 60%, #A4161A 80%, #0B090A 100%);
+        background: linear-gradient(left, #f1f1f1 0, #f1f1f1 20%, #FF758F 40%, #E5383B 60%, #A4161A 80%, #0B090A 100%);
+        background: -moz-linear-gradient(left, #f1f1f1 0, #f1f1f1 20%, #FF758F 40%, #E5383B 60%, #A4161A 80%, #0B090A 100%);
     }
     .slider-label {
         margin-bottom: 10px;
@@ -41,43 +41,43 @@ export const SAMPLE_CSS = `
     }
 `;
 
-export const COLOR_CODES = ['#9fdfdf', '#79d2d2', '#53C6C6', '#39acac', '#339999', '#2d8686'];
+export const COLOR_CODES = ['#f1f1f1', '#f1f1f1', '#FF758F', '#E5383B', '#A4161A', '#0B090A'];
 
 export const DEFAULT_COLOR_MAPPING = [
     {
         from: 1000,
         to: 10000,
-        color: '#9fdfdf',
+        color: '#f1f1f1',
         label: '<10K',
     },
     {
         from: 10000,
         to: 30000,
-        color: '#79d2d2',
+        color: '#f1f1f1',
         label: '10K-30K',
     },
     {
         from: 30000,
         to: 50000,
-        color: '#53C6C6',
+        color: '#FF758F',
         label: '30K-50K',
     },
     {
         from: 50000,
         to: 70000,
-        color: '#39acac',
+        color: '#E5383B',
         label: '50K-70K',
     },
     {
         from: 70000,
         to: 90000,
-        color: '#339999',
+        color: '#A4161A',
         label: '70K-90K',
     },
     {
         from: 90000,
         to: 100000,
-        color: '#2d8686',
+        color: '#0B090A',
         label: '>90K',
     },
 ];
