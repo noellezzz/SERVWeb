@@ -1,11 +1,21 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Snackbar, Alert } from '@mui/material';
+import { Snackbar, Alert, ToggleButtonGroup, ToggleButton, Box, Typography } from '@mui/material';
 import PopulationRangeSlider from './controls/PopulationRangeSlider';
 import ColorRangeFilter from './controls/ColorRangeFilter';
 import MapNavigationControls from './controls/MapNavigationControls';
 import HeatMap from './map/HeatMap';
 import { SAMPLE_CSS, COLOR_CODES, DEFAULT_COLOR_MAPPING, DEFAULT_POPULATION_RANGE } from './utils/constants';
-import { makeRandomPopulation, prepareDataSource, generateColorMapping, updateColorMappingByRange, getGeoJsonData } from './utils/dataHelpers';
+import { 
+    makeRandomPopulation, 
+    prepareDataSource, 
+    generateColorMapping, 
+    updateColorMappingByRange, 
+    getGeoJsonData,
+    GEO_LEVELS,
+    CURRENT_LEVEL,
+    PROPERTY_PATH,
+    switchGeoLevel
+} from './utils/dataHelpers';
 
 const SeniorCitizensHeatMap = () => {
     const mapRef = useRef(null);
@@ -17,6 +27,9 @@ const SeniorCitizensHeatMap = () => {
     const [sliderValue, setSliderValue] = useState(DEFAULT_POPULATION_RANGE);
     const [colormapping, setColormapping] = useState(DEFAULT_COLOR_MAPPING);
     const [key, setKey] = useState(0); // Force re-render key
+    
+    // GeoJSON level state
+    const [currentGeoLevel, setCurrentGeoLevel] = useState(CURRENT_LEVEL);
     
     // Status notification states - set initial open to false
     const [openToast, setOpenToast] = useState(false);
@@ -210,6 +223,43 @@ const SeniorCitizensHeatMap = () => {
         }
     };
     
+    // Handle geo level change
+    const handleGeoLevelChange = (event, newLevel) => {
+        if (newLevel && newLevel !== currentGeoLevel) {
+            console.log(`Changing geo level from ${currentGeoLevel} to ${newLevel}`);
+            
+            // Update the geo level in dataHelpers
+            if (switchGeoLevel(newLevel)) {
+                setCurrentGeoLevel(newLevel);
+                
+                // Reset data with new level
+                const newData = makeRandomPopulation();
+                setDatasource(newData);
+                
+                // Reset color mapping
+                const newColorMapping = generateColorMapping(populationRange[0], populationRange[1]);
+                setColormapping(newColorMapping);
+                
+                // Force map to re-render with new data
+                setKey(prevKey => prevKey + 1);
+                
+                // Show success message
+                setGeoJsonStatus({
+                    success: true,
+                    message: `Switched to ${newLevel === GEO_LEVELS.REGION ? 'regional' : 'city/municipality'} view`
+                });
+                setOpenToast(true);
+            } else {
+                // Show error message
+                setGeoJsonStatus({
+                    success: false,
+                    message: `Failed to switch to ${newLevel} view`
+                });
+                setOpenToast(true);
+            }
+        }
+    };
+
     // Create zoom settings object for map
     const zoomSettings = {
         enable: zoomEnabled,
@@ -231,6 +281,37 @@ const SeniorCitizensHeatMap = () => {
             <div className='control-pane'>
                 <style>{SAMPLE_CSS}</style>
                 
+                {/* GeoJSON Level Selector */}
+                <Box 
+                    sx={{ 
+                        display: 'flex',
+                        flexDirection: 'column',
+                        m: 2.5, 
+                        p: 3, 
+                        bgcolor: 'background.paper', 
+                        borderRadius: 1,
+                        boxShadow: 1
+                    }}
+                >
+                    <Typography variant="subtitle1" gutterBottom>
+                        Geographic Level:
+                    </Typography>
+                    <ToggleButtonGroup
+                        color="primary"
+                        value={currentGeoLevel}
+                        exclusive
+                        onChange={handleGeoLevelChange}
+                        aria-label="Geographic Level"
+                        fullWidth
+                    >
+                        <ToggleButton value={GEO_LEVELS.REGION}>Regions</ToggleButton>
+                        <ToggleButton value={GEO_LEVELS.CITY}>Cities/Municipalities</ToggleButton>
+                    </ToggleButtonGroup>
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                        Switch between regional view and city/municipality view
+                    </Typography>
+                </Box>
+                
                 {/* Color Range Filter */}
                 <ColorRangeFilter 
                     sliderValue={sliderValue} 
@@ -238,7 +319,7 @@ const SeniorCitizensHeatMap = () => {
                     sliderRef={sliderRef} 
                 />
                 
-                {/* Heat Map Component - notice the added key for forced updates */}
+                {/* Heat Map Component - notice the added key and geoLevel props */}
                 <HeatMap 
                     key={key}
                     mapRef={mapRef}
@@ -247,6 +328,8 @@ const SeniorCitizensHeatMap = () => {
                     zoomSettings={zoomSettings}
                     animationDuration={animationDuration}
                     onMapsLoad={onMapsLoad}
+                    geoLevel={currentGeoLevel}
+                    propertyPath={PROPERTY_PATH}
                 />            
                 
                 {/* Map Navigation Controls - Now with expand/collapse toggle */}
@@ -269,7 +352,7 @@ const SeniorCitizensHeatMap = () => {
                     onToggleExpand={toggleNavigationControls}
                 />
                 
-                {/* Status Notifications - Hidden by default but available if needed */}
+                {/* Status Notifications */}
                 <Snackbar 
                     open={openToast} 
                     autoHideDuration={6000} 

@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect } from 'react';
 import { MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip, Legend, Marker, Zoom } from '@syncfusion/ej2-react-maps';
-import { getGeoJsonData } from '../utils/dataHelpers';
+import { getGeoJsonData, PROPERTY_PATH, CURRENT_LEVEL, getLevelTitle } from '../utils/dataHelpers';
 
 // Optimize with React.memo to prevent unnecessary re-renders
 const HeatMap = React.memo(({
@@ -9,7 +9,9 @@ const HeatMap = React.memo(({
     colormapping,
     zoomSettings,
     animationDuration,
-    onMapsLoad
+    onMapsLoad,
+    geoLevel, // Added to trigger re-renders when the geo level changes
+    propertyPath = PROPERTY_PATH // Allow custom property path to be passed as prop
 }) => {
     // Memoize the geojson data to prevent reloading
     const geojsonData = useMemo(() => {
@@ -17,11 +19,18 @@ const HeatMap = React.memo(({
         const data = getGeoJsonData();
         console.timeEnd('GeoJSON Data Loading');
         return data;
-    }, []);
+    }, [geoLevel]); // Re-run when geoLevel changes
+    
+    // Log when property path is used
+    useEffect(() => {
+        console.log(`HeatMap using property path: ${propertyPath} for level: ${geoLevel}`);
+    }, [propertyPath, geoLevel]);
     
     // Track when the component refreshes
     useEffect(() => {
         console.log('HeatMap component render with props:', {
+            geoLevel,
+            propertyPath,
             dataSourceLength: datasource?.seniorCitizens?.length,
             colorMappingLength: colormapping?.length,
             colorMappingRange: colormapping?.length > 0 ? 
@@ -29,7 +38,7 @@ const HeatMap = React.memo(({
                 'undefined',
             animationDuration
         });
-    }, [datasource, colormapping, animationDuration]);
+    }, [datasource, colormapping, animationDuration, propertyPath, geoLevel]);
     
     // Ensure refresh is called when color mapping changes
     useEffect(() => {
@@ -75,18 +84,20 @@ const HeatMap = React.memo(({
         showLegendPath: false
     }), []);
     
-    // Memoize title settings
+    // Memoize title settings - now with dynamic title based on level
     const titleSettings = useMemo(() => ({
-        text: "Senior Citizen Population by Municipality/City in the Philippines", 
+        text: getLevelTitle(), 
         textStyle: { size: '16px' } 
-    }), []);
+    }), [geoLevel]);
     
     // Memoize tooltip settings
     const tooltipSettings = useMemo(() => ({ 
         visible: true, 
         valuePath: 'population', 
-        format: 'City/Municipality: ${Name} <br> Senior Population: ${population}' 
-    }), []);
+        format: geoLevel === 'region' ? 
+            'Region: ${Name} <br> Senior Population: ${population}' : 
+            'City/Municipality: ${Name} <br> Senior Population: ${population}'
+    }), [geoLevel]);
     
     // Memoize shape settings based on colormapping
     const shapeSettings = useMemo(() => {
@@ -119,7 +130,7 @@ const HeatMap = React.memo(({
                     <LayersDirective>
                         <LayerDirective 
                             shapeData={geojsonData} 
-                            shapePropertyPath='NAME_2' 
+                            shapePropertyPath={propertyPath} // Use the configurable property path
                             shapeDataPath='Name'
                             dataSource={datasource.seniorCitizens}
                             animationDuration={animationDuration}
