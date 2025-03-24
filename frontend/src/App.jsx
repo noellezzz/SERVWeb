@@ -17,6 +17,12 @@ import { Login as UserLogin, Signup } from './pages/users/Auth';
 import UserInfo from './pages/users/Auth/UserInfo.jsx';
 import AfterFeedback from './pages/users/Evaluation/AfterFeedback.jsx'; 
 
+// USER DASHBOARD PAGES
+import UserDashboard from './pages/users/Pages/index.jsx';
+import UserProfile from './pages/users/Pages/Profile.jsx';
+import UserResults from './pages/users/Pages/Results.jsx';
+import UserFeedbacks from './pages/users/Pages/Feedbacks.jsx';
+
 // ADMIN PAGES
 import Dashboard from './pages/admin/Dashboard/index.jsx';
 import AssessmenstPage from './pages/admin/Assessments/index.jsx';
@@ -54,6 +60,15 @@ const ProtectedRoute = () => {
   return isAuthenticated ? <Outlet /> : <Navigate to='/admin/login' replace />;
 };
 
+// Protected Route Component for users
+const ProtectedUserRoute = () => {
+  const isAuthenticated = useSelector((state) => state?.auth?.isAuthenticated);
+
+  if (isAuthenticated === undefined) return <div>Loading...</div>; // Handle undefined state
+
+  return isAuthenticated ? <Outlet /> : <Navigate to='/login' replace />;
+};
+
 function App() {
   return (
     <Routes>
@@ -76,6 +91,14 @@ function App() {
         <Route path='services' element={<Services />} />
         <Route path='about' element={<About />} />
         <Route path='contact' element={<Contact />} />
+        
+        {/* User Dashboard Pages - Protected */}
+        <Route element={<ProtectedUserRoute />}>
+          <Route path='dashboard' element={<UserDashboard />} />
+          <Route path='profile' element={<UserProfile />} />
+          <Route path='results' element={<UserResults />} />
+          <Route path='feedbacks' element={<UserFeedbacks />} />
+        </Route>
         
         {/* Not Found route for user section */}
         <Route path="*" element={<ErrorPage />} />
