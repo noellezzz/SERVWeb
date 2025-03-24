@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Chip, Rating, Tooltip, CircularProgress } from '@mui/material';
+import { Box, Typography, Chip, Rating, Tooltip, CircularProgress, Alert } from '@mui/material';
 import DashboardTable from '@/components/tables';
 import useResource from '@/hooks/useResource';
 import resourceEndpoints from '@/states/api/resources';
@@ -225,11 +225,13 @@ export default function VisualizeTable({ search = '' }) {
   
   const [feedbackData, setFeedbackData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const columns = getColumns(search); // Pass search term to columns for highlighting
   
   // Fetch data when component mounts or search term changes
   useEffect(() => {
     setIsLoading(true);
+    setError(null); // Reset error state on new search
     
     const fetchData = async () => {
       try {
@@ -242,9 +244,12 @@ export default function VisualizeTable({ search = '' }) {
           data = result.data;
         }
         
-        setFeedbackData(data);
+        // Ensure data is always an array even if API returns undefined
+        setFeedbackData(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching feedback data:', error);
+        setError(error.message || 'Failed to fetch feedback data');
+        setFeedbackData([]); // Reset to empty array on error
       } finally {
         setIsLoading(false);
       }
@@ -280,8 +285,17 @@ export default function VisualizeTable({ search = '' }) {
     });
   };
 
+  // Safely check if feedbackData exists and has items
+  const hasFeedbackData = Array.isArray(feedbackData) && feedbackData.length > 0;
+
   return (
     <div className="p-4 bg-white shadow-md rounded-xl">
+      {error && (
+        <Alert severity="error" className="mb-4">
+          {error}. Please try again or contact support if the problem persists.
+        </Alert>
+      )}
+
       {isLoading ? (
         <Box className="h-96 flex items-center justify-center">
           <CircularProgress />
@@ -289,10 +303,12 @@ export default function VisualizeTable({ search = '' }) {
             Loading feedback data...
           </Typography>
         </Box>
-      ) : feedbackData.length === 0 ? (
+      ) : !hasFeedbackData ? (
         <Box className="h-96 flex items-center justify-center">
           <Typography variant="body1" color="textSecondary">
-            No feedback data available. Please search for feedback to visualize.
+            {search 
+              ? `No feedback data found for "${search}". Try a different search term.` 
+              : 'No feedback data available. Please search for feedback to visualize.'}
           </Typography>
         </Box>
       ) : (

@@ -43,12 +43,14 @@ export default function VisualizeTimeline({ search = '' }) {
   
   const [feedbackData, setFeedbackData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState(timeRanges.WEEKLY);
   const [chartType, setChartType] = useState('line');
 
   // Fetch data when component mounts or search term changes
   useEffect(() => {
     setIsLoading(true);
+    setError(null);
     
     const fetchData = async () => {
       try {
@@ -60,9 +62,13 @@ export default function VisualizeTimeline({ search = '' }) {
           const result = await searchFeedbacks();
           data = result.data;
         }
-        setFeedbackData(data);
+        
+        // Ensure data is always an array
+        setFeedbackData(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching feedback data:', error);
+        setError(error.message || 'Failed to fetch feedback data');
+        setFeedbackData([]);
       } finally {
         setIsLoading(false);
       }
@@ -73,7 +79,7 @@ export default function VisualizeTimeline({ search = '' }) {
 
   // Process data into timeline format
   const processTimelineData = () => {
-    if (!feedbackData || feedbackData.length === 0) {
+    if (!Array.isArray(feedbackData) || feedbackData.length === 0) {
       return {
         sentimentScores: {},
         ratings: {},
@@ -351,16 +357,23 @@ export default function VisualizeTimeline({ search = '' }) {
 
   return (
     <div className="p-4 bg-white shadow-md rounded-xl">
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
+          <p className="font-medium">Error: {error}</p>
+          <p className="text-sm mt-1">Please try again later or contact support.</p>
+        </div>
+      )}
+      
       {isLoading ? (
         <div className="h-96 flex items-center justify-center">
           <Typography variant="body1" color="textSecondary">
             Loading timeline data...
           </Typography>
         </div>
-      ) : feedbackData.length === 0 ? (
+      ) : !Array.isArray(feedbackData) || feedbackData.length === 0 ? (
         <div className="h-96 flex items-center justify-center">
           <Typography variant="body1" color="textSecondary">
-            No feedback data available. Please search for feedback to visualize timeline.
+            {search ? `No feedback data available for "${search}". Try a different search term.` : 'No feedback data available. Please search for feedback to visualize timeline.'}
           </Typography>
         </div>
       ) : (

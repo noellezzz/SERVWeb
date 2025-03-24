@@ -5,6 +5,7 @@ import VisualizeScatter from './scatter';
 import VisualizeWordCloud from './wordcloud';
 import VisualizeTimeline from './timeline';
 import VisualizeTable from './table';
+import SeniorCitizensHeatMap from '@/components/heatmap';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -55,11 +56,12 @@ export default function Visualizer() {
       </div>
 
       <div className="rounded border shadow-md p-4">
-        <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
+        <Tabs value={value} onChange={handleChange} aria-label="visualization tabs">
           <Tab label="Feedbacks Table" />
           <Tab label="Scatter Chart" />
           <Tab label="Word Cloud" />
           <Tab label="Timeline Chart" />
+          <Tab label="Geo Heatmap" />
         </Tabs>
 
         <TabPanel value={value} index={0}>
@@ -68,13 +70,17 @@ export default function Visualizer() {
         <TabPanel value={value} index={1}>
           <VisualizeScatter search={filteredTerm} />          
         </TabPanel>
-
         <TabPanel value={value} index={2}>
-        <VisualizeWordCloud search={filteredTerm} />
+          <VisualizeWordCloud search={filteredTerm} />
         </TabPanel>
-
         <TabPanel value={value} index={3}>
           <VisualizeTimeline search={filteredTerm} />
+        </TabPanel>
+        <TabPanel value={value} index={4}>
+          <div className="mt-2">
+            <Typography variant="h6" className="mb-4">Geographic Heatmap Visualization</Typography>
+            <SeniorCitizensHeatMap />
+          </div>
         </TabPanel>
       </div>
       

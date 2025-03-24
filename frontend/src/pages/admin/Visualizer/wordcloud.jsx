@@ -161,18 +161,26 @@ export default function VisualizeWordCloud({ search = '' }) {
   const [searchFeedbacks] = resourceEndpoints.useSearchFeedbacksMutation();
   const [wordData, setWordData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   
   // Fetch data when search term changes from parent component
   useEffect(() => {
     if (search !== '') {
       setIsLoading(true);
+      setError(null);
+      
       searchFeedbacks(search)
         .then(res => {
+          if (!res.data) {
+            throw new Error('No data received from API');
+          }
           const words = getWords(res.data);
           setWordData(words);
         })
         .catch(err => {
           console.error('Error fetching feedback data:', err);
+          setError(err.message || 'Failed to fetch data');
+          setWordData([]);
         })
         .finally(() => {
           setIsLoading(false);
@@ -212,6 +220,13 @@ export default function VisualizeWordCloud({ search = '' }) {
 
   return (
     <div className="p-4 bg-white shadow-md rounded-xl">
+      {error && (
+        <div className="mb-4 px-4 py-3 bg-red-50 text-red-700 border border-red-200 rounded-md">
+          <p className="font-medium">Error: {error}</p>
+          <p className="text-sm">Please try a different search term or try again later.</p>
+        </div>
+      )}
+      
       <div className="relative h-96 border rounded-md bg-gray-50 overflow-hidden">
         {/* Quadrant Lines */}
         <div className="absolute inset-0 flex items-center justify-center">
@@ -254,6 +269,10 @@ export default function VisualizeWordCloud({ search = '' }) {
         {isLoading ? (
           <div className="absolute inset-0 flex items-center justify-center">
             <p className="text-gray-500">Loading word cloud data...</p>
+          </div>
+        ) : error ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className="text-red-500">Error loading data. Please try again.</p>
           </div>
         ) : wordData.length === 0 ? (
           <div className="absolute inset-0 flex items-center justify-center">
