@@ -1,15 +1,19 @@
+import "./index.css";
+import 'react-toastify/dist/ReactToastify.css'
+import App from "./App";
+
+import { registerLicense } from '@syncfusion/ej2-base';
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { Provider } from "react-redux";
 import {store,persistor} from "./states/store.js";
 import { PersistGate } from 'redux-persist/integration/react'
 
 import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+registerLicense(import.meta.env.VITE_APP_EJ2MAPS_API);
 
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>

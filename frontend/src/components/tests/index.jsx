@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import TestHeatMap from './test-heatmap';
+import TestHeatMap2 from './test-heatmap2';
 import TestSectorMap from './test-sectormap';
 import TestDataLayer from './test-datalayer';
 import TestGeocode from './test-geocode';
@@ -13,6 +14,10 @@ const TestsPage = () => {
     {
       name: "Senior Citizen Heatmap",
       component: <TestHeatMap />
+    },
+    {
+      name: "Philippines Senior Citizens by Municipalities",
+      component: <TestHeatMap2 />
     },
     {
       name: "Philippines Region Map",
