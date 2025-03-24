@@ -49,7 +49,7 @@ const ColorRangeFilter = React.memo(({
     return (
         <div className="m-5 p-6 bg-gray-100 rounded-lg shadow-sm">
             <div className="text-lg font-semibold mb-4 text-gray-700">
-                Filter Population Color Range: 
+                Filter Population Range: 
                 <span className="ml-2 text-teal-600 font-bold">
                     {pendingValue[0].toLocaleString()} - {pendingValue[1].toLocaleString()}
                 </span>

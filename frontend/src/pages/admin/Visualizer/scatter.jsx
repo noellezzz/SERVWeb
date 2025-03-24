@@ -84,7 +84,7 @@ export default function VisualizeScatter({ search = '' }) {
 
     if (isLoading) {
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '600px' }}>
                 <CircularProgress size={40} />
                 <Typography variant="body1" sx={{ ml: 2 }}>
                     Loading scatter plot data...
@@ -103,7 +103,7 @@ export default function VisualizeScatter({ search = '' }) {
 
     if (!words || words.length === 0) {
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '600px' }}>
                 <Typography variant="body1" color="text.secondary">
                     No words found for scatter plot. Please try a different search term.
                 </Typography>
@@ -112,8 +112,8 @@ export default function VisualizeScatter({ search = '' }) {
     }
 
     return (
-        <>
+        <Box sx={{ height: '600px' }}>
             <SentimentScatterChart data={data} title="Sentiment Analysis Visualizer" />
-        </>
+        </Box>
     );
 }

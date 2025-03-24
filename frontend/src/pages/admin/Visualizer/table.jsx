@@ -297,14 +297,14 @@ export default function VisualizeTable({ search = '' }) {
       )}
 
       {isLoading ? (
-        <Box className="h-96 flex items-center justify-center">
+        <Box className="h-[600px] flex items-center justify-center">
           <CircularProgress />
           <Typography variant="body1" color="textSecondary" className="ml-3">
             Loading feedback data...
           </Typography>
         </Box>
       ) : !hasFeedbackData ? (
-        <Box className="h-96 flex items-center justify-center">
+        <Box className="h-[600px] flex items-center justify-center">
           <Typography variant="body1" color="textSecondary">
             {search 
               ? `No feedback data found for "${search}". Try a different search term.` 
@@ -327,7 +327,7 @@ export default function VisualizeTable({ search = '' }) {
             </Typography>
           </div>
           
-          <Box sx={{ height: '100%', width: '100%' }}>
+          <Box sx={{ height: '600px', width: '100%' }}>
             <DashboardTable
               columns={columns}
               rows={feedbackData}

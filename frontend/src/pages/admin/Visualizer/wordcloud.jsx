@@ -227,7 +227,7 @@ export default function VisualizeWordCloud({ search = '' }) {
         </div>
       )}
       
-      <div className="relative h-96 border rounded-md bg-gray-50 overflow-hidden">
+      <div className="relative h-[600px] border rounded-md bg-gray-50 overflow-hidden">
         {/* Quadrant Lines */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="absolute h-full w-px bg-gray-300" />

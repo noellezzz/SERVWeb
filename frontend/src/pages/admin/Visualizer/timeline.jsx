@@ -365,13 +365,13 @@ export default function VisualizeTimeline({ search = '' }) {
       )}
       
       {isLoading ? (
-        <div className="h-96 flex items-center justify-center">
+        <div className="h-[600px] flex items-center justify-center">
           <Typography variant="body1" color="textSecondary">
             Loading timeline data...
           </Typography>
         </div>
       ) : !Array.isArray(feedbackData) || feedbackData.length === 0 ? (
-        <div className="h-96 flex items-center justify-center">
+        <div className="h-[600px] flex items-center justify-center">
           <Typography variant="body1" color="textSecondary">
             {search ? `No feedback data available for "${search}". Try a different search term.` : 'No feedback data available. Please search for feedback to visualize timeline.'}
           </Typography>
@@ -409,7 +409,7 @@ export default function VisualizeTimeline({ search = '' }) {
           </div>
           
           <Box sx={{ mb: 4 }}>
-            <Paper elevation={1} sx={{ p: 2, height: '400px' }}>
+            <Paper elevation={1} sx={{ p: 2, height: '500px' }}>
               {chartType === 'line' ? (
                 <Line options={chartOptions} data={chartData} />
               ) : (
@@ -419,7 +419,7 @@ export default function VisualizeTimeline({ search = '' }) {
           </Box>
           
           <Box>
-            <Paper elevation={1} sx={{ p: 2, height: '300px' }}>
+            <Paper elevation={1} sx={{ p: 2, height: '400px' }}>
               <Bar options={volumeChartOptions} data={feedbackCountData} />
             </Paper>
           </Box>

@@ -115,7 +115,15 @@ const HeatMap = React.memo(({
     
     return (
         <div className='control-section row'>
-            <div className='col-md-12'>
+            <div 
+                className='col-md-12'
+                style={{
+                    height: '900px',
+                    width: '100%',
+                    margin: '0 auto',
+                    aspectRatio: '1/1'
+                }}
+            >
                 <MapsComponent 
                     id="maps" 
                     ref={mapRef}
@@ -125,6 +133,8 @@ const HeatMap = React.memo(({
                     zoomSettings={zoomSettings}
                     legendSettings={legendSettings}
                     titleSettings={titleSettings}
+                    height='100%'
+                    width='100%'
                 >
                     <Inject services={[Marker, MapsTooltip, Legend, Zoom]}/>
                     <LayersDirective>
