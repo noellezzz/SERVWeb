@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 import PopulationRangeSlider from './controls/PopulationRangeSlider';
 import ColorRangeFilter from './controls/ColorRangeFilter';
@@ -16,12 +16,13 @@ const SeniorCitizensHeatMap = () => {
     const [populationRange, setPopulationRange] = useState(DEFAULT_POPULATION_RANGE);
     const [sliderValue, setSliderValue] = useState(DEFAULT_POPULATION_RANGE);
     const [colormapping, setColormapping] = useState(DEFAULT_COLOR_MAPPING);
+    const [key, setKey] = useState(0); // Force re-render key
     
-    // Status notification states
+    // Status notification states - set initial open to false
     const [openToast, setOpenToast] = useState(false);
     const [geoJsonStatus, setGeoJsonStatus] = useState({ success: false, message: "" });
     
-    // Zoom controls state
+    // Zoom controls state and visibility
     const [zoomEnabled, setZoomEnabled] = useState(true);
     const [panningEnabled, setPanningEnabled] = useState(true);
     const [mouseWheelZoom, setMouseWheelZoom] = useState(true);
@@ -29,9 +30,24 @@ const SeniorCitizensHeatMap = () => {
     const [singleClickZoom, setSingleClickZoom] = useState(false);
     const [doubleClickZoom, setDoubleClickZoom] = useState(true);
     const [animationDuration, setAnimationDuration] = useState(500);
+    const [controlsExpanded, setControlsExpanded] = useState(false);
+    
+    // Log when color mapping is updated
+    useEffect(() => {
+        console.log('Color mapping updated:', 
+            colormapping.length > 0 ? 
+            `Range: ${colormapping[0].from}-${colormapping[colormapping.length-1].to}` : 
+            'No mapping');
+    }, [colormapping]);
+    
+    // Toggle navigation controls visibility
+    const toggleNavigationControls = () => {
+        setControlsExpanded(!controlsExpanded);
+    };
     
     // Maps loading handler
     const onMapsLoad = () => {
+        console.log('Map loaded event triggered');
         const maps = document.getElementById('maps');
         if (maps) {
             maps.setAttribute('title', '');
@@ -40,17 +56,18 @@ const SeniorCitizensHeatMap = () => {
         // Check if geojsonData was loaded properly using the imported function
         const geojsonData = getGeoJsonData();
         if (geojsonData && geojsonData.features && geojsonData.features.length > 0) {
+            console.log(`GeoJSON loaded with ${geojsonData.features.length} regions`);
             setGeoJsonStatus({
                 success: true,
                 message: `GeoJSON loaded successfully with ${geojsonData.features.length} regions`
             });
         } else {
+            console.error("Failed to load GeoJSON data properly");
             setGeoJsonStatus({
                 success: false,
                 message: "Failed to load GeoJSON data properly"
             });
         }
-        setOpenToast(true);
     };
 
     // Toast notification handler
@@ -63,34 +80,61 @@ const SeniorCitizensHeatMap = () => {
 
     // Population range slider handler
     const handleRangeChange = (event, newValue) => {
+        console.time('Population range update');
         setPopulationRange(newValue);
         updateDataSource(newValue[0], newValue[1]);
+        console.timeEnd('Population range update');
     };
 
-    // Syncfusion slider filter handler
-    const handleSyncfusionSliderChange = () => {
-        if (sliderRef.current && !isNaN(sliderRef.current.value[0]) && !isNaN(sliderRef.current.value[1])) {
-            const min = sliderRef.current.value[0];
-            const max = sliderRef.current.value[1];
+    // Modified to accept direct value instead of using ref
+    const handleSyncfusionSliderChange = useCallback((newValue) => {
+        console.time('Color filter apply');
+        
+        try {
+            // Get slider values either from parameter or fallback to ref
+            const values = newValue || (sliderRef.current ? sliderRef.current.value : null);
+            
+            if (!values || values.length !== 2) {
+                console.error('Invalid slider values:', values);
+                return;
+            }
+            
+            const [min, max] = values;
+            console.log(`Applying filter range: ${min}-${max}`);
             
             // Update colormapping based on slider range
             const updatedColorMapping = updateColorMappingByRange([...colormapping], min, max, COLOR_CODES);
             setColormapping(updatedColorMapping);
-            setSliderValue(sliderRef.current.value);
+            setSliderValue(values);
             
+            // Force the map to refresh with new values by updating key
+            setKey(prevKey => prevKey + 1);
+            
+            // Also try the regular refresh method
             if (mapRef.current) {
-                mapRef.current.refresh();
+                console.log('Refreshing map with new color mapping');
+                setTimeout(() => {
+                    if (mapRef.current) mapRef.current.refresh();
+                }, 50);
             }
+        } catch (error) {
+            console.error('Error applying color filter:', error);
         }
-    };
+        
+        console.timeEnd('Color filter apply');
+    }, [colormapping]);
 
     // Update data source when population range changes
     const updateDataSource = (min, max) => {
+        console.time('Data source update');
+        console.log(`Updating data source with range: ${min}-${max}`);
+        
         setDatasource(prepareDataSource(min, max));
         
         // Update color mapping based on new range
         const newColorMapping = generateColorMapping(min, max);
         setColormapping(newColorMapping);
+        console.timeEnd('Data source update');
     };
     
     // Zoom controls handlers
@@ -187,14 +231,25 @@ const SeniorCitizensHeatMap = () => {
             <div className='control-pane'>
                 <style>{SAMPLE_CSS}</style>
                 
-                {/* Population Range Slider */}
-                <PopulationRangeSlider 
-                    populationRange={populationRange} 
-                    onRangeChange={handleRangeChange} 
+                {/* Color Range Filter */}
+                <ColorRangeFilter 
+                    sliderValue={sliderValue} 
+                    onSliderChange={handleSyncfusionSliderChange} 
+                    sliderRef={sliderRef} 
                 />
                 
+                {/* Heat Map Component - notice the added key for forced updates */}
+                <HeatMap 
+                    key={key}
+                    mapRef={mapRef}
+                    datasource={datasource}
+                    colormapping={colormapping}
+                    zoomSettings={zoomSettings}
+                    animationDuration={animationDuration}
+                    onMapsLoad={onMapsLoad}
+                />            
                 
-                {/* Map Navigation Controls */}
+                {/* Map Navigation Controls - Now with expand/collapse toggle */}
                 <MapNavigationControls 
                     zoomEnabled={zoomEnabled}
                     panningEnabled={panningEnabled}
@@ -210,26 +265,11 @@ const SeniorCitizensHeatMap = () => {
                     onSingleClickZoomChange={handleSingleClickZoomChange}
                     onDoubleClickZoomChange={handleDoubleClickZoomChange}
                     onAnimationDurationChange={handleAnimationDurationChange}
-                />
-
-                {/* Color Range Filter */}
-                <ColorRangeFilter 
-                    sliderValue={sliderValue} 
-                    onSliderChange={handleSyncfusionSliderChange} 
-                    sliderRef={sliderRef} 
+                    isExpanded={controlsExpanded}
+                    onToggleExpand={toggleNavigationControls}
                 />
                 
-                {/* Heat Map Component */}
-                <HeatMap 
-                    mapRef={mapRef}
-                    datasource={datasource}
-                    colormapping={colormapping}
-                    zoomSettings={zoomSettings}
-                    animationDuration={animationDuration}
-                    onMapsLoad={onMapsLoad}
-                />
-                
-                {/* Status Notifications */}
+                {/* Status Notifications - Hidden by default but available if needed */}
                 <Snackbar 
                     open={openToast} 
                     autoHideDuration={6000} 
