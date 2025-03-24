@@ -8,8 +8,12 @@ import {
     cities, 
     barangays 
 } from 'select-philippines-address';
-import { FaUser, FaCalendarAlt, FaMapMarkerAlt, FaUserCircle } from 'react-icons/fa';
+import { FaUser, FaCalendarAlt, FaMapMarkerAlt, FaUserCircle, FaPhone, FaIdCard } from 'react-icons/fa';
 import { setRegistrationStep, setRegistrationData } from '../../../states/slices/signup.slice';
+import axios from 'axios';
+
+// Get API base URL from environment variables
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL || '';
 
 // Form Field Component
 const FormField = ({ icon, label, children, error }) => (
@@ -139,7 +143,7 @@ const UserInfo = () => {
     const dispatch = useDispatch();
     const { registrationStep, registrationData } = useSelector((state) => state.signup);
     
-    const { email, name } = location.state || {};
+    const { email, name, senior_id } = location.state || {};
     
     // Check if user came from signup
     useEffect(() => {
@@ -154,13 +158,17 @@ const UserInfo = () => {
     const [provinceData, setProvinceData] = useState([]);
     const [cityData, setCityData] = useState([]);
     const [barangayData, setBarangayData] = useState([]);
+    const [serverError, setServerError] = useState('');
     
     const [userData, setUserData] = useState({
         firstName: registrationData?.name ? registrationData.name.split(' ')[0] : '',
         lastName: registrationData?.name ? registrationData.name.split(' ').slice(1).join(' ') : '',
         username: registrationData?.name ? registrationData.name.replace(/\s+/g, '') : '',
         email: registrationData?.email || '',
+        seniorId: registrationData?.senior_id || senior_id || '', // Add senior ID
         birthday: '',
+        gender: 'M', // Default gender selection
+        phone: '',
         region: '',
         province: '',
         city: '',
@@ -328,6 +336,8 @@ const UserInfo = () => {
             newErrors.username = 'Username must be at least 3 characters';
         }
         if (!userData.birthday) newErrors.birthday = 'Birthday is required';
+        if (!userData.phone) newErrors.phone = 'Contact number is required';
+        if (!userData.seniorId) newErrors.seniorId = 'Senior Citizen ID is required';
         if (!userData.region) newErrors.region = 'Region is required';
         if (!userData.province) newErrors.province = 'Province is required';
         if (!userData.city) newErrors.city = 'City/Municipality is required';
@@ -337,20 +347,72 @@ const UserInfo = () => {
         return newErrors;
     };
     
-    // Simulate API call for user data submission
+    // Save user info to backend
     const saveUserInfo = async (userInfo) => {
         setLoading(true);
         
         try {
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            // Get the token either from registration data or local storage
+            const token = registrationData?.token || localStorage.getItem('authToken');
             
-            // Simulate successful API response
-            console.log('User info submitted:', userInfo);
+            if (!token) {
+                throw new Error('Authentication token not found');
+            }
+            
+            // First, update the user profile with demographic info
+            const userResponse = await axios.patch(`${API_BASE_URL}/api/v1/auth/user/`, {
+                first_name: userInfo.firstName,
+                last_name: userInfo.lastName,
+                username: userInfo.username,
+                date_of_birth: userInfo.birthday,
+                gender: userInfo.gender,
+                contact_number: userInfo.phone,
+                address: `${userInfo.streetAddress}, ${userInfo.barangayName}, ${userInfo.cityName}, ${userInfo.provinceName}, ${userInfo.regionName}`
+            }, {
+                headers: {
+                    Authorization: `Token ${token}`
+                }
+            });
+            
+            // Then create the senior citizen record
+            const seniorResponse = await axios.post(`${API_BASE_URL}/api/v1/senior-citizen-info/`, {
+                nid: userInfo.seniorId
+            }, {
+                headers: {
+                    Authorization: `Token ${token}`
+                }
+            });
+            
+            // Get the updated user data
+            const updatedUserResponse = await axios.get(`${API_BASE_URL}/api/v1/auth/user/`, {
+                headers: {
+                    Authorization: `Token ${token}`
+                }
+            });
+            
+            // Store the updated user data in localStorage
+            localStorage.setItem('userData', JSON.stringify(updatedUserResponse.data));
+            
             return { success: true };
         } catch (error) {
             console.error('Error saving user info:', error);
-            return { success: false, error: 'Failed to save user information' };
+            
+            let errorMessage = 'Failed to save user information';
+            
+            if (error.response) {
+                // Handle different error messages from backend
+                const responseData = error.response.data;
+                
+                if (responseData.username) {
+                    return { success: false, field: 'username', error: responseData.username[0] };
+                } else if (responseData.detail) {
+                    errorMessage = responseData.detail;
+                } else if (responseData.non_field_errors) {
+                    errorMessage = responseData.non_field_errors[0];
+                }
+            }
+            
+            return { success: false, error: errorMessage };
         } finally {
             setLoading(false);
         }
@@ -368,6 +430,9 @@ const UserInfo = () => {
                 lastName: userData.lastName,
                 username: userData.username,
                 birthday: userData.birthday,
+                gender: userData.gender,
+                phone: userData.phone,
+                seniorId: userData.seniorId,
                 address: {
                     region: userData.regionName,
                     province: userData.provinceName,
@@ -385,8 +450,11 @@ const UserInfo = () => {
             if (result.success) {
                 // Redirect to home page or dashboard after successful submission
                 navigate('/');
+            } else if (result.field) {
+                // If there's a specific field error
+                setErrors({ [result.field]: result.error });
             } else {
-                setErrors({ submit: result.error });
+                setServerError(result.error);
             }
         } else {
             setErrors(validationErrors);
@@ -413,6 +481,12 @@ const UserInfo = () => {
                     Please provide some additional information to complete your registration.
                 </p>
                 
+                {serverError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                        {serverError}
+                    </div>
+                )}
+                
                 <form onSubmit={handleSubmit}>
                     <div className="md:flex md:space-x-4 mb-4">
                         <div className="md:w-1/2 mb-4 md:mb-0">
@@ -428,6 +502,7 @@ const UserInfo = () => {
                                     value={userData.firstName}
                                     onChange={handleChange}
                                     className="flex-1 outline-none w-full"
+                                    disabled={loading}
                                 />
                             </FormField>
                         </div>
@@ -444,6 +519,7 @@ const UserInfo = () => {
                                     value={userData.lastName}
                                     onChange={handleChange}
                                     className="flex-1 outline-none w-full"
+                                    disabled={loading}
                                 />
                             </FormField>
                         </div>
@@ -461,23 +537,81 @@ const UserInfo = () => {
                             value={userData.username}
                             onChange={handleChange}
                             className="flex-1 outline-none w-full"
+                            disabled={loading}
                         />
                     </FormField>
                     <p className="text-gray-500 text-xs mb-4 italic">
                         Your username defaults to your full name without spaces. You can change it if you prefer.
                     </p>
                     
+                    {/* Senior Citizen ID field */}
                     <FormField 
-                        label="Birthday" 
-                        icon={<FaCalendarAlt className="text-[#A4161A] mr-2" />}
-                        error={errors.birthday}
+                        label="Senior Citizen ID" 
+                        icon={<FaIdCard className="text-[#A4161A] mr-2" />}
+                        error={errors.seniorId}
                     >
                         <input
-                            type="date"
-                            name="birthday"
-                            value={userData.birthday}
+                            type="text"
+                            name="seniorId"
+                            placeholder="Senior Citizen ID"
+                            value={userData.seniorId}
                             onChange={handleChange}
                             className="flex-1 outline-none w-full"
+                            disabled={loading}
+                        />
+                    </FormField>
+                    
+                    <div className="md:flex md:space-x-4 mb-4">
+                        <div className="md:w-1/2 mb-4 md:mb-0">
+                            <FormField 
+                                label="Birthday" 
+                                icon={<FaCalendarAlt className="text-[#A4161A] mr-2" />}
+                                error={errors.birthday}
+                            >
+                                <input
+                                    type="date"
+                                    name="birthday"
+                                    value={userData.birthday}
+                                    onChange={handleChange}
+                                    className="flex-1 outline-none w-full"
+                                    disabled={loading}
+                                />
+                            </FormField>
+                        </div>
+                        <div className="md:w-1/2">
+                            <FormField 
+                                label="Gender" 
+                                icon={<FaUser className="text-[#A4161A] mr-2" />}
+                                error={errors.gender}
+                            >
+                                <select 
+                                    name="gender"
+                                    value={userData.gender}
+                                    onChange={handleChange}
+                                    className="flex-1 outline-none w-full"
+                                    disabled={loading}
+                                >
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                    <option value="O">Other</option>
+                                </select>
+                            </FormField>
+                        </div>
+                    </div>
+                    
+                    <FormField 
+                        label="Contact Number" 
+                        icon={<FaPhone className="text-[#A4161A] mr-2" />}
+                        error={errors.phone}
+                    >
+                        <input
+                            type="tel"
+                            name="phone"
+                            placeholder="Contact Number"
+                            value={userData.phone}
+                            onChange={handleChange}
+                            className="flex-1 outline-none w-full"
+                            disabled={loading}
                         />
                     </FormField>
                     
@@ -491,12 +625,6 @@ const UserInfo = () => {
                         onChange={handleChange}
                         errors={errors}
                     />
-                    
-                    {errors.submit && (
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                            {errors.submit}
-                        </div>
-                    )}
                     
                     <button
                         type="submit"
