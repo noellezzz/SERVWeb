@@ -15,6 +15,11 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { ToastContainer } from 'react-toastify'
 registerLicense(import.meta.env.VITE_APP_EJ2MAPS_API);
 
+import { configureAxios } from './utils/auth.js';
+
+// Configure axios with authentication headers
+configureAxios();
+
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
         <ToastContainer

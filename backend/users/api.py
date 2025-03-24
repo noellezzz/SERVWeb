@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, generics, status
+from rest_framework import viewsets, permissions, generics, status, filters
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -7,6 +7,20 @@ from rest_framework.decorators import action
 from django.contrib.auth.models import User
 from .serializers import UserSerializer, SeniorCitizenInfoSerializer, EmployeeInfoSerializer, UserProfileSerializer
 from .models import SeniorCitizenInfo, EmployeeInfo, User
+from django.contrib.auth.hashers import make_password
+
+# Custom permission for users with admin role
+class IsAdminRole(permissions.BasePermission):
+    """
+    Custom permission to only allow users with 'admin' role.
+    """
+    def has_permission(self, request, view):
+        # Check if user is authenticated and has admin role
+        return bool(
+            request.user and
+            request.user.is_authenticated and
+            (request.user.role == 'admin' or request.user.is_staff or request.user.is_superuser)
+        )
 
 
 class UserAPI(generics.RetrieveAPIView):
@@ -103,3 +117,50 @@ class EmployeeInfoViewSet(viewsets.ModelViewSet):
     queryset = EmployeeInfo.objects.all()
     serializer_class = EmployeeInfoSerializer
     # permission_classes = [permissions.IsAuthenticated]
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing users
+    """
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
+    # Use our custom permission class instead of IsAdminUser
+    permission_classes = [IsAdminRole]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['username', 'email', 'first_name', 'last_name']
+    ordering_fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'role']
+    
+    def perform_create(self, serializer):
+        """
+        Hash password on user creation
+        """
+        # Check if password was provided and hash it
+        if 'password' in self.request.data:
+            password = make_password(self.request.data['password'])
+            serializer.save(password=password)
+        else:
+            serializer.save()
+    
+    def perform_update(self, serializer):
+        """
+        Hash password on user update if provided
+        """
+        # Check if password was provided and hash it
+        if 'password' in self.request.data and self.request.data['password']:
+            password = make_password(self.request.data['password'])
+            serializer.save(password=password)
+        else:
+            serializer.save()
+    
+    def get_queryset(self):
+        """
+        Filter queryset based on role if specified
+        """
+        queryset = super().get_queryset()
+        role = self.request.query_params.get('role', None)
+        
+        if role and role != 'all':
+            queryset = queryset.filter(role=role)
+        
+        return queryset

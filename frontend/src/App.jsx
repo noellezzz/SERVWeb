@@ -28,7 +28,11 @@ import Dashboard from './pages/admin/Dashboard/index.jsx';
 import AssessmenstPage from './pages/admin/Assessments/index.jsx';
 import AsssessmentView from './pages/admin/Assessments/AsssessmentView.jsx';
 import Visualizer from './pages/admin/Visualizer/index.jsx';
-import Users from './pages/admin/Users.jsx';
+// Update import to point to the correct file
+import Users from './pages/admin/Users/index.jsx';
+// Add imports for UserDetail and UserEdit components
+import UserDetail from './pages/admin/Users/UserDetail.jsx';
+import UserEdit from './pages/admin/Users/UserEdit.jsx';
 import ReportsPage from './pages/admin/Reports/index.jsx';
 import FeedbacksPage from './pages/admin/Feedbacks/index.jsx';
 import Analytics from './pages/admin/Analytics/index.jsx';
@@ -111,7 +115,13 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path='/admin' element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
+          {/* User management routes */}
           <Route path='users' element={<Users />} />
+          <Route path='users/:id' element={<UserDetail />} />
+          <Route path='users/:id/edit' element={<UserEdit />} />
+          <Route path='users/new' element={<UserEdit />} />
+          
+          {/* Other admin routes */}
           <Route path='assessments' element={<AssessmenstPage />} />
           <Route path='assessments/:assessmentId' element={<AsssessmentView />} />
           <Route path='feedbacks' element={<FeedbacksPage />} />
