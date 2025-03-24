@@ -1,7 +1,27 @@
-import React, { useState } from 'react';
-import { Typography, FormGroup, FormControlLabel, Checkbox, Divider, Paper, Slider, IconButton } from '@mui/material';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import React from 'react';
+import { Typography, FormGroup, FormControlLabel, Checkbox, Divider, Paper, Slider, IconButton, Tooltip, Zoom } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { styled, keyframes } from '@mui/material/styles';
+
+// Create a spinning animation
+const spin = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+// Styled icon button with spinning animation when active
+const AnimatedIconButton = styled(IconButton)(({ theme, spinning }) => ({
+  animation: spinning ? `${spin} 1s ease-out` : 'none',
+  backgroundColor: spinning ? theme.palette.grey[300] : 'transparent',
+  boxShadow: spinning ? theme.shadows[2] : 'none',
+  '&:hover': {
+    backgroundColor: theme.palette.grey[200],
+  },
+}));
 
 const MapNavigationControls = ({
     zoomEnabled,
@@ -21,25 +41,60 @@ const MapNavigationControls = ({
     isExpanded,
     onToggleExpand
 }) => {
+    // Use isExpanding to track the spinning animation
+    const [isSpinning, setIsSpinning] = React.useState(false);
+    
+    // Handle expansion with animation
+    const handleToggle = () => {
+        setIsSpinning(true);
+        onToggleExpand();
+        
+        // Reset spinning state after animation completes
+        setTimeout(() => setIsSpinning(false), 1000);
+    };
+    
     return (
-        <Paper className='zoom-controls'>
-            <div className="flex justify-between items-center">
-                <Typography variant="h6" className="zoom-title">
-                    Map Navigation Controls
-                </Typography>
-                <IconButton 
-                    onClick={onToggleExpand} 
-                    aria-label={isExpanded ? "Collapse controls" : "Expand controls"}
-                    size="small"
+        <div className="fixed bottom-4 right-4 z-50">
+            {/* Floating icon button */}
+            <Tooltip title={isExpanded ? "Hide map controls" : "Show map controls"} arrow>
+                <AnimatedIconButton
+                    color="primary"
+                    onClick={handleToggle}
+                    spinning={isSpinning ? 1 : 0}
+                    size="large"
+                    sx={{ 
+                        bgcolor: 'white', 
+                        boxShadow: 3,
+                        '&:hover': { bgcolor: 'background.paper' } 
+                    }}
                 >
-                    {isExpanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                </IconButton>
-            </div>
+                    <SettingsIcon />
+                </AnimatedIconButton>
+            </Tooltip>
             
-            <Divider sx={{ mb: 2 }} />
-            
-            {isExpanded && (
-                <>
+            {/* Content panel - only shown when expanded */}
+            <Zoom in={isExpanded}>
+                <Paper 
+                    className='zoom-controls' 
+                    sx={{ 
+                        position: 'absolute', 
+                        bottom: '60px', 
+                        right: 0, 
+                        width: '300px',
+                        maxWidth: '90vw',
+                        visibility: isExpanded ? 'visible' : 'hidden',
+                        maxHeight: isExpanded ? '500px' : '0px',
+                        opacity: isExpanded ? 1 : 0,
+                        overflow: 'hidden',
+                        transition: 'opacity 0.3s, max-height 0.3s, visibility 0.3s',
+                    }}
+                >
+                    <Typography variant="h6" className="zoom-title text-center">
+                        Map Navigation Controls
+                    </Typography>
+                    
+                    <Divider sx={{ mb: 2 }} />
+                    
                     <FormGroup>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <FormControlLabel
@@ -88,9 +143,9 @@ const MapNavigationControls = ({
                             ]}
                         />
                     </div>
-                </>
-            )}
-        </Paper>
+                </Paper>
+            </Zoom>
+        </div>
     );
 };
 
