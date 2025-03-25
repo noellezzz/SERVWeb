@@ -294,6 +294,7 @@ CORS_ALLOW_HEADERS = [
 SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = [
+    'users.auth_backends.EmailOrUsernameModelBackend',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]

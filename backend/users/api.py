@@ -164,3 +164,37 @@ class UserViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(role=role)
         
         return queryset
+
+
+class CustomAuthToken(ObtainAuthToken):
+    """
+    Custom authentication view that accepts username_or_email or email
+    """
+    def post(self, request, *args, **kwargs):
+        # Check for username_or_email first, then fall back to email
+        username_or_email = request.data.get('username_or_email', request.data.get('email', ''))
+        password = request.data.get('password', '')
+        
+        if not username_or_email or not password:
+            return Response(
+                {"non_field_errors": ["Must include username/email and password."]}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Use Django's authenticate with our custom backend
+        from django.contrib.auth import authenticate
+        user = authenticate(
+            request=request,
+            username_or_email=username_or_email,
+            password=password
+        )
+        
+        if not user:
+            return Response(
+                {"non_field_errors": ["Unable to log in with provided credentials."]},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Generate or get token
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'key': token.key})

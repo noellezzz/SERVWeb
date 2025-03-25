@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// Check if token exists in localStorage on initialization
-const token = localStorage.getItem('auth_token');
+// Check for token in localStorage with either key name
+const token = localStorage.getItem('auth_token') || localStorage.getItem('authToken');
 
 const initialState = {
   isAuthenticated: !!token,
