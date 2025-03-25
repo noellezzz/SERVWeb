@@ -1,40 +1,49 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Snackbar, Alert, ToggleButtonGroup, ToggleButton, Box, Typography } from '@mui/material';
+import { createPortal } from 'react-dom';
+import { Snackbar, Alert, Box } from '@mui/material';
 import PopulationRangeSlider from './controls/PopulationRangeSlider';
 import ColorRangeFilter from './controls/ColorRangeFilter';
 import MapNavigationControls from './controls/MapNavigationControls';
+import GeoJsonLevelSelector from './controls/GeoJsonLevelSelector';
+import FullscreenToggle from './controls/FullscreenToggle';
 import HeatMap from './map/HeatMap';
-import { SAMPLE_CSS, COLOR_CODES, DEFAULT_COLOR_MAPPING, DEFAULT_POPULATION_RANGE } from './utils/constants';
-import { 
-    makeRandomPopulation, 
-    prepareDataSource, 
-    generateColorMapping, 
-    updateColorMappingByRange, 
+import { SAMPLE_CSS, FULLSCREEN_CSS, COLOR_CODES, DEFAULT_COLOR_MAPPING, DEFAULT_POPULATION_RANGE } from './utils/constants';
+import {
+    makeRandomPopulation,
+    prepareDataSource,
+    generateColorMapping,
+    updateColorMappingByRange,
     getGeoJsonData,
     GEO_LEVELS,
     CURRENT_LEVEL,
     PROPERTY_PATH,
-    switchGeoLevel
+    switchGeoLevel,
+    focusOnRegion,
+    clearRegionFocus,
+    IS_REGION_FOCUSED,
+    FOCUSED_REGION,
+    getSuggestedPopulationRange,
+    getRegionPopulation
 } from './utils/dataHelpers';
 
 const SeniorCitizensHeatMap = () => {
     const mapRef = useRef(null);
     const sliderRef = useRef(null);
-    
+
     // Map data states
     const [datasource, setDatasource] = useState(makeRandomPopulation());
     const [populationRange, setPopulationRange] = useState(DEFAULT_POPULATION_RANGE);
     const [sliderValue, setSliderValue] = useState(DEFAULT_POPULATION_RANGE);
     const [colormapping, setColormapping] = useState(DEFAULT_COLOR_MAPPING);
     const [key, setKey] = useState(0); // Force re-render key
-    
+
     // GeoJSON level state
     const [currentGeoLevel, setCurrentGeoLevel] = useState(CURRENT_LEVEL);
-    
+
     // Status notification states - set initial open to false
     const [openToast, setOpenToast] = useState(false);
     const [geoJsonStatus, setGeoJsonStatus] = useState({ success: false, message: "" });
-    
+
     // Zoom controls state and visibility
     const [zoomEnabled, setZoomEnabled] = useState(true);
     const [panningEnabled, setPanningEnabled] = useState(true);
@@ -44,20 +53,32 @@ const SeniorCitizensHeatMap = () => {
     const [doubleClickZoom, setDoubleClickZoom] = useState(true);
     const [animationDuration, setAnimationDuration] = useState(500);
     const [controlsExpanded, setControlsExpanded] = useState(false);
-    
+
+    // Region focus state
+    const [isRegionFocused, setIsRegionFocused] = useState(IS_REGION_FOCUSED);
+    const [focusedRegion, setFocusedRegion] = useState(FOCUSED_REGION);
+
+    // Add state for fullscreen mode
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
     // Log when color mapping is updated
     useEffect(() => {
-        console.log('Color mapping updated:', 
-            colormapping.length > 0 ? 
-            `Range: ${colormapping[0].from}-${colormapping[colormapping.length-1].to}` : 
-            'No mapping');
+        console.log('Color mapping updated:',
+            colormapping.length > 0 ?
+                `Range: ${colormapping[0].from}-${colormapping[colormapping.length - 1].to}` :
+                'No mapping');
     }, [colormapping]);
-    
+
     // Toggle navigation controls visibility
     const toggleNavigationControls = () => {
         setControlsExpanded(!controlsExpanded);
     };
-    
+
+    // Toggle fullscreen mode
+    const toggleFullscreen = () => {
+        setIsFullscreen(!isFullscreen);
+    };
+
     // Maps loading handler
     const onMapsLoad = () => {
         console.log('Map loaded event triggered');
@@ -65,7 +86,7 @@ const SeniorCitizensHeatMap = () => {
         if (maps) {
             maps.setAttribute('title', '');
         }
-        
+
         // Check if geojsonData was loaded properly using the imported function
         const geojsonData = getGeoJsonData();
         if (geojsonData && geojsonData.features && geojsonData.features.length > 0) {
@@ -102,27 +123,27 @@ const SeniorCitizensHeatMap = () => {
     // Modified to accept direct value instead of using ref
     const handleSyncfusionSliderChange = useCallback((newValue) => {
         console.time('Color filter apply');
-        
+
         try {
             // Get slider values either from parameter or fallback to ref
             const values = newValue || (sliderRef.current ? sliderRef.current.value : null);
-            
+
             if (!values || values.length !== 2) {
                 console.error('Invalid slider values:', values);
                 return;
             }
-            
+
             const [min, max] = values;
             console.log(`Applying filter range: ${min}-${max}`);
-            
+
             // Update colormapping based on slider range
             const updatedColorMapping = updateColorMappingByRange([...colormapping], min, max, COLOR_CODES);
             setColormapping(updatedColorMapping);
             setSliderValue(values);
-            
+
             // Force the map to refresh with new values by updating key
             setKey(prevKey => prevKey + 1);
-            
+
             // Also try the regular refresh method
             if (mapRef.current) {
                 console.log('Refreshing map with new color mapping');
@@ -133,7 +154,7 @@ const SeniorCitizensHeatMap = () => {
         } catch (error) {
             console.error('Error applying color filter:', error);
         }
-        
+
         console.timeEnd('Color filter apply');
     }, [colormapping]);
 
@@ -141,15 +162,15 @@ const SeniorCitizensHeatMap = () => {
     const updateDataSource = (min, max) => {
         console.time('Data source update');
         console.log(`Updating data source with range: ${min}-${max}`);
-        
+
         setDatasource(prepareDataSource(min, max));
-        
+
         // Update color mapping based on new range
         const newColorMapping = generateColorMapping(min, max);
         setColormapping(newColorMapping);
         console.timeEnd('Data source update');
     };
-    
+
     // Zoom controls handlers
     const handleZoomEnableChange = (event) => {
         setZoomEnabled(event.target.checked);
@@ -158,7 +179,7 @@ const SeniorCitizensHeatMap = () => {
             mapRef.current.refresh();
         }
     };
-    
+
     const handlePanningChange = (event) => {
         setPanningEnabled(event.target.checked);
         if (mapRef.current) {
@@ -166,7 +187,7 @@ const SeniorCitizensHeatMap = () => {
             mapRef.current.refresh();
         }
     };
-    
+
     const handleMouseWheelZoomChange = (event) => {
         setMouseWheelZoom(event.target.checked);
         if (mapRef.current) {
@@ -174,7 +195,7 @@ const SeniorCitizensHeatMap = () => {
             mapRef.current.refresh();
         }
     };
-    
+
     const handlePinchZoomChange = (event) => {
         setPinchZoom(event.target.checked);
         if (mapRef.current) {
@@ -182,7 +203,7 @@ const SeniorCitizensHeatMap = () => {
             mapRef.current.refresh();
         }
     };
-    
+
     const handleSingleClickZoomChange = (event) => {
         setSingleClickZoom(event.target.checked);
         if (mapRef.current) {
@@ -198,7 +219,7 @@ const SeniorCitizensHeatMap = () => {
             }
         }
     };
-    
+
     const handleDoubleClickZoomChange = (event) => {
         setDoubleClickZoom(event.target.checked);
         if (mapRef.current) {
@@ -214,7 +235,7 @@ const SeniorCitizensHeatMap = () => {
             }
         }
     };
-    
+
     const handleAnimationDurationChange = (event, newValue) => {
         setAnimationDuration(newValue);
         if (mapRef.current) {
@@ -222,27 +243,27 @@ const SeniorCitizensHeatMap = () => {
             mapRef.current.refresh();
         }
     };
-    
+
     // Handle geo level change
     const handleGeoLevelChange = (event, newLevel) => {
         if (newLevel && newLevel !== currentGeoLevel) {
             console.log(`Changing geo level from ${currentGeoLevel} to ${newLevel}`);
-            
+
             // Update the geo level in dataHelpers
             if (switchGeoLevel(newLevel)) {
                 setCurrentGeoLevel(newLevel);
-                
+
                 // Reset data with new level
                 const newData = makeRandomPopulation();
                 setDatasource(newData);
-                
+
                 // Reset color mapping
                 const newColorMapping = generateColorMapping(populationRange[0], populationRange[1]);
                 setColormapping(newColorMapping);
-                
+
                 // Force map to re-render with new data
                 setKey(prevKey => prevKey + 1);
-                
+
                 // Show success message
                 setGeoJsonStatus({
                     success: true,
@@ -257,6 +278,72 @@ const SeniorCitizensHeatMap = () => {
                 });
                 setOpenToast(true);
             }
+        }
+    };
+
+    // Handle region focus with proper population distribution
+    const handleFocusRegion = (regionName) => {
+        if (focusOnRegion(regionName)) {
+            // Update component state
+            setIsRegionFocused(true);
+            setFocusedRegion(regionName);
+            
+            // Get region's total population
+            const regionPopulation = getRegionPopulation(regionName);
+            
+            // Generate new data with cities in that region and distributed population
+            const newData = makeRandomPopulation();
+            setDatasource(newData);
+            
+            // Get appropriate population range for cities in this region
+            const newPopulationRange = getSuggestedPopulationRange();
+            setPopulationRange(newPopulationRange);
+            setSliderValue(newPopulationRange);
+            
+            // Generate new color mapping for the appropriate city population range
+            const newColorMapping = generateColorMapping(newPopulationRange[0], newPopulationRange[1]);
+            setColormapping(newColorMapping);
+            
+            // Force re-render
+            setKey(prevKey => prevKey + 1);
+            
+            // Show notification
+            setGeoJsonStatus({
+                success: true,
+                message: `Now viewing cities in ${regionName} (Population: ${regionPopulation.toLocaleString()} seniors)`
+            });
+            setOpenToast(true);
+        }
+    };
+    
+    // Handle returning to all regions view with appropriate ranges
+    const handleClearRegionFocus = () => {
+        if (clearRegionFocus()) {
+            // Update component state
+            setIsRegionFocused(false);
+            setFocusedRegion(null);
+            
+            // Reset data to all regions
+            const newData = makeRandomPopulation();
+            setDatasource(newData);
+            
+            // Reset to default population range
+            setPopulationRange(DEFAULT_POPULATION_RANGE);
+            setSliderValue(DEFAULT_POPULATION_RANGE);
+            
+            // Reset color mapping to default range
+            const newColorMapping = generateColorMapping(DEFAULT_POPULATION_RANGE[0], DEFAULT_POPULATION_RANGE[1]);
+            setColormapping(newColorMapping);
+            
+            // Force re-render
+            setKey(prevKey => prevKey + 1);
+            
+            // Show notification
+            setGeoJsonStatus({
+                success: true,
+                message: 'Returned to all regions view'
+            });
+            setOpenToast(true);
         }
     };
 
@@ -276,64 +363,148 @@ const SeniorCitizensHeatMap = () => {
         }
     };
 
+    // Render the fullscreen content through a portal for proper overlay positioning
+    const renderFullscreenContent = () => {
+        if (!isFullscreen) return null;
+        
+        return createPortal(
+            <div className="fullscreen-overlay">
+                <style>{FULLSCREEN_CSS}</style>
+                
+                <FullscreenToggle 
+                    isFullscreen={isFullscreen} 
+                    onToggle={toggleFullscreen} 
+                />
+                
+                <div className="fullscreen-content">
+                    <div className="fullscreen-controls">
+                        {/* GeoJSON Level Selector - only show when not focused on a region */}
+                        {!isRegionFocused && (
+                            <GeoJsonLevelSelector
+                                currentGeoLevel={currentGeoLevel}
+                                onGeoLevelChange={handleGeoLevelChange}
+                            />
+                        )}
+                        
+                        {/* Color Range Filter */}
+                        <ColorRangeFilter
+                            sliderValue={sliderValue}
+                            onSliderChange={handleSyncfusionSliderChange}
+                            sliderRef={sliderRef}
+                        />
+                    </div>
+                    
+                    <HeatMap
+                        key={`fullscreen-${key}`}
+                        mapRef={mapRef}
+                        datasource={datasource}
+                        colormapping={colormapping}
+                        zoomSettings={zoomSettings}
+                        animationDuration={animationDuration}
+                        onMapsLoad={onMapsLoad}
+                        geoLevel={currentGeoLevel}
+                        propertyPath={PROPERTY_PATH}
+                        onFocusRegion={handleFocusRegion}
+                        onClearRegionFocus={handleClearRegionFocus}
+                        isRegionFocused={isRegionFocused}
+                        focusedRegion={focusedRegion}
+                    />
+                    
+                    {/* Navigation controls */}
+                    <MapNavigationControls
+                        zoomEnabled={zoomEnabled}
+                        panningEnabled={panningEnabled}
+                        mouseWheelZoom={mouseWheelZoom}
+                        pinchZoom={pinchZoom}
+                        singleClickZoom={singleClickZoom}
+                        doubleClickZoom={doubleClickZoom}
+                        animationDuration={animationDuration}
+                        onZoomEnableChange={handleZoomEnableChange}
+                        onPanningChange={handlePanningChange}
+                        onMouseWheelZoomChange={handleMouseWheelZoomChange}
+                        onPinchZoomChange={handlePinchZoomChange}
+                        onSingleClickZoomChange={handleSingleClickZoomChange}
+                        onDoubleClickZoomChange={handleDoubleClickZoomChange}
+                        onAnimationDurationChange={handleAnimationDurationChange}
+                        isExpanded={controlsExpanded}
+                        onToggleExpand={toggleNavigationControls}
+                    />
+                    
+                    <div className="fullscreen-attribution">
+                        Source: Simulated data for demonstration purposes
+                    </div>
+                </div>
+                
+                {/* Status Notifications */}
+                <Snackbar
+                    open={openToast}
+                    autoHideDuration={6000}
+                    onClose={handleCloseToast}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                    <Alert
+                        onClose={handleCloseToast}
+                        severity={geoJsonStatus.success ? "success" : "error"}
+                        sx={{ width: '100%' }}
+                    >
+                        {geoJsonStatus.message}
+                    </Alert>
+                </Snackbar>
+            </div>,
+            document.body
+        );
+    };
+
     return (
         <main>
             <div className='control-pane'>
                 <style>{SAMPLE_CSS}</style>
-                
+
+                {/* Fullscreen Toggle Button - for normal mode */}
+                <FullscreenToggle 
+                    isFullscreen={isFullscreen} 
+                    onToggle={toggleFullscreen} 
+                />
+
                 {/* GeoJSON Level Selector */}
-                <Box 
-                    sx={{ 
-                        display: 'flex',
-                        flexDirection: 'column',
-                        m: 2.5, 
-                        p: 3, 
-                        bgcolor: 'background.paper', 
-                        borderRadius: 1,
-                        boxShadow: 1
-                    }}
-                >
-                    <Typography variant="subtitle1" gutterBottom>
-                        Geographic Level:
-                    </Typography>
-                    <ToggleButtonGroup
-                        color="primary"
-                        value={currentGeoLevel}
-                        exclusive
-                        onChange={handleGeoLevelChange}
-                        aria-label="Geographic Level"
-                        fullWidth
-                    >
-                        <ToggleButton value={GEO_LEVELS.REGION}>Regions</ToggleButton>
-                        <ToggleButton value={GEO_LEVELS.CITY}>Cities/Municipalities</ToggleButton>
-                    </ToggleButtonGroup>
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                        Switch between regional view and city/municipality view
-                    </Typography>
+                <Box sx={{ 
+                    opacity: isRegionFocused ? 0.5 : 1, 
+                    pointerEvents: isRegionFocused ? 'none' : 'auto'
+                }}>
+                    <GeoJsonLevelSelector
+                        currentGeoLevel={currentGeoLevel}
+                        onGeoLevelChange={handleGeoLevelChange}
+                    />
                 </Box>
                 
+                {/* Heat Map Component */}
+                <div style={{ marginTop: '20px' }}>
+                    <HeatMap
+                        key={key}
+                        mapRef={mapRef}
+                        datasource={datasource}
+                        colormapping={colormapping}
+                        zoomSettings={zoomSettings}
+                        animationDuration={animationDuration}
+                        onMapsLoad={onMapsLoad}
+                        geoLevel={currentGeoLevel}
+                        propertyPath={PROPERTY_PATH}
+                        onFocusRegion={handleFocusRegion}
+                        onClearRegionFocus={handleClearRegionFocus}
+                        isRegionFocused={isRegionFocused}
+                        focusedRegion={focusedRegion}
+                    />
+                </div>
+
                 {/* Color Range Filter */}
-                <ColorRangeFilter 
-                    sliderValue={sliderValue} 
-                    onSliderChange={handleSyncfusionSliderChange} 
-                    sliderRef={sliderRef} 
+                <ColorRangeFilter
+                    sliderValue={sliderValue}
+                    onSliderChange={handleSyncfusionSliderChange}
+                    sliderRef={sliderRef}
                 />
-                
-                {/* Heat Map Component - notice the added key and geoLevel props */}
-                <HeatMap 
-                    key={key}
-                    mapRef={mapRef}
-                    datasource={datasource}
-                    colormapping={colormapping}
-                    zoomSettings={zoomSettings}
-                    animationDuration={animationDuration}
-                    onMapsLoad={onMapsLoad}
-                    geoLevel={currentGeoLevel}
-                    propertyPath={PROPERTY_PATH}
-                />            
-                
-                {/* Map Navigation Controls - Now with expand/collapse toggle */}
-                <MapNavigationControls 
+
+                {/* Map Navigation Controls */}
+                <MapNavigationControls
                     zoomEnabled={zoomEnabled}
                     panningEnabled={panningEnabled}
                     mouseWheelZoom={mouseWheelZoom}
@@ -351,41 +522,58 @@ const SeniorCitizensHeatMap = () => {
                     isExpanded={controlsExpanded}
                     onToggleExpand={toggleNavigationControls}
                 />
-                
+
                 {/* Status Notifications */}
-                <Snackbar 
-                    open={openToast} 
-                    autoHideDuration={6000} 
+                <Snackbar
+                    open={openToast}
+                    autoHideDuration={6000}
                     onClose={handleCloseToast}
                     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                 >
-                    <Alert 
-                        onClose={handleCloseToast} 
-                        severity={geoJsonStatus.success ? "success" : "error"} 
+                    <Alert
+                        onClose={handleCloseToast}
+                        severity={geoJsonStatus.success ? "success" : "error"}
                         sx={{ width: '100%' }}
                     >
                         {geoJsonStatus.message}
                     </Alert>
                 </Snackbar>
-                
-                <div style={{ float: 'right', marginRight: '10px' }}>
+
+                <div className='italic text-xs font-bold text-gray-400 text-right'>
                     Source: Simulated data for demonstration purposes
                 </div>
             </div>
-            <section id="action-description" aria-label="Description of Maps sample">
-                <p>This sample visualizes the senior citizen population by municipality/city in the Philippines. You can zoom and pan the map using various controls, and adjust the color mapping based on population ranges.</p>
-            </section>
-            <section id="description" aria-label="Description of the Maps features demonstrated in this sample">
-                <p>In this example, you can use the slider to adjust the range of senior citizen population values. The colors on the map will update accordingly to show population density across different regions.</p>
-                <p>The map includes zoom controls that let you navigate the map in various ways:</p>
-                <ul>
-                    <li>Use the toolbar buttons for zooming and panning</li>
-                    <li>Scroll with your mouse wheel to zoom in/out</li>
-                    <li>Click and drag to pan the map</li>
-                    <li>Use pinch gestures on touch devices</li>
-                </ul>
-                <p>You can customize the zoom behavior using the checkboxes provided.</p>
-            </section>
+
+            {/* Description section */}
+            <div className="bg-white rounded-lg shadow-md p-5 space-y-4 mt-4">
+                <section id="action-description" aria-label="Description of Maps sample">
+                    <h3 className="text-lg font-medium text-gray-800 mb-2">Senior Citizens Population Heat Map</h3>
+                    <p className="text-gray-700">
+                        This visualization represents the senior citizen population distribution by municipality/city in the Philippines.
+                        The interactive map allows for detailed exploration through various navigation controls.
+                    </p>
+                </section>
+
+                <section id="description" aria-label="Description of the Maps features" className="border-t pt-4">
+                    <h4 className="text-md font-medium text-gray-800 mb-2">Features</h4>
+                    <p className="text-gray-700 mb-2">
+                        Adjust the slider to modify the range of population values displayed on the map. Color intensity indicates population density across regions.
+                    </p>
+                    <p className="text-gray-700 mb-2">Navigation options include:</p>
+                    <ul className="list-disc pl-5 text-gray-700 space-y-1">
+                        <li>Toolbar buttons for zooming and panning functions</li>
+                        <li>Mouse wheel scrolling for zoom control</li>
+                        <li>Click and drag functionality for map panning</li>
+                        <li>Pinch gestures supported on touch-enabled devices</li>
+                    </ul>
+                    <p className="text-gray-700 mt-2">
+                        Customize your navigation experience using the control panel provided.
+                    </p>
+                </section>
+            </div>
+
+            {/* Render fullscreen content as a portal */}
+            {renderFullscreenContent()}
         </main>
     );
 };
