@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip, Legend, Marker, Zoom, Selection, Highlight } from '@syncfusion/ej2-react-maps';
-import { getGeoJsonData, PROPERTY_PATH, getLevelTitle, GEO_LEVELS, IS_REGION_FOCUSED, FOCUSED_REGION, getRegionPopulation } from '../utils/dataHelpers';
+import { getGeoJsonData, PROPERTY_PATH, getLevelTitle, GEO_LEVELS, IS_REGION_FOCUSED, FOCUSED_REGION, getRegionPopulation, getSuggestedPopulationRange } from '../utils/dataHelpers';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { POPUP_CSS } from '../utils/constants';
 import FullscreenToggle from '../controls/FullscreenToggle';
@@ -117,21 +117,35 @@ const HeatMap = React.memo(({
         showLegendPath: false
     }), []);
     
-    // Enhanced title settings for better context
+    // Enhanced title settings with more detailed population info
     const titleSettings = useMemo(() => {
         let title = getLevelTitle();
         
         if (isRegionFocused && focusedRegion) {
             const regionPop = datasource?.regionTotal || getRegionPopulation(focusedRegion);
+            const visibleCount = datasource?.seniorCitizens?.length || 0;
+            
             title = `Cities/Municipalities in ${focusedRegion} Region`;
-            title += ` (Total Population: ${regionPop.toLocaleString()} Seniors)`;
+            title += ` (${visibleCount} Cities, Total Population: ${regionPop.toLocaleString()} Seniors)`;
+            
+            // Add population range indicator when filtered
+            if (colormapping?.length > 0) {
+                const minPop = colormapping[0].from;
+                const maxPop = colormapping[colormapping.length-1].to;
+                
+                // Only show range if it's not showing everything
+                const defaultRange = getSuggestedPopulationRange();
+                if (minPop > defaultRange[0] || maxPop < defaultRange[1]) {
+                    title += ` [Filtered: ${minPop.toLocaleString()}-${maxPop.toLocaleString()}]`;
+                }
+            }
         }
         
         return {
             text: title,
             textStyle: { size: '16px' }
         };
-    }, [geoLevel, isRegionFocused, focusedRegion, datasource]);
+    }, [geoLevel, isRegionFocused, focusedRegion, datasource, colormapping]);
     
     // Enhanced tooltip settings for focused region view
     const tooltipSettings = useMemo(() => ({ 

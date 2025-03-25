@@ -135,6 +135,12 @@ export const FULLSCREEN_CSS = `
 
 export const COLOR_CODES = ['#d08a8c', '#c77375', '#bd5b5e', '#b44447', '#aa2c30', '#a11519'];
 
+// Minimum population value to use when range gets too small
+export const MIN_POPULATION_VALUE = 100;
+
+// Minimum range spread to ensure color distribution works properly
+export const MIN_RANGE_SPREAD = 5000;
+
 export const DEFAULT_COLOR_MAPPING = [
     {
         from: 1000,

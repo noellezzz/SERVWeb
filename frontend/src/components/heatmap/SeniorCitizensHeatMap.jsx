@@ -313,11 +313,22 @@ const SeniorCitizensHeatMap = () => {
             
             console.log(`City population actual range: ${actualMin}-${actualMax}, Count: ${cityPops.length}`);
             
-            // Use these actual values to set appropriate slider range
+            // Use suggested population range for better color distribution
+            const suggestedRange = getSuggestedPopulationRange();
+            console.log('Suggested population range:', suggestedRange);
+            
+            // Use the better of actual vs suggested ranges
             const newPopulationRange = [
-                Math.floor(actualMin * 0.9), // Give a little buffer below
-                Math.ceil(actualMax * 1.1)   // Give a little buffer above
+                Math.min(actualMin, suggestedRange[0]),
+                Math.max(actualMax, suggestedRange[1])
             ];
+            
+            // Ensure minimum range spread for good visualization
+            if (newPopulationRange[1] - newPopulationRange[0] < 5000) {
+                newPopulationRange[1] = newPopulationRange[0] + 5000;
+            }
+            
+            console.log('Setting new population range:', newPopulationRange);
             
             setDatasource(newData);
             setPopulationRange(newPopulationRange);
@@ -410,6 +421,9 @@ const SeniorCitizensHeatMap = () => {
                             onSliderChange={handleSyncfusionSliderChange}
                             sliderRef={sliderRef}
                             colormapping={colormapping}
+                            isRegionFocused={isRegionFocused}
+                            focusedRegion={focusedRegion}
+                            regionTotal={datasource?.regionTotal || 0}
                         />
                     </div>
                     
@@ -520,6 +534,9 @@ const SeniorCitizensHeatMap = () => {
                     onSliderChange={handleSyncfusionSliderChange}
                     sliderRef={sliderRef}
                     colormapping={colormapping}
+                    isRegionFocused={isRegionFocused}
+                    focusedRegion={focusedRegion}
+                    regionTotal={datasource?.regionTotal || 0}
                 />
 
                 {/* Map Navigation Controls */}

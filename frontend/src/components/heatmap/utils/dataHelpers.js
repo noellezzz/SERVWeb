@@ -399,7 +399,7 @@ export const distributeCityPopulations = (regionName, totalPopulation, min = nul
     // Determine realistic population ranges to ensure better distribution
     // Smallest city should be at least 10% of average, largest no more than 300% of average
     const calculatedMin = min || Math.max(100, Math.floor(avgPopulation * 0.1));
-    const calculatedMax = max || Math.floor(avgPopulation * 3);
+    const calculatedMax = max || Math.max(calculatedMin + 5000, Math.floor(avgPopulation * 3));
 
     console.log(`City population range for ${regionName}: ${calculatedMin}-${calculatedMax}, Avg: ${avgPopulation}`);
 
@@ -501,15 +501,11 @@ export const getSuggestedPopulationRange = () => {
             // Set range to include at least 5% of avg at minimum and 5x avg at maximum
             // This ensures good spread for color mapping
             const minPop = Math.max(100, Math.floor(avgPopulation * 0.05));
-            const maxPop = Math.ceil(avgPopulation * 5);
+            const maxPop = Math.max(minPop + 5000, Math.ceil(avgPopulation * 5));
 
             console.log(`Suggested city population range: ${minPop}-${maxPop}, Avg: ${avgPopulation}`);
 
             // Make sure the range is wide enough for reasonable color distribution
-            if (maxPop - minPop < 1000) {
-                return [minPop, minPop + 5000];
-            }
-
             return [minPop, maxPop];
         }
     }
