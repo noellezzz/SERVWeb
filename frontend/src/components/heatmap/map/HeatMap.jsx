@@ -3,6 +3,7 @@ import { MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip, Le
 import { getGeoJsonData, PROPERTY_PATH, getLevelTitle, GEO_LEVELS, IS_REGION_FOCUSED, FOCUSED_REGION, getRegionPopulation } from '../utils/dataHelpers';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { POPUP_CSS } from '../utils/constants';
+import FullscreenToggle from '../controls/FullscreenToggle';
 
 // Optimize with React.memo to prevent unnecessary re-renders
 const HeatMap = React.memo(({
@@ -17,7 +18,9 @@ const HeatMap = React.memo(({
     onFocusRegion,
     onClearRegionFocus,
     isRegionFocused = IS_REGION_FOCUSED,
-    focusedRegion = FOCUSED_REGION
+    focusedRegion = FOCUSED_REGION,
+    isFullscreen,
+    onToggleFullscreen
 }) => {
     // State for popup
     const [popupDisplay, setPopupDisplay] = useState('none');
@@ -214,34 +217,20 @@ const HeatMap = React.memo(({
                     position: 'relative'  
                 }}
             >
-                <MapsComponent 
-                    id="maps" 
-                    ref={mapRef}
-                    loaded={onMapsLoad} 
-                    useGroupingSeparator={true} 
-                    format={"n"}
-                    zoomSettings={zoomSettings}
-                    legendSettings={legendSettings}
-                    titleSettings={titleSettings}
-                    height='100%'
-                    width='100%'
-                    shapeSelected={handleShapeSelected}
-                >
-                    <Inject services={[Marker, MapsTooltip, Legend, Zoom, Selection, Highlight]}/>
-                    <LayersDirective>
-                        <LayerDirective 
-                            shapeData={geojsonData} 
-                            shapePropertyPath={isRegionFocused ? 'NAME_2' : propertyPath} 
-                            shapeDataPath='Name'
-                            dataSource={datasource.seniorCitizens}
-                            animationDuration={animationDuration}
-                            tooltipSettings={tooltipSettings}
-                            shapeSettings={shapeSettings}
-                            selectionSettings={selectionSettings}
-                            highlightSettings={highlightSettings}
+                {/* Add FullscreenToggle inside the map container */}
+                {onToggleFullscreen && (
+                    <div style={{ 
+                        position: 'absolute', 
+                        top: '10px', 
+                        right: '10px', 
+                        zIndex: 1001
+                    }}>
+                        <FullscreenToggle 
+                            isFullscreen={isFullscreen} 
+                            onToggle={onToggleFullscreen} 
                         />
-                    </LayersDirective>
-                </MapsComponent>
+                    </div>
+                )}
                 
                 {/* Back to all regions button - now positioned inside the map */}
                 {isRegionFocused && (
@@ -283,6 +272,35 @@ const HeatMap = React.memo(({
                         </button>
                     </div>
                 )}
+                
+                <MapsComponent 
+                    id="maps" 
+                    ref={mapRef}
+                    loaded={onMapsLoad} 
+                    useGroupingSeparator={true} 
+                    format={"n"}
+                    zoomSettings={zoomSettings}
+                    legendSettings={legendSettings}
+                    titleSettings={titleSettings}
+                    height='100%'
+                    width='100%'
+                    shapeSelected={handleShapeSelected}
+                >
+                    <Inject services={[Marker, MapsTooltip, Legend, Zoom, Selection, Highlight]}/>
+                    <LayersDirective>
+                        <LayerDirective 
+                            shapeData={geojsonData} 
+                            shapePropertyPath={isRegionFocused ? 'NAME_2' : propertyPath} 
+                            shapeDataPath='Name'
+                            dataSource={datasource.seniorCitizens}
+                            animationDuration={animationDuration}
+                            tooltipSettings={tooltipSettings}
+                            shapeSettings={shapeSettings}
+                            selectionSettings={selectionSettings}
+                            highlightSettings={highlightSettings}
+                        />
+                    </LayersDirective>
+                </MapsComponent>
                 
                 {/* Popup for selected region/city details - enhanced for cities */}
                 <div className="popup" style={{ display: popupDisplay }}>

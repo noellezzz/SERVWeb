@@ -383,8 +383,8 @@ export const getCitiesForRegion = (regionName) => {
         .map(feature => feature.properties.NAME_2);
 };
 
-// Distribute a region's population among its cities
-export const distributeCityPopulations = (regionName, totalPopulation, min = 100, max = null) => {
+// Improved distribution of city populations
+export const distributeCityPopulations = (regionName, totalPopulation, min = null, max = null) => {
     const cities = getCitiesForRegion(regionName);
 
     if (!cities.length) {
@@ -392,51 +392,103 @@ export const distributeCityPopulations = (regionName, totalPopulation, min = 100
         return [];
     }
 
-    // If max is not specified, calculate it based on total and city count
-    if (!max) {
-        // Allow some cities to have up to 20% of the total population
-        max = Math.floor(totalPopulation * 0.2);
-        // Ensure min < max
-        min = Math.min(min, Math.floor(max * 0.1));
-    }
+    // Calculate more appropriate min/max values based on total population and city count
+    const cityCount = cities.length;
+    const avgPopulation = Math.floor(totalPopulation / cityCount);
 
-    // Generate random proportions for all cities
-    let remainingPopulation = totalPopulation;
-    const cityPopulations = [];
+    // Determine realistic population ranges to ensure better distribution
+    // Smallest city should be at least 10% of average, largest no more than 300% of average
+    const calculatedMin = min || Math.max(100, Math.floor(avgPopulation * 0.1));
+    const calculatedMax = max || Math.floor(avgPopulation * 3);
 
-    // Distribute population to all cities except the last one
-    for (let i = 0; i < cities.length - 1; i++) {
-        // For more realistic distribution, limit maximum population per city
-        const maxForThisCity = Math.min(max, remainingPopulation - min * (cities.length - i - 1));
-        const minForThisCity = Math.min(min, maxForThisCity);
+    console.log(`City population range for ${regionName}: ${calculatedMin}-${calculatedMax}, Avg: ${avgPopulation}`);
 
-        // Random population between min and max
-        const cityPop = Math.floor(Math.random() * (maxForThisCity - minForThisCity + 1)) + minForThisCity;
+    // Generate weighted distribution based on a power-law like distribution
+    // This creates more realistic population patterns where few cities have high populations
+    let cityPopulations = [];
+    let totalAssigned = 0;
+
+    // Generate weights using a power distribution (similar to Zipf's law for city sizes)
+    const weights = cities.map((_, i) => 1 / Math.pow(i + 1, 0.8)); // less steep than pure Zipf
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+
+    // First pass: assign target populations based on weights
+    for (let i = 0; i < cities.length; i++) {
+        // Calculate desired population based on weight
+        const targetPop = Math.floor((weights[i] / totalWeight) * totalPopulation);
+
+        // Constrain to min/max
+        const population = Math.min(Math.max(targetPop, calculatedMin), calculatedMax);
 
         cityPopulations.push({
             Name: cities[i],
-            population: cityPop
+            population: population
         });
 
-        remainingPopulation -= cityPop;
+        totalAssigned += population;
     }
 
-    // Last city gets the remaining population to ensure total adds up exactly
-    cityPopulations.push({
-        Name: cities[cities.length - 1],
-        population: remainingPopulation
-    });
+    // Second pass: adjust to ensure total adds up correctly
+    const diff = totalPopulation - totalAssigned;
 
-    // Shuffle the array to avoid the last city always having the remainder
-    for (let i = cityPopulations.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [cityPopulations[i], cityPopulations[j]] = [cityPopulations[j], cityPopulations[i]];
+    if (Math.abs(diff) > 0) {
+        // If we need to add population, give it to smaller cities first
+        // If we need to remove, take from larger cities first
+        const sortedCities = [...cityPopulations].sort(diff > 0 ?
+            (a, b) => a.population - b.population :  // Sort ascending for adding
+            (a, b) => b.population - a.population    // Sort descending for subtracting
+        );
+
+        let remaining = Math.abs(diff);
+        const sign = diff > 0 ? 1 : -1;
+
+        for (let i = 0; i < sortedCities.length && remaining > 0; i++) {
+            const city = sortedCities[i];
+            const cityIndex = cityPopulations.findIndex(c => c.Name === city.Name);
+
+            if (cityIndex === -1) continue;
+
+            // Calculate how much we can add/subtract from this city
+            let adjustment;
+
+            if (sign > 0) {
+                // Adding: don't exceed max
+                adjustment = Math.min(remaining, calculatedMax - city.population);
+            } else {
+                // Subtracting: don't go below min
+                adjustment = Math.min(remaining, city.population - calculatedMin);
+            }
+
+            cityPopulations[cityIndex].population += sign * adjustment;
+            remaining -= adjustment;
+        }
+
+        // If we still have a difference, distribute evenly as a last resort
+        if (remaining > 0) {
+            const perCity = Math.floor(remaining / cityPopulations.length);
+            const extra = remaining % cityPopulations.length;
+
+            cityPopulations.forEach((city, i) => {
+                city.population += sign * perCity;
+                // Add one extra to some cities if there's a remainder
+                if (i < extra) {
+                    city.population += sign * 1;
+                }
+            });
+        }
     }
+
+    // Verify the total is correct
+    const finalTotal = cityPopulations.reduce((sum, city) => sum + city.population, 0);
+    console.log(`City population distribution: Target=${totalPopulation}, Actual=${finalTotal}, Diff=${finalTotal - totalPopulation}`);
+
+    // Sort by population to ensure color mapping works better
+    cityPopulations.sort((a, b) => a.population - b.population);
 
     return cityPopulations;
 };
 
-// Get suggested population range based on region data
+// Improved population range suggestion for cities
 export const getSuggestedPopulationRange = () => {
     // If focused on a region, adjust range based on city populations
     if (IS_REGION_FOCUSED && FOCUSED_REGION) {
@@ -444,25 +496,27 @@ export const getSuggestedPopulationRange = () => {
         const cityCount = getCitiesForRegion(FOCUSED_REGION).length;
 
         if (cityCount > 0) {
-            // Estimate city population ranges
             const avgPopulation = Math.floor(regionPopulation / cityCount);
-            const minPop = Math.max(100, Math.floor(avgPopulation * 0.2));
-            const maxPop = Math.ceil(avgPopulation * 2);
+
+            // Set range to include at least 5% of avg at minimum and 5x avg at maximum
+            // This ensures good spread for color mapping
+            const minPop = Math.max(100, Math.floor(avgPopulation * 0.05));
+            const maxPop = Math.ceil(avgPopulation * 5);
+
+            console.log(`Suggested city population range: ${minPop}-${maxPop}, Avg: ${avgPopulation}`);
+
+            // Make sure the range is wide enough for reasonable color distribution
+            if (maxPop - minPop < 1000) {
+                return [minPop, minPop + 5000];
+            }
 
             return [minPop, maxPop];
         }
     }
 
     // Default range
-    return DEFAULT_POPULATION_RANGE;
+    return [1000, 100000];
 };
-
-// Override getFilteredRegionData to use our city population distribution
-// const originalGetFilteredRegionData = getFilteredRegionData;
-// export const getFilteredRegionData = () => {
-//     const data = originalGetFilteredRegionData();
-//     return data;
-// };
 
 // Initialize the data preprocessing for default level
 preprocessGeoJson();

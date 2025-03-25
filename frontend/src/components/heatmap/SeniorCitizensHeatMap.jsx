@@ -5,7 +5,6 @@ import PopulationRangeSlider from './controls/PopulationRangeSlider';
 import ColorRangeFilter from './controls/ColorRangeFilter';
 import MapNavigationControls from './controls/MapNavigationControls';
 import GeoJsonLevelSelector from './controls/GeoJsonLevelSelector';
-import FullscreenToggle from './controls/FullscreenToggle';
 import HeatMap from './map/HeatMap';
 import { SAMPLE_CSS, FULLSCREEN_CSS, COLOR_CODES, DEFAULT_COLOR_MAPPING, DEFAULT_POPULATION_RANGE } from './utils/constants';
 import {
@@ -281,7 +280,7 @@ const SeniorCitizensHeatMap = () => {
         }
     };
 
-    // Handle region focus with proper population distribution
+    // Handle region focus with improved color mapping
     const handleFocusRegion = (regionName) => {
         if (focusOnRegion(regionName)) {
             // Update component state
@@ -293,14 +292,25 @@ const SeniorCitizensHeatMap = () => {
             
             // Generate new data with cities in that region and distributed population
             const newData = makeRandomPopulation();
-            setDatasource(newData);
             
-            // Get appropriate population range for cities in this region
-            const newPopulationRange = getSuggestedPopulationRange();
+            // First analyze the population range in the data to ensure colormapping fits
+            const cityPops = newData.seniorCitizens.map(city => city.population);
+            const actualMin = Math.min(...cityPops);
+            const actualMax = Math.max(...cityPops);
+            
+            console.log(`City population actual range: ${actualMin}-${actualMax}, Count: ${cityPops.length}`);
+            
+            // Use these actual values to set appropriate slider range
+            const newPopulationRange = [
+                Math.floor(actualMin * 0.9), // Give a little buffer below
+                Math.ceil(actualMax * 1.1)   // Give a little buffer above
+            ];
+            
+            setDatasource(newData);
             setPopulationRange(newPopulationRange);
             setSliderValue(newPopulationRange);
             
-            // Generate new color mapping for the appropriate city population range
+            // Generate new color mapping specifically for this distribution
             const newColorMapping = generateColorMapping(newPopulationRange[0], newPopulationRange[1]);
             setColormapping(newColorMapping);
             
@@ -310,12 +320,12 @@ const SeniorCitizensHeatMap = () => {
             // Show notification
             setGeoJsonStatus({
                 success: true,
-                message: `Now viewing cities in ${regionName} (Population: ${regionPopulation.toLocaleString()} seniors)`
+                message: `Now viewing cities in ${regionName} (Total Population: ${regionPopulation.toLocaleString()} seniors)`
             });
             setOpenToast(true);
         }
     };
-    
+
     // Handle returning to all regions view with appropriate ranges
     const handleClearRegionFocus = () => {
         if (clearRegionFocus()) {
@@ -371,11 +381,6 @@ const SeniorCitizensHeatMap = () => {
             <div className="fullscreen-overlay">
                 <style>{FULLSCREEN_CSS}</style>
                 
-                <FullscreenToggle 
-                    isFullscreen={isFullscreen} 
-                    onToggle={toggleFullscreen} 
-                />
-                
                 <div className="fullscreen-content">
                     <div className="fullscreen-controls">
                         {/* GeoJSON Level Selector - only show when not focused on a region */}
@@ -385,6 +390,13 @@ const SeniorCitizensHeatMap = () => {
                                 onGeoLevelChange={handleGeoLevelChange}
                             />
                         )}
+                        
+                        {/* Population Range Slider */}
+                        <PopulationRangeSlider
+                            populationRange={populationRange}
+                            onRangeChange={handleRangeChange}
+                            colormapping={colormapping}
+                        />
                         
                         {/* Color Range Filter */}
                         <ColorRangeFilter
@@ -408,6 +420,8 @@ const SeniorCitizensHeatMap = () => {
                         onClearRegionFocus={handleClearRegionFocus}
                         isRegionFocused={isRegionFocused}
                         focusedRegion={focusedRegion}
+                        isFullscreen={isFullscreen}
+                        onToggleFullscreen={toggleFullscreen}
                     />
                     
                     {/* Navigation controls */}
@@ -460,12 +474,6 @@ const SeniorCitizensHeatMap = () => {
             <div className='control-pane'>
                 <style>{SAMPLE_CSS}</style>
 
-                {/* Fullscreen Toggle Button - for normal mode */}
-                <FullscreenToggle 
-                    isFullscreen={isFullscreen} 
-                    onToggle={toggleFullscreen} 
-                />
-
                 {/* GeoJSON Level Selector */}
                 <Box sx={{ 
                     opacity: isRegionFocused ? 0.5 : 1, 
@@ -476,6 +484,13 @@ const SeniorCitizensHeatMap = () => {
                         onGeoLevelChange={handleGeoLevelChange}
                     />
                 </Box>
+                
+                {/* Population Range Slider - now passing colormapping */}
+                <PopulationRangeSlider
+                    populationRange={populationRange}
+                    onRangeChange={handleRangeChange}
+                    colormapping={colormapping}
+                />
                 
                 {/* Heat Map Component */}
                 <div style={{ marginTop: '20px' }}>
@@ -493,6 +508,8 @@ const SeniorCitizensHeatMap = () => {
                         onClearRegionFocus={handleClearRegionFocus}
                         isRegionFocused={isRegionFocused}
                         focusedRegion={focusedRegion}
+                        isFullscreen={isFullscreen}
+                        onToggleFullscreen={toggleFullscreen}
                     />
                 </div>
 
