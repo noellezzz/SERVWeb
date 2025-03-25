@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Snackbar, Alert, Box } from '@mui/material';
-import PopulationRangeSlider from './controls/PopulationRangeSlider';
 import ColorRangeFilter from './controls/ColorRangeFilter';
 import MapNavigationControls from './controls/MapNavigationControls';
 import GeoJsonLevelSelector from './controls/GeoJsonLevelSelector';
@@ -73,10 +72,24 @@ const SeniorCitizensHeatMap = () => {
         setControlsExpanded(!controlsExpanded);
     };
 
-    // Toggle fullscreen mode
+    // Toggle fullscreen mode with proper map refresh
     const toggleFullscreen = () => {
-        setIsFullscreen(!isFullscreen);
+        setIsFullscreen(prevState => !prevState);
+        // Force re-render by incrementing key to ensure proper sizing
+        setKey(prevKey => prevKey + 1);
     };
+
+    // Effect hook to handle fullscreen changes and propagate size adjustments
+    useEffect(() => {
+        if (mapRef.current) {
+            // Allow time for DOM update then refresh map
+            const timer = setTimeout(() => {
+                mapRef.current.refresh();
+            }, 350);
+            
+            return () => clearTimeout(timer);
+        }
+    }, [isFullscreen]);
 
     // Maps loading handler
     const onMapsLoad = () => {
@@ -373,7 +386,6 @@ const SeniorCitizensHeatMap = () => {
         }
     };
 
-    // Render the fullscreen content through a portal for proper overlay positioning
     const renderFullscreenContent = () => {
         if (!isFullscreen) return null;
         
@@ -391,18 +403,13 @@ const SeniorCitizensHeatMap = () => {
                             />
                         )}
                         
-                        {/* Population Range Slider */}
-                        <PopulationRangeSlider
-                            populationRange={populationRange}
-                            onRangeChange={handleRangeChange}
-                            colormapping={colormapping}
-                        />
                         
                         {/* Color Range Filter */}
                         <ColorRangeFilter
                             sliderValue={sliderValue}
                             onSliderChange={handleSyncfusionSliderChange}
                             sliderRef={sliderRef}
+                            colormapping={colormapping}
                         />
                     </div>
                     
@@ -485,12 +492,6 @@ const SeniorCitizensHeatMap = () => {
                     />
                 </Box>
                 
-                {/* Population Range Slider - now passing colormapping */}
-                <PopulationRangeSlider
-                    populationRange={populationRange}
-                    onRangeChange={handleRangeChange}
-                    colormapping={colormapping}
-                />
                 
                 {/* Heat Map Component */}
                 <div style={{ marginTop: '20px' }}>
@@ -518,6 +519,7 @@ const SeniorCitizensHeatMap = () => {
                     sliderValue={sliderValue}
                     onSliderChange={handleSyncfusionSliderChange}
                     sliderRef={sliderRef}
+                    colormapping={colormapping}
                 />
 
                 {/* Map Navigation Controls */}

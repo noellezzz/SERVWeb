@@ -20,7 +20,9 @@ const HeatMap = React.memo(({
     isRegionFocused = IS_REGION_FOCUSED,
     focusedRegion = FOCUSED_REGION,
     isFullscreen,
-    onToggleFullscreen
+    onToggleFullscreen,
+    // Add a prop to control auto-zooming
+    preventAutoZoom = false
 }) => {
     // State for popup
     const [popupDisplay, setPopupDisplay] = useState('none');
@@ -87,6 +89,21 @@ const HeatMap = React.memo(({
             }
         };
     }, [mapRef]);
+    
+    // Refresh map when fullscreen state changes to adjust to new container size
+    useEffect(() => {
+        if (mapRef.current) {
+            // Use setTimeout to ensure DOM has updated before refreshing
+            console.log(`Fullscreen state changed to: ${isFullscreen}, refreshing map...`);
+            const timer = setTimeout(() => {
+                console.time('Map Refresh after fullscreen change');
+                mapRef.current.refresh();
+                console.timeEnd('Map Refresh after fullscreen change');
+            }, 300); // Slight delay to allow transitions to complete
+            
+            return () => clearTimeout(timer);
+        }
+    }, [isFullscreen, mapRef]);
     
     // Memoize legend settings to prevent recreating object on each render
     const legendSettings = useMemo(() => ({
@@ -204,6 +221,24 @@ const HeatMap = React.memo(({
         fill: '#A3B0D0'
     }), []);
     
+    // Popup positioning style - dynamically set based on fullscreen mode
+    const popupStyle = useMemo(() => {
+        const baseStyle = { display: popupDisplay };
+        
+        // If in fullscreen mode, reposition to bottom right instead of bottom left
+        if (isFullscreen) {
+            return {
+                ...baseStyle,
+                left: 'auto',
+                right: '20px',
+                bottom: '50%'
+            };
+        }
+        
+        // Default position (bottom left)
+        return baseStyle;
+    }, [popupDisplay, isFullscreen]);
+    
     return (
         <div className='control-section row relative'>
             <style>{POPUP_CSS}</style>
@@ -221,7 +256,7 @@ const HeatMap = React.memo(({
                 {onToggleFullscreen && (
                     <div style={{ 
                         position: 'absolute', 
-                        top: '10px', 
+                        top: '60px', 
                         right: '10px', 
                         zIndex: 1001
                     }}>
@@ -298,12 +333,14 @@ const HeatMap = React.memo(({
                             shapeSettings={shapeSettings}
                             selectionSettings={selectionSettings}
                             highlightSettings={highlightSettings}
+                            // Prevent auto-zoom on region focus
+                            zoomOnSelection={false}
                         />
                     </LayersDirective>
                 </MapsComponent>
                 
-                {/* Popup for selected region/city details - enhanced for cities */}
-                <div className="popup" style={{ display: popupDisplay }}>
+                {/* Popup for selected region/city details - enhanced with dynamic positioning */}
+                <div className="popup" style={popupStyle}>
                     <span className="close-btn" onClick={handleClosePopup}>×</span>
                     <div className="region-name">{selectedRegion.name}</div>
                     

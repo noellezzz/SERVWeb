@@ -46,7 +46,7 @@ export const POPUP_CSS = `
         border: 0.5px groove #CCCCCC;
         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
         left: 20px;
-        bottom: 20px;
+        bottom: 10px;
         margin-bottom: 2em;
         border-radius: 4px;
         display: none;
@@ -110,7 +110,7 @@ export const FULLSCREEN_CSS = `
         display: flex;
         flex-direction: column;
         gap: 10px;
-        max-width: 250px;
+        max-width: 400px;
         transition: opacity 0.3s;
         opacity: 0.8;
     }
@@ -121,7 +121,7 @@ export const FULLSCREEN_CSS = `
     
     .fullscreen-attribution {
         position: absolute;
-        bottom: 5px;
+        bottom: 25px;
         right: 10px;
         padding: 5px;
         background-color: rgba(255,255,255,0.7);

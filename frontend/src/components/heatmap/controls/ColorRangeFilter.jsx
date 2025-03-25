@@ -5,11 +5,16 @@ import { Button } from '@mui/material';
 const ColorRangeFilter = React.memo(({ 
     sliderValue,
     onSliderChange,
-    sliderRef
+    sliderRef,
+    colormapping // Add colormapping as a prop
 }) => {
     // Local state to track slider values before confirmation
     const [pendingValue, setPendingValue] = useState(sliderValue);
     const [isApplying, setIsApplying] = useState(false);
+    
+    // Calculate min/max from colormapping
+    const minValue = colormapping?.length > 0 ? colormapping[0].from : 1000;
+    const maxValue = colormapping?.length > 0 ? colormapping[colormapping.length - 1].to : 100000;
     
     // Update local state when props change (but avoid loop during apply)
     useEffect(() => {
@@ -60,11 +65,16 @@ const ColorRangeFilter = React.memo(({
                     id="mapRangeSlider" 
                     className="map-slider w-full"
                     type='Range' 
-                    min={1000} 
-                    max={100000} 
-                    step={1000} 
+                    min={minValue} 
+                    max={maxValue} 
+                    step={Math.max(1, Math.floor((maxValue - minValue) / 100))} 
                     value={pendingValue} 
-                    ticks={{ placement: 'After', largeStep: 10000, smallStep: 1000, showSmallTicks: false }}
+                    ticks={{ 
+                        placement: 'After', 
+                        largeStep: Math.max(1, Math.floor((maxValue - minValue) / 5)), 
+                        smallStep: Math.max(1, Math.floor((maxValue - minValue) / 20)), 
+                        showSmallTicks: false 
+                    }}
                     tooltip={{ isVisible: true, format: 'n0' }}
                     change={handleLocalSliderChange}
                     ref={sliderRef}
