@@ -251,11 +251,18 @@ export const updateColorMappingByRange = (colorMapping, min, max, colorCodes) =>
         return updateColorMappingCache.get(cacheKey);
     }
 
+    // Create a new color mapping that preserves the original ranges
+    // but updates colors based on whether they intersect with user's range
     const updatedMapping = colorMapping.map((mapping, index) => {
-        if (mapping.from < min || mapping.to > max) {
-            return { ...mapping, color: '#E5E5E5' }; // Gray out regions outside range
+        // Check if this range has ANY overlap with the selected range
+        const hasOverlap = !(mapping.to < min || mapping.from > max);
+
+        if (hasOverlap) {
+            // This range has at least some overlap with the selected range
+            return { ...mapping, color: colorCodes[index] }; // Keep original color
         } else {
-            return { ...mapping, color: colorCodes[index] }; // Restore original color
+            // This range has no overlap with the selected range
+            return { ...mapping, color: '#E5E5E5' }; // Gray out
         }
     });
 
@@ -263,6 +270,9 @@ export const updateColorMappingByRange = (colorMapping, min, max, colorCodes) =>
     if (updateColorMappingCache.size < 50) {
         updateColorMappingCache.set(cacheKey, updatedMapping);
     }
+
+    console.log('Updated color mapping with range:', min, '-', max,
+        'Result:', updatedMapping.map(m => ({ range: `${m.from}-${m.to}`, color: m.color })));
 
     return updatedMapping;
 };

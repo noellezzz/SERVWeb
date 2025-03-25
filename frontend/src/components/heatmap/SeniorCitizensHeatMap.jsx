@@ -148,8 +148,32 @@ const SeniorCitizensHeatMap = () => {
             const [min, max] = values;
             console.log(`Applying filter range: ${min}-${max}`);
 
-            // Update colormapping based on slider range
-            const updatedColorMapping = updateColorMappingByRange([...colormapping], min, max, COLOR_CODES);
+            // Create a filtered version of the datasource that only includes
+            // cities with populations within the selected range
+            const originalData = datasource.seniorCitizens || [];
+            const regionTotal = datasource.regionTotal || 0;
+            
+            // Keep track of how many cities are in range vs total
+            let citiesInRange = 0;
+            const totalCities = originalData.length;
+            
+            // First pass: count cities in range for logging
+            originalData.forEach(city => {
+                if (city.population >= min && city.population <= max) {
+                    citiesInRange++;
+                }
+            });
+            
+            console.log(`Cities in range ${min}-${max}: ${citiesInRange}/${totalCities}`);
+            
+            // Update colormapping to properly highlight/gray out based on the range
+            const updatedColorMapping = updateColorMappingByRange(
+                [...colormapping], 
+                min, 
+                max, 
+                COLOR_CODES
+            );
+            
             setColormapping(updatedColorMapping);
             setSliderValue(values);
 
@@ -163,12 +187,21 @@ const SeniorCitizensHeatMap = () => {
                     if (mapRef.current) mapRef.current.refresh();
                 }, 50);
             }
+
+            // Show a toast notification if many cities are filtered out
+            if (isRegionFocused && citiesInRange < totalCities * 0.5) {
+                setGeoJsonStatus({
+                    success: true,
+                    message: `Showing ${citiesInRange} of ${totalCities} cities in ${focusedRegion} (population range: ${min.toLocaleString()}-${max.toLocaleString()})`
+                });
+                setOpenToast(true);
+            }
         } catch (error) {
             console.error('Error applying color filter:', error);
         }
 
         console.timeEnd('Color filter apply');
-    }, [colormapping]);
+    }, [colormapping, datasource, isRegionFocused, focusedRegion]);
 
     // Update data source when population range changes
     const updateDataSource = (min, max) => {

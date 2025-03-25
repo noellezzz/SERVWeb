@@ -158,7 +158,7 @@ const HeatMap = React.memo(({
                 : 'City/Municipality: ${Name} <br> Senior Population: ${population}')
     }), [geoLevel, isRegionFocused]);
     
-    // Memoize shape settings based on colormapping
+    // Memoize shape settings based on colormapping and add hover effects
     const shapeSettings = useMemo(() => {
         console.log('Creating new shape settings with color mapping range:', 
             colormapping.length > 0 ? 
@@ -168,7 +168,31 @@ const HeatMap = React.memo(({
         return { 
             colorValuePath: 'population', 
             colorMapping: colormapping,
-            border: { width: 0.5, color: '#FFFFFF' }  
+            border: { width: 0.5, color: '#FFFFFF' },
+            // Add a fill rule function that properly determines colors based on population
+            fill: (args) => {
+                // This is a callback function that runs for each shape
+                const population = args.properties?.population;
+                
+                // If population is undefined, return default color
+                if (population === undefined || population === null) {
+                    return '#E5E5E5'; // Gray default
+                }
+                
+                // Find matching color range from our mapping
+                for (const mapping of colormapping) {
+                    if (population >= mapping.from && population <= mapping.to) {
+                        // Check if this range should be grayed out (means it's filtered out)
+                        if (mapping.color === '#E5E5E5') {
+                            return '#E5E5E5'; // Return gray for filtered out regions
+                        }
+                        return mapping.color; // Return the color for this population range
+                    }
+                }
+                
+                // If no match found, return gray
+                return '#E5E5E5';
+            }
         };
     }, [colormapping]);
 
@@ -178,6 +202,22 @@ const HeatMap = React.memo(({
             // Determine if we're looking at a city in a focused region
             const isCityInFocusedRegion = isRegionFocused && FOCUSED_REGION;
             
+            // Check if this region's population falls within our visible range
+            let isInVisibleRange = false;
+            if (colormapping.length > 0) {
+                const population = args.data.population;
+                // Find the mapping range for this population
+                for (const mapping of colormapping) {
+                    if (population >= mapping.from && population <= mapping.to) {
+                        // If the color isn't gray, it's in the visible range
+                        isInVisibleRange = mapping.color !== '#E5E5E5';
+                        break;
+                    }
+                }
+            } else {
+                isInVisibleRange = true; // Default to visible if no mapping
+            }
+            
             // Update selected region data
             setSelectedRegion({
                 name: args.data.Name,
@@ -185,7 +225,9 @@ const HeatMap = React.memo(({
                 // Add the parent region name if we're viewing a city
                 parentRegion: isCityInFocusedRegion ? FOCUSED_REGION : null,
                 // Store the type for display purposes
-                type: isCityInFocusedRegion ? 'city' : (geoLevel === GEO_LEVELS.REGION ? 'region' : 'city')
+                type: isCityInFocusedRegion ? 'city' : (geoLevel === GEO_LEVELS.REGION ? 'region' : 'city'),
+                // Store visibility status
+                isInVisibleRange: isInVisibleRange
             });
             
             // Show popup
@@ -378,6 +420,18 @@ const HeatMap = React.memo(({
                     <div className="detail-row">
                         <span>Senior Population: </span>
                         <span className="population-value">{selectedRegion.population.toLocaleString()}</span>
+                        
+                        {/* Add visual indicator if population is outside filtered range */}
+                        {!selectedRegion.isInVisibleRange && (
+                            <span style={{ 
+                                marginLeft: '5px', 
+                                color: 'orange', 
+                                fontWeight: 'bold',
+                                fontSize: '0.8em'
+                            }}>
+                                (outside filter range)
+                            </span>
+                        )}
                     </div>
                     
                     {/* Show percentage of region total for cities in focused view */}

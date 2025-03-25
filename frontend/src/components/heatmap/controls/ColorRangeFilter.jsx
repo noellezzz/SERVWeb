@@ -44,10 +44,14 @@ const ColorRangeFilter = React.memo(({
             return;
         }
         
-        // Simple approximation based on range vs. total
-        const rangeSpan = range[1] - range[0];
-        const fullSpan = maxValue - minValue;
-        const percent = Math.min(100, Math.round((rangeSpan / fullSpan) * 100));
+        // Get the min and max values from the current data
+        const actualMin = colormapping[0].from;
+        const actualMax = colormapping[colormapping.length-1].to;
+        
+        // Calculate what percentage of the full range is being shown
+        const fullRange = actualMax - actualMin;
+        const selectedRange = range[1] - range[0];
+        const percent = Math.min(100, Math.round((selectedRange / fullRange) * 100));
         
         setFilteredPercent(percent);
     };
@@ -96,15 +100,56 @@ const ColorRangeFilter = React.memo(({
             };
         }
         
-        // Use the color mapping boundaries for large steps
-        const largeStep = Math.max(1, Math.floor((maxValue - minValue) / colormapping.length));
+        // Use the actual boundaries from color mapping for more accurate ticks
+        const ticks = [];
+        
+        // Add each boundary as a tick
+        colormapping.forEach(mapping => {
+            ticks.push(mapping.from);
+            ticks.push(mapping.to);
+        });
+        
+        // Remove duplicates and sort
+        const uniqueTicks = [...new Set(ticks)].sort((a, b) => a - b);
+        
+        // Use these as large steps if there aren't too many
+        const largeStep = uniqueTicks.length <= 10 ? 
+            uniqueTicks : 
+            [minValue, ...uniqueTicks.filter((_, i) => i % 2 === 0), maxValue];
         
         return {
             placement: 'After',
-            largeStep: largeStep,
-            smallStep: Math.max(1, Math.floor(largeStep / 4)),
+            largeStep: Math.max(1, Math.floor((maxValue - minValue) / colormapping.length)),
+            smallStep: Math.max(1, Math.floor((maxValue - minValue) / (colormapping.length * 4))),
             showSmallTicks: false
         };
+    };
+
+    // Add debug helper function to show how ranges map to colors
+    const renderColorMappingDebug = () => {
+        if (!colormapping || colormapping.length === 0) return null;
+        
+        return (
+            <div className="mt-2 text-xs text-gray-500">
+                <details>
+                    <summary className="cursor-pointer">View Population Range Details</summary>
+                    <div className="mt-1 pl-2 border-l-2 border-gray-300">
+                        {colormapping.map((mapping, index) => (
+                            <div key={index} className="flex items-center mb-1">
+                                <span 
+                                    className="inline-block w-3 h-3 mr-2"
+                                    style={{ backgroundColor: mapping.color }}
+                                />
+                                <span>
+                                    {mapping.from.toLocaleString()}-{mapping.to.toLocaleString()} 
+                                    ({mapping.color === '#E5E5E5' ? 'Filtered Out' : 'Visible'})
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </details>
+            </div>
+        );
     };
 
     return (
@@ -156,6 +201,8 @@ const ColorRangeFilter = React.memo(({
                     </Alert>
                 </div>
             )}
+            
+            {renderColorMappingDebug()}
             
             <div className="flex justify-end mt-4">
                 <Button 
