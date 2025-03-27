@@ -71,7 +71,9 @@ const Login = () => {
                 };
                 
                 // Make API request to Django backend using environment variable
-                const response = await axios.post(`${API_BASE_URL}/api/v1/auth/login/`, loginPayload);
+                const response = await axios.post(`${API_BASE_URL}/api/v1/login/`, loginPayload, {
+                    'ngrok-skip-browser-warning': '1'
+                });
                 
                 // Store auth token in localStorage and Redux store
                 if (response.data.key) {
@@ -80,7 +82,9 @@ const Login = () => {
                     // Get user data
                     const userResponse = await axios.get(`${API_BASE_URL}/api/v1/auth/user/`, {
                         headers: {
-                            Authorization: `Token ${token}`
+                            Authorization: `Token ${token}`,
+                        'ngrok-skip-browser-warning': '1'
+
                         }
                     });
                     

@@ -55,6 +55,8 @@ function UserEdit() {
                     `${API_BASE_URL}/api/v1/users/${id}/`,
                     {
                         headers: {
+                            'ngrok-skip-browser-warning': '1',
+
                             'Authorization': `Token ${getToken()}`
                         }
                     }
@@ -75,6 +77,8 @@ function UserEdit() {
                             `${API_BASE_URL}/api/v1/senior-citizens/`,
                             {
                                 headers: {
+                                    'ngrok-skip-browser-warning': '1',
+
                                     'Authorization': `Token ${getToken()}`
                                 },
                                 params: { user: id }
@@ -95,6 +99,8 @@ function UserEdit() {
                             `${API_BASE_URL}/api/v1/employees/`,
                             {
                                 headers: {
+                                    'ngrok-skip-browser-warning': '1',
+
                                     'Authorization': `Token ${getToken()}`
                                 },
                                 params: { user: id }
@@ -127,6 +133,8 @@ function UserEdit() {
                     `${API_BASE_URL}/api/v1/services/`,
                     {
                         headers: {
+                            'ngrok-skip-browser-warning': '1',
+
                             'Authorization': `Token ${getToken()}`
                         }
                     }
@@ -269,6 +277,8 @@ function UserEdit() {
                     },
                     {
                         headers: {
+                            'ngrok-skip-browser-warning': '1',
+
                             'Authorization': `Token ${getToken()}`,
                             'Content-Type': 'application/json'
                         }
@@ -285,6 +295,8 @@ function UserEdit() {
                     },
                     {
                         headers: {
+                            'ngrok-skip-browser-warning': '1',
+
                             'Authorization': `Token ${getToken()}`,
                             'Content-Type': 'application/json'
                         }
@@ -301,6 +313,8 @@ function UserEdit() {
                         { ...seniorInfo, user: userId },
                         {
                             headers: {
+                                'ngrok-skip-browser-warning': '1',
+
                                 'Authorization': `Token ${getToken()}`,
                                 'Content-Type': 'application/json'
                             }
@@ -313,6 +327,8 @@ function UserEdit() {
                         { ...seniorInfo, user: userId },
                         {
                             headers: {
+                                'ngrok-skip-browser-warning': '1',
+
                                 'Authorization': `Token ${getToken()}`,
                                 'Content-Type': 'application/json'
                             }
@@ -325,6 +341,8 @@ function UserEdit() {
                     `${API_BASE_URL}/api/v1/senior-citizens/${seniorInfo.id}/`,
                     {
                         headers: {
+                            'ngrok-skip-browser-warning': '1',
+
                             'Authorization': `Token ${getToken()}`
                         }
                     }
@@ -340,6 +358,8 @@ function UserEdit() {
                         { ...employeeInfo, user: userId },
                         {
                             headers: {
+                                'ngrok-skip-browser-warning': '1',
+
                                 'Authorization': `Token ${getToken()}`,
                                 'Content-Type': 'application/json'
                             }
@@ -352,6 +372,8 @@ function UserEdit() {
                         { ...employeeInfo, user: userId },
                         {
                             headers: {
+                                'ngrok-skip-browser-warning': '1',
+
                                 'Authorization': `Token ${getToken()}`,
                                 'Content-Type': 'application/json'
                             }
@@ -364,6 +386,8 @@ function UserEdit() {
                     `${API_BASE_URL}/api/v1/employees/${employeeInfo.id}/`,
                     {
                         headers: {
+                            'ngrok-skip-browser-warning': '1',
+
                             'Authorization': `Token ${getToken()}`
                         }
                     }

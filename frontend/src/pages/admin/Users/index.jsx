@@ -26,30 +26,31 @@ function Users() {
             // Build query parameters
             const params = new URLSearchParams();
             params.append('page', currentPage);
-            
+
             if (searchTerm) {
                 params.append('search', searchTerm);
             }
-            
+
             if (sortField) {
                 const sortParam = sortDirection === 'desc' ? `-${sortField}` : sortField;
                 params.append('ordering', sortParam);
             }
-            
+
             if (roleFilter !== 'all') {
                 params.append('role', roleFilter);
             }
-            
+
             const response = await axios.get(
                 `${API_BASE_URL}/api/v1/users/`,
                 {
                     headers: {
+                        'ngrok-skip-browser-warning': '1',
                         'Authorization': `Token ${getToken()}`
                     },
                     params
                 }
             );
-            
+
             setUsers(response.data.results || []);
             setTotalPages(Math.ceil((response.data.count || 0) / 10));
             setError(null);
@@ -96,7 +97,9 @@ function Users() {
                     `${API_BASE_URL}/api/v1/users/${userId}/`,
                     {
                         headers: {
-                            'Authorization': `Token ${getToken()}`
+                            'Authorization': `Token ${getToken()}`,
+                            'ngrok-skip-browser-warning': '1',
+
                         }
                     }
                 );
@@ -119,8 +122,8 @@ function Users() {
             <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-semibold text-black">User Management</h2>
-                    <Link 
-                        to="/admin/users/new" 
+                    <Link
+                        to="/admin/users/new"
                         className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
                     >
                         Add New User
@@ -182,29 +185,29 @@ function Users() {
                         <>
                             {/* Header Row */}
                             <div className="grid grid-cols-6 gap-6 text-black mb-4 font-semibold bg-gray-200 p-3 rounded-lg">
-                                <div 
-                                    onClick={() => handleSort('username')} 
+                                <div
+                                    onClick={() => handleSort('username')}
                                     className="cursor-pointer hover:text-blue-600 flex items-center"
                                 >
                                     <span>User</span>
                                     <span className="ml-1">{getSortIcon('username')}</span>
                                 </div>
-                                <div 
-                                    onClick={() => handleSort('email')} 
+                                <div
+                                    onClick={() => handleSort('email')}
                                     className="cursor-pointer hover:text-blue-600 flex items-center"
                                 >
                                     <span>Email</span>
                                     <span className="ml-1">{getSortIcon('email')}</span>
                                 </div>
-                                <div 
-                                    onClick={() => handleSort('role')} 
+                                <div
+                                    onClick={() => handleSort('role')}
                                     className="cursor-pointer hover:text-blue-600 flex items-center"
                                 >
                                     <span>Role</span>
                                     <span className="ml-1">{getSortIcon('role')}</span>
                                 </div>
-                                <div 
-                                    onClick={() => handleSort('date_joined')} 
+                                <div
+                                    onClick={() => handleSort('date_joined')}
                                     className="cursor-pointer hover:text-blue-600 flex items-center"
                                 >
                                     <span>Joined</span>
@@ -271,7 +274,7 @@ function Users() {
                                                 >
                                                     <FaEdit className="mr-2" /> Edit
                                                 </Link>
-                                                <button 
+                                                <button
                                                     onClick={() => handleDelete(user.id)}
                                                     className="flex items-center px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all"
                                                 >

@@ -24,7 +24,7 @@ class EmailOrUsernameModelBackend(ModelBackend):
             query = Q(email__iexact=username_or_email)
         except ValidationError:
             # If validation fails, treat as username
-            query = Q(username__iexact(username_or_email))
+            query = Q(username__iexact=username_or_email)  # Fixed: added = instead of ()
         
         try:
             # Try to find the user

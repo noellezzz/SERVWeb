@@ -60,9 +60,12 @@ export const setupAuthErrorHandling = (navigate) => {
 // Login function
 export const login = async (credentials) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/api/v1/auth/login/`, {
+        const response = await axios.post(`${API_BASE_URL}/api/v1/login/`, {
             email: credentials.email,
             password: credentials.password
+        }, {
+            'ngrok-skip-browser-warning': '1',
+
         });
 
         // Django REST Auth returns token in 'key' field
@@ -90,6 +93,8 @@ export const logout = async () => {
     try {
         await axios.post(`${API_BASE_URL}/api/v1/auth/logout/`, {}, {
             headers: {
+                'ngrok-skip-browser-warning': '1',
+
                 'Authorization': `Token ${getToken()}`
             }
         });
@@ -116,6 +121,8 @@ export const isAdmin = async () => {
     try {
         const response = await axios.get(`${API_BASE_URL}/api/v1/current-user/`, {
             headers: {
+                'ngrok-skip-browser-warning': '1',
+
                 'Authorization': `Token ${token}`
             }
         });

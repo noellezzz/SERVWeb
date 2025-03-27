@@ -26,6 +26,8 @@ function UserDetail() {
                     `${API_BASE_URL}/api/v1/users/${id}/`,
                     {
                         headers: {
+                            'ngrok-skip-browser-warning': '1',
+
                             'Authorization': `Token ${getToken()}`
                         }
                     }
@@ -39,6 +41,7 @@ function UserDetail() {
                             `${API_BASE_URL}/api/v1/senior-citizens/`,
                             {
                                 headers: {
+                                    'ngrok-skip-browser-warning': '1',
                                     'Authorization': `Token ${getToken()}`
                                 },
                                 params: { user: id }
@@ -59,6 +62,8 @@ function UserDetail() {
                             `${API_BASE_URL}/api/v1/employees/`,
                             {
                                 headers: {
+                                    'ngrok-skip-browser-warning': '1',
+
                                     'Authorization': `Token ${getToken()}`
                                 },
                                 params: { user: id }

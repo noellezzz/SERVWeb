@@ -56,6 +56,8 @@ const UserDashboard = () => {
         // Fetch user profile
         const userResponse = await axios.get(`${API_BASE_URL}/api/v1/auth/user/`, {
           headers: {
+            'ngrok-skip-browser-warning': '1',
+
             Authorization: `Token ${token}`
           }
         });
@@ -66,6 +68,8 @@ const UserDashboard = () => {
         try {
           const seniorResponse = await axios.get(`${API_BASE_URL}/api/v1/senior-citizen-info/my_info/`, {
             headers: {
+              'ngrok-skip-browser-warning': '1',
+
               Authorization: `Token ${token}`
             }
           });

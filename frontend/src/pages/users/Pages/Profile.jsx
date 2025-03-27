@@ -61,6 +61,8 @@ const Profile = () => {
         // Fetch user profile
         const userResponse = await axios.get(`${API_BASE_URL}/api/v1/auth/user/`, {
           headers: {
+            'ngrok-skip-browser-warning': '1',
+
             Authorization: `Token ${token}`
           }
         });
@@ -71,6 +73,8 @@ const Profile = () => {
         try {
           const seniorResponse = await axios.get(`${API_BASE_URL}/api/v1/senior-citizen-info/my_info/`, {
             headers: {
+              'ngrok-skip-browser-warning': '1',
+
               Authorization: `Token ${token}`
             }
           });
@@ -149,6 +153,8 @@ const Profile = () => {
           contact_number: userData.contact_number
         }, {
           headers: {
+            'ngrok-skip-browser-warning': '1',
+
             Authorization: `Token ${token}`
           }
         });
@@ -159,6 +165,8 @@ const Profile = () => {
             nid: seniorData.nid
           }, {
             headers: {
+              'ngrok-skip-browser-warning': '1',
+
               Authorization: `Token ${token}`
             }
           });

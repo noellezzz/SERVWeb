@@ -23,10 +23,11 @@ urlpatterns = [
 
     # path('accounts/', include('django.contrib.auth.urls')),
     path('api/v1/', include([
-        path('pdf/', include('pdf.urls')),  
-        path('auth/', include('dj_rest_auth.urls')),
-        path('auth/registration/', include('dj_rest_auth.registration.urls')),
+        path('', include('dj_rest_auth.urls')),  # This provides /login/, /logout/, etc.
+        path('registration/', include('dj_rest_auth.registration.urls')),
         path('accounts/', include('allauth.urls')),
+        
+        path('pdf/', include('pdf.urls')),  
         path('', include('dashboard.urls')),
         path('', include('feedbacks.urls')),
         path('', include('sentiment_tests.urls')),

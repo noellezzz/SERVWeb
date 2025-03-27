@@ -50,7 +50,9 @@ const Profile = () => {
           `${API_BASE_URL}/api/v1/profile/`,
           {
             headers: {
-              'Authorization': `Token ${getToken()}`
+              'Authorization': `Token ${getToken()}`,
+              'ngrok-skip-browser-warning': '1'
+
             }
           }
         );
@@ -137,7 +139,9 @@ const Profile = () => {
         {
           headers: {
             'Authorization': `Token ${getToken()}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': '1'
+
           }
         }
       );
@@ -181,7 +185,9 @@ const Profile = () => {
         {
           headers: {
             'Authorization': `Token ${getToken()}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': '1',
+
           }
         }
       );
@@ -232,6 +238,7 @@ const Profile = () => {
         {
           headers: {
             'Authorization': `Token ${getToken()}`,
+            'ngrok-skip-browser-warning': '1',
             'Content-Type': 'application/json'
           }
         }

@@ -38,6 +38,7 @@ function Profile() {
           `${API_BASE_URL}/api/v1/profile/`, 
           {
             headers: {
+              'ngrok-skip-browser-warning': '1',
               'Authorization': `Token ${getToken()}`
             }
           }
@@ -112,6 +113,7 @@ function Profile() {
         {
           headers: {
             'Authorization': `Token ${getToken()}`,
+            'ngrok-skip-browser-warning': '1',
             'Content-Type': 'application/json'
           }
         }

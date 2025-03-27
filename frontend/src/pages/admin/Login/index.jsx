@@ -29,52 +29,56 @@ const Login = () => {
       return;
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address');
-      setLoading(false);
-      return;
-    }
-
     dispatch(loginRequest());
 
     try {
-      // Use axios instead of fetch for consistency
-      const response = await axios.post(`${API_BASE_URL}/api/v1/auth/login/`, {
-        email,
+      // Use the correct parameter name for authentication
+      const response = await axios.post(`${API_BASE_URL}/api/v1/login/`, {
+        email: email,  
         password,
+      }, {
+        'ngrok-skip-browser-warning': '1',
       });
 
       // Check for successful response
       if (response.data && response.data.key) {
         // Store the token
-        localStorage.setItem('auth_token', response.data.key);
+        const token = response.data.key;
+        localStorage.setItem('auth_token', token);
         
         // Fetch user data
-        const userResponse = await axios.get(`${API_BASE_URL}/api/v1/current-user/`, {
-          headers: {
-            'Authorization': `Token ${response.data.key}`
-          }
-        });
-        
-        // Check if user has admin role
-        if (userResponse.data.role !== 'admin' && !userResponse.data.is_staff && !userResponse.data.is_superuser) {
-          setError('You do not have permission to access the admin area');
-          localStorage.removeItem('auth_token');
-          dispatch(loginFailure('Insufficient permissions'));
-          setLoading(false);
-          return;
-        }
-        
-        // Update Redux state with token and user data
-        dispatch(loginSuccess({ 
-          token: response.data.key, 
-          user: userResponse.data 
-        }));
+        try {
+          const userResponse = await axios.get(`${API_BASE_URL}/api/v1/current-user/`, {
+            headers: {
+              'Authorization': `Token ${token}`,
+            'ngrok-skip-browser-warning': '1',
 
-        // Redirect to admin dashboard
-        navigate('/admin', { replace: true });
+            }
+          });
+          
+          // Check if user has admin role - using logical OR for proper permission check
+          if (userResponse.data.role === 'admin' || userResponse.data.is_staff || userResponse.data.is_superuser) {
+            // Update Redux state with token and user data
+            dispatch(loginSuccess({ 
+              token: token, 
+              user: userResponse.data 
+            }));
+
+            // Redirect to admin dashboard
+            navigate('/admin', { replace: true });
+          } else {
+            // Not admin - show appropriate message
+            setError('You do not have permission to access the admin area');
+            localStorage.removeItem('auth_token');
+            dispatch(loginFailure('Insufficient permissions'));
+          }
+        } catch (userError) {
+          // Handle error fetching user data
+          console.error('Error fetching user data:', userError);
+          setError('Could not verify user permissions. Please try again.');
+          localStorage.removeItem('auth_token');
+          dispatch(loginFailure('User data fetch failed'));
+        }
       } else {
         throw new Error('Invalid login response');
       }
@@ -103,8 +107,7 @@ const Login = () => {
           <form onSubmit={handleSubmit}>
             <TextField 
               fullWidth 
-              label='Email Address' 
-              type='email'
+              label='Email or Username' 
               variant='outlined' 
               margin='normal' 
               value={email} 

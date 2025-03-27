@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// Check for token in localStorage with either key name
-const token = localStorage.getItem('auth_token') || localStorage.getItem('authToken');
+// Use only auth_token for consistency across the application
+const token = localStorage.getItem('auth_token');
 
 const initialState = {
   isAuthenticated: !!token,
@@ -20,15 +20,17 @@ const authSlice = createSlice({
       state.error = null;
     },
     loginSuccess: (state, action) => {
+      const token = action.payload.token;
+
       // Ensure the token is properly saved in both Redux and localStorage
       state.isAuthenticated = true;
-      state.token = action.payload.token;
+      state.token = token;
       state.user = action.payload.user;
       state.loading = false;
       state.error = null;
 
       // Make sure token is also saved to localStorage
-      localStorage.setItem('auth_token', action.payload.token);
+      localStorage.setItem('auth_token', token);
     },
     loginFailure: (state, action) => {
       state.isAuthenticated = false;
@@ -36,6 +38,9 @@ const authSlice = createSlice({
       state.user = null;
       state.loading = false;
       state.error = action.payload;
+
+      // Clear localStorage on failure
+      localStorage.removeItem('auth_token');
     },
     logout: (state) => {
       state.isAuthenticated = false;

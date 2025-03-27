@@ -370,6 +370,8 @@ const UserInfo = () => {
                 address: `${userInfo.streetAddress}, ${userInfo.barangayName}, ${userInfo.cityName}, ${userInfo.provinceName}, ${userInfo.regionName}`
             }, {
                 headers: {
+                    'ngrok-skip-browser-warning': '1',
+
                     Authorization: `Token ${token}`
                 }
             });
@@ -379,6 +381,8 @@ const UserInfo = () => {
                 nid: userInfo.seniorId
             }, {
                 headers: {
+                    'ngrok-skip-browser-warning': '1',
+
                     Authorization: `Token ${token}`
                 }
             });
@@ -386,6 +390,8 @@ const UserInfo = () => {
             // Get the updated user data
             const updatedUserResponse = await axios.get(`${API_BASE_URL}/api/v1/auth/user/`, {
                 headers: {
+                    'ngrok-skip-browser-warning': '1',
+
                     Authorization: `Token ${token}`
                 }
             });
