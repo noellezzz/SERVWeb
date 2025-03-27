@@ -507,7 +507,6 @@ const SeniorCitizensHeatMap = () => {
                             isProvinceFocused={isProvinceFocused}
                             focusedProvince={focusedProvince}
                             provinceTotal={datasource?.regionTotal || 0}
-                            // Pass population data directly to ensure it's available
                             populationData={datasource?.seniorCitizens || []}
                         />
                     </div>
@@ -528,9 +527,7 @@ const SeniorCitizensHeatMap = () => {
                         focusedProvince={focusedProvince}
                         isFullscreen={isFullscreen}
                         onToggleFullscreen={toggleFullscreen}
-                        // Add missing props for fullscreen mode
                         onColorMappingChange={setColormapping} 
-                        // Pass population data directly
                         populationData={datasource?.seniorCitizens || []}
                     />
                     
@@ -627,7 +624,6 @@ const SeniorCitizensHeatMap = () => {
                     isProvinceFocused={isProvinceFocused}
                     focusedProvince={focusedProvince}
                     provinceTotal={datasource?.regionTotal || 0}
-                    // Pass population data directly to ensure it's available
                     populationData={datasource?.seniorCitizens || []}
                 />
 
