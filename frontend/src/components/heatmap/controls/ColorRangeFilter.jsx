@@ -11,7 +11,8 @@ const ColorRangeFilter = React.memo(({
     isProvinceFocused = false,
     focusedProvince = null,
     provinceTotal = 0,
-    filteredPopulation = { total: 0, filtered: 0, percentage: 0 }
+    filteredPopulation = { total: 0, filtered: 0, percentage: 0 },
+    populationData = [] // Add this prop to accept the full population dataset
 }) => {
     // Local state to track slider values before confirmation
     const [pendingValue, setPendingValue] = useState(sliderValue);
@@ -81,11 +82,21 @@ const ColorRangeFilter = React.memo(({
         // This bypasses any potential issues with the slider reference
         console.log('Applying filter with values:', pendingValue);
         
-        // Pass the pending value directly to the parent component
-        onSliderChange(pendingValue);
+        // Wrap in try/catch to handle potential errors
+        try {
+            // Use a small timeout to ensure UI is updated before heavy operations
+            setTimeout(() => {
+                // Pass the pending value directly to the parent component
+                onSliderChange(pendingValue);
+                
+                // Reset flag after apply
+                setTimeout(() => setIsApplying(false), 200);
+            }, 50);
+        } catch (error) {
+            console.error('Error applying filter:', error);
+            setIsApplying(false);
+        }
         
-        // Reset flag after apply
-        setTimeout(() => setIsApplying(false), 100);
         console.timeEnd('Filter application');
     };
 
@@ -157,7 +168,23 @@ const ColorRangeFilter = React.memo(({
     const renderFilterInfo = () => {
         if (!filteredPopulation) return null;
         
-        const { total, filtered, percentage } = filteredPopulation;
+        // Use population data to calculate totals if filteredPopulation has zeros
+        let { total, filtered, percentage } = filteredPopulation;
+        
+        // If we don't have valid data from filteredPopulation, calculate from populationData
+        if ((total === 0 || filtered === 0) && populationData && populationData.length > 0) {
+            const calculatedTotal = populationData.reduce((sum, item) => sum + (item.population || 0), 0);
+            const calculatedFiltered = populationData
+                .filter(item => (item.population || 0) >= pendingValue[0] && (item.population || 0) <= pendingValue[1])
+                .reduce((sum, item) => sum + (item.population || 0), 0);
+            
+            if (calculatedTotal > 0) {
+                total = calculatedTotal;
+                filtered = calculatedFiltered;
+                percentage = Math.round((calculatedFiltered / calculatedTotal) * 100);
+                console.log('Using direct population data for statistics:', { total, filtered, percentage });
+            }
+        }
         
         // Different display for province focus vs regular view
         if (isProvinceFocused) {

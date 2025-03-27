@@ -70,28 +70,52 @@ const HeatMap = React.memo(({
         });
     }, [datasource, colormapping, animationDuration, propertyPath, geoLevel]);
     
-    // Ensure refresh is called when color mapping changes
+    // Ensure refresh is called when color mapping changes with proper error handling
     useEffect(() => {
         console.log('Colormapping change - refreshing map');
-        setTimeout(() => {
-            if (mapRef.current) {
-                console.time('Map Refresh from colormap change');
-                mapRef.current.refresh();
-                console.timeEnd('Map Refresh from colormap change');
+        const timer = setTimeout(() => {
+            try {
+                if (mapRef.current && mapRef.current.refresh) {
+                    console.time('Map Refresh from colormap change');
+                    // Make sure legends are properly initialized before refresh
+                    if (mapRef.current.legendModule) {
+                        mapRef.current.refresh();
+                    } else {
+                        console.log('Legend module not ready, delaying refresh');
+                        setTimeout(() => {
+                            if (mapRef.current && mapRef.current.refresh) {
+                                mapRef.current.refresh();
+                            }
+                        }, 100);
+                    }
+                    console.timeEnd('Map Refresh from colormap change');
+                }
+            } catch (error) {
+                console.error('Error refreshing map:', error);
             }
-        }, 50);
+        }, 100); // Slightly increased delay
+        
+        return () => clearTimeout(timer);
     }, [colormapping, mapRef]);
     
-    // Log when map refreshes
+    // Log when map refreshes and add safety check for legends
     useEffect(() => {
         if (mapRef.current) {
             const originalRefresh = mapRef.current.refresh;
             mapRef.current.refresh = function() {
-                console.time('Map Refresh Time');
-                const result = originalRefresh.apply(this, arguments);
-                console.timeEnd('Map Refresh Time');
-                return result;
+                try {
+                    console.time('Map Refresh Time');
+                    // Check if legend elements exist before refreshing
+                    const result = originalRefresh.apply(this, arguments);
+                    console.timeEnd('Map Refresh Time');
+                    return result;
+                } catch (error) {
+                    console.error('Error during map refresh:', error);
+                }
             };
+            
+            // Store original method for cleanup
+            mapRef.current.refresh.__original = originalRefresh;
         }
         
         return () => {
@@ -188,22 +212,50 @@ const HeatMap = React.memo(({
                 
                 // If population is undefined, return default color
                 if (population === undefined || population === null) {
-                    return '#E5E5E5'; // Gray default
+                    return '#E5E5E5'; // Light gray default
+                }
+                
+                // If colormapping is not properly initialized, use default color
+                if (!colormapping || colormapping.length === 0) {
+                    return '#E5E5E5';
                 }
                 
                 // Find matching color range from our mapping
                 for (const mapping of colormapping) {
                     if (population >= mapping.from && population <= mapping.to) {
                         // Check if this range should be grayed out (means it's filtered out)
-                        if (mapping.color === '#E5E5E5') {
+                        if (!mapping.color || mapping.color === '#E5E5E5') {
                             return '#E5E5E5'; // Return gray for filtered out regions
                         }
-                        return mapping.color; // Return the color for this population range
+                        
+                        // Ensure we never return null, undefined or #000000
+                        if (mapping.color && mapping.color !== '#000000') {
+                            return mapping.color; // Return the color for this population range
+                        } else {
+                            console.warn('Invalid color found in mapping:', mapping);
+                            return '#E5E5E5'; // Use default color as fallback
+                        }
                     }
                 }
                 
-                // If no match found, return gray
-                return '#E5E5E5';
+                // If no match found in ranges, use the color from nearest range
+                // First, find the closest range boundary
+                let minDistance = Number.MAX_VALUE;
+                let closestColor = '#E5E5E5';
+                
+                for (const mapping of colormapping) {
+                    const distanceToLower = Math.abs(population - mapping.from);
+                    const distanceToUpper = Math.abs(population - mapping.to);
+                    const minRangeDistance = Math.min(distanceToLower, distanceToUpper);
+                    
+                    if (minRangeDistance < minDistance) {
+                        minDistance = minRangeDistance;
+                        closestColor = mapping.color || '#E5E5E5';
+                    }
+                }
+                
+                // Ensure the closest color is valid
+                return closestColor !== '#000000' ? closestColor : '#E5E5E5';
             }
         };
     }, [colormapping]);
@@ -338,10 +390,32 @@ const HeatMap = React.memo(({
     // Update filtered stats when color mapping changes
     useEffect(() => {
         if (colormapping && colormapping.length > 0) {
-            const stats = calculateFilteredPopulation(currentColorRange[0], currentColorRange[1]);
-            setFilteredPopulationStats(stats);
+            try {
+                // Calculate population stats using current filter range
+                const stats = calculateFilteredPopulation(currentColorRange[0], currentColorRange[1]);
+                
+                // If total population is 0, use the data from datasource as fallback
+                if (stats.total === 0 && datasource?.seniorCitizens?.length > 0) {
+                    const totalFromDataset = datasource.seniorCitizens.reduce((sum, item) => sum + item.population, 0);
+                    const filteredFromDataset = datasource.seniorCitizens
+                        .filter(item => item.population >= currentColorRange[0] && item.population <= currentColorRange[1])
+                        .reduce((sum, item) => sum + item.population, 0);
+                    
+                    console.log(`Using dataset for population calculation: Total=${totalFromDataset}, Filtered=${filteredFromDataset}`);
+                    
+                    if (totalFromDataset > 0) {
+                        stats.total = totalFromDataset;
+                        stats.filtered = filteredFromDataset;
+                        stats.percentage = Math.round((filteredFromDataset / totalFromDataset) * 100);
+                    }
+                }
+                
+                setFilteredPopulationStats(stats);
+            } catch (error) {
+                console.error('Error calculating population stats:', error);
+            }
         }
-    }, [colormapping, currentColorRange]);
+    }, [colormapping, currentColorRange, datasource]);
     
     return (
         <div className='control-section row relative'>
@@ -349,10 +423,10 @@ const HeatMap = React.memo(({
             <div 
                 className='col-md-12'
                 style={{
-                    height: '900px',
+                    height: isFullscreen ? '100vh' : '900px',
                     width: '100%',
                     margin: '0 auto',
-                    aspectRatio: '1/1',
+                    aspectRatio: isFullscreen ? 'auto' : '1/1',
                     position: 'relative'  
                 }}
             >
@@ -536,6 +610,8 @@ const HeatMap = React.memo(({
                 focusedProvince={focusedProvince}
                 provinceTotal={datasource?.regionTotal || getProvincePopulation(focusedProvince)}
                 filteredPopulation={filteredPopulationStats}
+                // Pass the full dataset to ensure we have population data
+                populationData={datasource?.seniorCitizens || []}
             />
         </div>
     );

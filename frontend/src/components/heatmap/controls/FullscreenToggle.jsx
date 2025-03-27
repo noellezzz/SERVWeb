@@ -11,13 +11,13 @@ const FullscreenToggle = ({ isFullscreen, onToggle }) => {
         sx={{
           backgroundColor: 'white',
           '&:hover': { backgroundColor: '#f5f5f5' },
-          boxShadow: 2,
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          zIndex: 1001,
+          boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
           padding: '8px',
-          color: isFullscreen ? '#f44336' : '#4caf50'
+          color: isFullscreen ? '#f44336' : '#4caf50',
+          transition: 'all 0.2s ease',
+          // Remove the absolute positioning from here
+          // as it's now handled by the parent container
+          zIndex: 1001,
         }}
         aria-label={isFullscreen ? "exit fullscreen" : "enter fullscreen"}
       >

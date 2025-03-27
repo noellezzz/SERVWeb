@@ -108,6 +108,22 @@ const SeniorCitizensHeatMap = () => {
                 'No mapping');
     }, [colormapping]);
 
+    // Add an effect to validate the colormapping when fullscreen changes
+    useEffect(() => {
+        // Validate color mapping every time fullscreen state changes
+        if (colormapping && colormapping.length > 0) {
+            const hasInvalidColors = colormapping.some(mapping => 
+                !mapping.color || mapping.color === '#000000');
+            
+            if (hasInvalidColors) {
+                console.warn('Invalid colors detected in colormapping, regenerating...');
+                const range = calculatePopulationRange(datasource);
+                const newColorMapping = generateColorMapping(range[0], range[1]);
+                setColormapping(newColorMapping);
+            }
+        }
+    }, [isFullscreen, colormapping, datasource]);
+
     // Toggle navigation controls visibility
     const toggleNavigationControls = () => {
         setControlsExpanded(!controlsExpanded);
@@ -218,25 +234,34 @@ const SeniorCitizensHeatMap = () => {
             setColormapping(updatedColorMapping);
             setSliderValue(values);
 
-            // Force the map to refresh with new values by updating key
-            setKey(prevKey => prevKey + 1);
+            // Delay the map refresh to ensure DOM is ready
+            setTimeout(() => {
+                // Force the map to refresh with new values by updating key
+                setKey(prevKey => prevKey + 1);
 
-            // Also try the regular refresh method
-            if (mapRef.current) {
-                console.log('Refreshing map with new color mapping');
-                setTimeout(() => {
-                    if (mapRef.current) mapRef.current.refresh();
-                }, 50);
-            }
+                // Also try the regular refresh method with a further delay
+                if (mapRef.current) {
+                    console.log('Refreshing map with new color mapping');
+                    setTimeout(() => {
+                        if (mapRef.current && mapRef.current.refresh) {
+                            try {
+                                mapRef.current.refresh();
+                            } catch (error) {
+                                console.error('Error refreshing map:', error);
+                            }
+                        }
+                    }, 150);
+                }
 
-            // Show a toast notification if many cities are filtered out
-            if (isProvinceFocused && citiesInRange < totalCities * 0.5) {
-                setGeoJsonStatus({
-                    success: true,
-                    message: `Showing ${citiesInRange} of ${totalCities} cities in ${focusedProvince} (population range: ${min.toLocaleString()}-${max.toLocaleString()})`
-                });
-                setOpenToast(true);
-            }
+                // Show a toast notification if many cities are filtered out
+                if (isProvinceFocused && citiesInRange < totalCities * 0.5) {
+                    setGeoJsonStatus({
+                        success: true,
+                        message: `Showing ${citiesInRange} of ${totalCities} cities in ${focusedProvince} (population range: ${min.toLocaleString()}-${max.toLocaleString()})`
+                    });
+                    setOpenToast(true);
+                }
+            }, 50);
         } catch (error) {
             console.error('Error applying color filter:', error);
         }
@@ -455,6 +480,9 @@ const SeniorCitizensHeatMap = () => {
     const renderFullscreenContent = () => {
         if (!isFullscreen) return null;
         
+        // Create a deep copy of the color mapping to prevent reference issues
+        const fullscreenColorMapping = colormapping.map(item => ({ ...item }));
+        
         return createPortal(
             <div className="fullscreen-overlay">
                 <style>{FULLSCREEN_CSS}</style>
@@ -479,6 +507,8 @@ const SeniorCitizensHeatMap = () => {
                             isProvinceFocused={isProvinceFocused}
                             focusedProvince={focusedProvince}
                             provinceTotal={datasource?.regionTotal || 0}
+                            // Pass population data directly to ensure it's available
+                            populationData={datasource?.seniorCitizens || []}
                         />
                     </div>
                     
@@ -486,7 +516,7 @@ const SeniorCitizensHeatMap = () => {
                         key={`fullscreen-${key}`}
                         mapRef={mapRef}
                         datasource={datasource}
-                        colormapping={colormapping}
+                        colormapping={fullscreenColorMapping} // Use the copied mapping
                         zoomSettings={zoomSettings}
                         animationDuration={animationDuration}
                         onMapsLoad={onMapsLoad}
@@ -498,6 +528,10 @@ const SeniorCitizensHeatMap = () => {
                         focusedProvince={focusedProvince}
                         isFullscreen={isFullscreen}
                         onToggleFullscreen={toggleFullscreen}
+                        // Add missing props for fullscreen mode
+                        onColorMappingChange={setColormapping} 
+                        // Pass population data directly
+                        populationData={datasource?.seniorCitizens || []}
                     />
                     
                     {/* Navigation controls */}
@@ -593,6 +627,8 @@ const SeniorCitizensHeatMap = () => {
                     isProvinceFocused={isProvinceFocused}
                     focusedProvince={focusedProvince}
                     provinceTotal={datasource?.regionTotal || 0}
+                    // Pass population data directly to ensure it's available
+                    populationData={datasource?.seniorCitizens || []}
                 />
 
                 {/* Map Navigation Controls */}

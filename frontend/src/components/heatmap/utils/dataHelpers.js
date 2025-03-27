@@ -272,15 +272,42 @@ export const updateColorMappingByRange = (colorMapping, min, max, colorCodes) =>
         return updateColorMappingCache.get(cacheKey);
     }
 
+    // Validate input parameters
+    if (!colorMapping || colorMapping.length === 0) {
+        console.error('Invalid color mapping provided to updateColorMappingByRange');
+        return DEFAULT_COLOR_MAPPING || []; // Return default mapping or empty array
+    }
+
+    if (!colorCodes || colorCodes.length === 0) {
+        console.error('No color codes provided to updateColorMappingByRange');
+        // Use built-in fallback colors to prevent #000000
+        colorCodes = ['#d08a8c', '#c77375', '#bd5b5e', '#b44447', '#aa2c30', '#a11519'];
+    }
+
     // Create a new color mapping that preserves the original ranges
     // but updates colors based on whether they intersect with user's range
     const updatedMapping = colorMapping.map((mapping, index) => {
+        // Make sure we're working with a valid mapping object
+        if (!mapping || typeof mapping !== 'object') {
+            console.warn('Invalid mapping object in colorMapping', mapping);
+            return {
+                from: 0,
+                to: 100000,
+                color: '#E5E5E5',
+                label: 'Default'
+            };
+        }
+
         // Check if this range has ANY overlap with the selected range
         const hasOverlap = !(mapping.to < min || mapping.from > max);
+        const safeIndex = Math.min(index, colorCodes.length - 1);
 
         if (hasOverlap) {
             // This range has at least some overlap with the selected range
-            return { ...mapping, color: colorCodes[index] }; // Keep original color
+            return {
+                ...mapping,
+                color: colorCodes[safeIndex] || '#E5E5E5' // Use index-appropriate color or fallback
+            };
         } else {
             // This range has no overlap with the selected range
             return { ...mapping, color: '#E5E5E5' }; // Gray out
@@ -613,17 +640,52 @@ export const calculateFilteredPopulation = (minRange, maxRange) => {
     const { filteredFeatures } = preprocessGeoJson();
 
     if (!filteredFeatures || !filteredFeatures.length) {
+        console.warn('No filtered features available for population calculation');
         return { total: 0, filtered: 0, percentage: 0 };
     }
 
     let totalPopulation = 0;
     let filteredPopulation = 0;
+    let featuresWithPopulation = 0;
 
     // Calculate total and filtered populations
     filteredFeatures.forEach(feature => {
         const properties = feature.properties;
-        // Use _sum as the real population value, or fall back to 0
-        const population = properties._sum !== undefined ? Math.round(properties._sum) : 0;
+
+        // First try to get population from _sum property
+        let population = null;
+
+        if (properties._sum !== undefined) {
+            population = Math.round(properties._sum);
+        }
+        // If no _sum, try to look up from cached population data
+        else {
+            // Get property name based on current level
+            const propName = IS_PROVINCE_FOCUSED ? 'NAME_2' : PROPERTY_PATH;
+            const regionName = properties[propName];
+
+            // Try to find population in cache
+            if (regionName) {
+                // Check if we have a cached dataset with this region
+                const cachedData = [...populationCache.values()]
+                    .find(data => data.seniorCitizens &&
+                        data.seniorCitizens.some(r => r.Name === regionName));
+
+                if (cachedData) {
+                    const region = cachedData.seniorCitizens.find(r => r.Name === regionName);
+                    if (region) {
+                        population = region.population;
+                    }
+                }
+            }
+        }
+
+        // If we still don't have a population, default to 0
+        if (population === null) {
+            population = 0;
+        } else {
+            featuresWithPopulation++;
+        }
 
         totalPopulation += population;
 
@@ -633,9 +695,25 @@ export const calculateFilteredPopulation = (minRange, maxRange) => {
         }
     });
 
-    // Calculate percentage
+    // Log detailed information for debugging
+    console.log(`Population calculation - Total: ${totalPopulation.toLocaleString()}, Filtered: ${filteredPopulation.toLocaleString()}, Features with data: ${featuresWithPopulation}/${filteredFeatures.length}`);
+
+    // Calculate percentage - avoid division by zero
     const percentage = totalPopulation > 0 ?
         Math.round((filteredPopulation / totalPopulation) * 100) : 0;
+
+    // If we didn't find any population data using _sum or cache, try to get it from active dataset
+    if (totalPopulation === 0 && IS_PROVINCE_FOCUSED && FOCUSED_PROVINCE) {
+        const provincePop = getProvincePopulation(FOCUSED_PROVINCE);
+        if (provincePop > 0) {
+            console.log(`Using province total population as fallback: ${provincePop}`);
+            return {
+                total: provincePop,
+                filtered: provincePop,
+                percentage: 100
+            };
+        }
+    }
 
     return {
         total: totalPopulation,
