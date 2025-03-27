@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Snackbar, Alert, Box } from '@mui/material';
 import ColorRangeFilter from './controls/ColorRangeFilter';
@@ -580,6 +580,7 @@ const SeniorCitizensHeatMap = () => {
                         focusedProvince={focusedProvince}
                         isFullscreen={isFullscreen}
                         onToggleFullscreen={toggleFullscreen}
+                        onColorMappingChange={setColormapping} // Pass the handler
                     />
                 </div>
 

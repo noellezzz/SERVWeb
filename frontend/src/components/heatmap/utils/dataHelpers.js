@@ -606,3 +606,40 @@ export const getLevelTitle = () => {
         ? "Senior Citizen Population by Province in the Philippines"
         : "Senior Citizen Population by Municipality/City in the Philippines";
 };
+
+// New function to calculate total filtered population based on range
+export const calculateFilteredPopulation = (minRange, maxRange) => {
+    // Get the current data source based on level
+    const { filteredFeatures } = preprocessGeoJson();
+
+    if (!filteredFeatures || !filteredFeatures.length) {
+        return { total: 0, filtered: 0, percentage: 0 };
+    }
+
+    let totalPopulation = 0;
+    let filteredPopulation = 0;
+
+    // Calculate total and filtered populations
+    filteredFeatures.forEach(feature => {
+        const properties = feature.properties;
+        // Use _sum as the real population value, or fall back to 0
+        const population = properties._sum !== undefined ? Math.round(properties._sum) : 0;
+
+        totalPopulation += population;
+
+        // Add to filtered total if within range
+        if (population >= minRange && population <= maxRange) {
+            filteredPopulation += population;
+        }
+    });
+
+    // Calculate percentage
+    const percentage = totalPopulation > 0 ?
+        Math.round((filteredPopulation / totalPopulation) * 100) : 0;
+
+    return {
+        total: totalPopulation,
+        filtered: filteredPopulation,
+        percentage: percentage
+    };
+};

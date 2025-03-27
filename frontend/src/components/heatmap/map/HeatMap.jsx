@@ -1,9 +1,10 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useRef, useCallback } from 'react';
 import { MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip, Legend, Marker, Zoom, Selection, Highlight } from '@syncfusion/ej2-react-maps';
-import { getGeoJsonData, PROPERTY_PATH, getLevelTitle, GEO_LEVELS, IS_PROVINCE_FOCUSED, FOCUSED_PROVINCE, getProvincePopulation, getSuggestedPopulationRange } from '../utils/dataHelpers';
+import { getGeoJsonData, PROPERTY_PATH, getLevelTitle, GEO_LEVELS, IS_PROVINCE_FOCUSED, FOCUSED_PROVINCE, getProvincePopulation, getSuggestedPopulationRange, calculateFilteredPopulation, updateColorMappingByRange } from '../utils/dataHelpers';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
-import { POPUP_CSS } from '../utils/constants';
+import { POPUP_CSS, COLOR_CODES } from '../utils/constants';
 import FullscreenToggle from '../controls/FullscreenToggle';
+import ColorRangeFilter from '../controls/ColorRangeFilter';
 
 // Optimize with React.memo to prevent unnecessary re-renders
 const HeatMap = React.memo(({
@@ -22,7 +23,8 @@ const HeatMap = React.memo(({
     isFullscreen,
     onToggleFullscreen,
     // Add a prop to control auto-zooming
-    preventAutoZoom = false
+    preventAutoZoom = false,
+    onColorMappingChange, // Add this new prop
 }) => {
     // State for popup
     const [popupDisplay, setPopupDisplay] = useState('none');
@@ -30,6 +32,16 @@ const HeatMap = React.memo(({
         name: '',
         population: 0
     });
+
+    // State for handling map data
+    const initialRange = useMemo(() => getSuggestedPopulationRange(), []);
+    const [currentColorRange, setCurrentColorRange] = useState(initialRange);
+    const [filteredPopulationStats, setFilteredPopulationStats] = useState({ 
+        total: 0, filtered: 0, percentage: 0 
+    });
+
+    // Create ref for the slider component
+    const sliderRef = useRef(null);
 
     // Memoize the geojson data to prevent reloading
     const geojsonData = useMemo(() => {
@@ -294,6 +306,42 @@ const HeatMap = React.memo(({
         // Default position (bottom left)
         return baseStyle;
     }, [popupDisplay, isFullscreen]);
+
+    // Handle slider change
+    const handleSliderChange = useCallback((newRange) => {
+        if (!newRange || newRange.length !== 2 || isNaN(newRange[0]) || isNaN(newRange[1])) {
+            console.error('Invalid range values:', newRange);
+            return;
+        }
+        
+        console.log('Slider changed:', newRange);
+        setCurrentColorRange(newRange);
+        
+        // Update color mapping based on range
+        const updatedMapping = updateColorMappingByRange(
+            colormapping, 
+            newRange[0], 
+            newRange[1], 
+            COLOR_CODES
+        );
+        
+        // Instead of calling setColorMapping directly, use the prop
+        if (onColorMappingChange) {
+            onColorMappingChange(updatedMapping);
+        }
+        
+        // Calculate and update filtered population stats
+        const stats = calculateFilteredPopulation(newRange[0], newRange[1]);
+        setFilteredPopulationStats(stats);
+    }, [colormapping, onColorMappingChange]);
+
+    // Update filtered stats when color mapping changes
+    useEffect(() => {
+        if (colormapping && colormapping.length > 0) {
+            const stats = calculateFilteredPopulation(currentColorRange[0], currentColorRange[1]);
+            setFilteredPopulationStats(stats);
+        }
+    }, [colormapping, currentColorRange]);
     
     return (
         <div className='control-section row relative'>
@@ -479,6 +527,16 @@ const HeatMap = React.memo(({
                     )}
                 </div>
             </div>
+            <ColorRangeFilter
+                sliderValue={currentColorRange}
+                onSliderChange={handleSliderChange}
+                sliderRef={sliderRef}
+                colormapping={colormapping}
+                isProvinceFocused={isProvinceFocused}
+                focusedProvince={focusedProvince}
+                provinceTotal={datasource?.regionTotal || getProvincePopulation(focusedProvince)}
+                filteredPopulation={filteredPopulationStats}
+            />
         </div>
     );
 });
