@@ -1,0 +1,135 @@
+{
+  "type": "Senior Citizens Population Data",
+  "level": "Region",
+  "gender": "both",
+  "data": [
+    {
+      "name": "NATIONAL CAPITAL REGION",
+      "seniors": {
+        "both": 1055616,
+        "male": 442131,
+        "female": 613485
+      }
+    },
+    {
+      "name": "CORDILLERA ADMINISTRATIVE REGION",
+      "seniors": {
+        "both": 166678,
+        "male": 76052,
+        "female": 90626
+      }
+    },
+    {
+      "name": "REGION I (ILOCOS REGION)",
+      "seniors": {
+        "both": 577516,
+        "male": 251360,
+        "female": 326156
+      }
+    },
+    {
+      "name": "REGION II (CAGAYAN VALLEY)",
+      "seniors": {
+        "both": 358384,
+        "male": 161286,
+        "female": 197098
+      }
+    },
+    {
+      "name": "REGION III (CENTRAL LUZON)",
+      "seniors": {
+        "both": 1094372,
+        "male": 488871,
+        "female": 605501
+      }
+    },
+    {
+      "name": "REGION IV-A (CALABARZON)",
+      "seniors": {
+        "both": 1293295,
+        "male": 558161,
+        "female": 735134
+      }
+    },
+    {
+      "name": "MIMAROPA REGION",
+      "seniors": {
+        "both": 271781,
+        "male": 123654,
+        "female": 148127
+      }
+    },
+    {
+      "name": "REGION V (BICOL REGION)",
+      "seniors": {
+        "both": 538124,
+        "male": 234434,
+        "female": 303690
+      }
+    },
+    {
+      "name": "REGION VI (WESTERN VISAYAS)",
+      "seniors": {
+        "both": 837732,
+        "male": 363111,
+        "female": 474621
+      }
+    },
+    {
+      "name": "REGION VII (CENTRAL VISAYAS)",
+      "seniors": {
+        "both": 734558,
+        "male": 330335,
+        "female": 404223
+      }
+    },
+    {
+      "name": "REGION VIII (EASTERN VISAYAS)",
+      "seniors": {
+        "both": 443333,
+        "male": 203051,
+        "female": 240282
+      }
+    },
+    {
+      "name": "REGION IX (ZAMBOANGA PENINSULA)",
+      "seniors": {
+        "both": 311360,
+        "male": 144475,
+        "female": 166885
+      }
+    },
+    {
+      "name": "REGION X (NORTHERN MINDANAO)",
+      "seniors": {
+        "both": 395010,
+        "male": 183821,
+        "female": 211189
+      }
+    },
+    {
+      "name": "REGION XI (DAVAO REGION)",
+      "seniors": {
+        "both": 426822,
+        "male": 201989,
+        "female": 224833
+      }
+    },
+    {
+      "name": "REGION XII (SOCCSKSARGEN)",
+      "seniors": {
+        "both": 98115,
+        "male": 45592,
+        "female": 52523
+      }
+    },
+    {
+      "name": "BANGSAMORO AUTONOMOUS REGION IN MUSLIM MINDANAO",
+      "seniors": {
+        "both": 5331,
+        "male": 2528,
+        "female": 2803
+      }
+    }
+  ]
+}

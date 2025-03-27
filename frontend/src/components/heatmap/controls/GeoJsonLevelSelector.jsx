@@ -29,7 +29,9 @@ const GeoJsonLevelSelector = React.memo(({
                 aria-label="Geographic Level"
                 fullWidth
             >
-                <ToggleButton value={GEO_LEVELS.REGION}>Regions</ToggleButton>
+                {/* Supposed to be provinces */}
+                <ToggleButton value={GEO_LEVELS.REGION}>Provinces</ToggleButton> 
+
                 <ToggleButton value={GEO_LEVELS.CITY}>Cities/Municipalities</ToggleButton>
             </ToggleButtonGroup>
             <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>

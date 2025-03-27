@@ -8,9 +8,9 @@ const ColorRangeFilter = React.memo(({
     onSliderChange,
     sliderRef,
     colormapping, // Add colormapping as a prop
-    isRegionFocused = false,
-    focusedRegion = null,
-    regionTotal = 0
+    isProvinceFocused = false,
+    focusedProvince = null,
+    provinceTotal = 0
 }) => {
     // Local state to track slider values before confirmation
     const [pendingValue, setPendingValue] = useState(sliderValue);
@@ -31,15 +31,15 @@ const ColorRangeFilter = React.memo(({
             setPendingValue(sliderValue);
             
             // Calculate percentage of data being shown (for region focus feedback)
-            if (isRegionFocused && colormapping?.length > 0) {
+            if (isProvinceFocused && colormapping?.length > 0) {
                 calculateFilteredPercentage(sliderValue);
             }
         }
-    }, [sliderValue, isApplying, isRegionFocused, colormapping]);
+    }, [sliderValue, isApplying, isProvinceFocused, colormapping]);
     
     // Calculate what percentage of city population falls within the filter range
     const calculateFilteredPercentage = (range) => {
-        if (!isRegionFocused || !colormapping || colormapping.length === 0 || !regionTotal) {
+        if (!isProvinceFocused || !colormapping || colormapping.length === 0 || !provinceTotal) {
             setFilteredPercent(100);
             return;
         }
@@ -65,7 +65,7 @@ const ColorRangeFilter = React.memo(({
             setPendingValue(sliderRef.current.value);
             
             // Update filtered percentage for visual feedback
-            if (isRegionFocused) {
+            if (isProvinceFocused) {
                 calculateFilteredPercentage(sliderRef.current.value);
             }
         }
@@ -155,17 +155,17 @@ const ColorRangeFilter = React.memo(({
     return (
         <div className="m-5 p-6 bg-gray-100 rounded-lg shadow-sm">
             <div className="text-lg font-semibold mb-4 text-gray-700">
-                Filter Population Range: 
+                Senior Citizen Population Range: 
                 <span className="ml-2 text-teal-600 font-bold">
                     {pendingValue[0].toLocaleString()} - {pendingValue[1].toLocaleString()}
                 </span>
                 
-                {/* Show context info when focused on a region */}
-                {isRegionFocused && focusedRegion && (
+                {/* Show context info when focused on a province */}
+                {isProvinceFocused && focusedProvince && (
                     <div className="text-sm font-normal text-gray-600 mt-1">
-                        Viewing cities in {focusedRegion} Region
-                        {regionTotal > 0 && (
-                            <span> (Total: {regionTotal.toLocaleString()} seniors)</span>
+                        Viewing cities in {focusedProvince} Province
+                        {provinceTotal > 0 && (
+                            <span> (Total: {provinceTotal.toLocaleString()} seniors)</span>
                         )}
                     </div>
                 )}
@@ -188,15 +188,15 @@ const ColorRangeFilter = React.memo(({
             </div>
             
             {/* Filtering info when in region focus mode */}
-            {isRegionFocused && (
+            {isProvinceFocused && (
                 <div className="mb-3">
                     <Alert 
                         severity={filteredPercent < 30 ? "warning" : "info"} 
                         sx={{ fontSize: '0.85rem', py: 0 }}
                     >
                         {filteredPercent < 30 
-                            ? `You're viewing only ${filteredPercent}% of cities in this region`
-                            : `Showing ${filteredPercent}% of population range for this region`
+                            ? `You're viewing only ${filteredPercent}% of cities in this province`
+                            : `Showing ${filteredPercent}% of population range for this province`
                         }
                     </Alert>
                 </div>
@@ -217,8 +217,8 @@ const ColorRangeFilter = React.memo(({
             </div>
             
             <p className="mt-4 text-sm text-gray-500 italic">
-                {isRegionFocused
-                    ? "Adjust the slider to filter cities by population within this region."
+                {isProvinceFocused
+                    ? "Adjust the slider to filter cities by actual senior population within this province."
                     : "Move the slider handles to select population ranges, then click \"Apply Filter\" to update the map."}
                 Areas outside the range will appear grayed out.
             </p>

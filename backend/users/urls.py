@@ -4,7 +4,8 @@ from .api import UserAPI, SeniorCitizenInfoViewSet, EmployeeInfoViewSet, UserPro
 
 router = DefaultRouter()
 router.register(r'senior-citizens', SeniorCitizenInfoViewSet)
-router.register(r'employees', EmployeeInfoViewSet)
+router.register(r'employee-info', EmployeeInfoViewSet)
+# router.register(r'senior-citizen-info', SeniorCitizenInfoViewSet)
 router.register(r'users', UserViewSet)
 
 urlpatterns = [

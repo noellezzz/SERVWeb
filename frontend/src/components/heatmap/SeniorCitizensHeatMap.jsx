@@ -16,23 +16,64 @@ import {
     CURRENT_LEVEL,
     PROPERTY_PATH,
     switchGeoLevel,
-    focusOnRegion,
-    clearRegionFocus,
-    IS_REGION_FOCUSED,
-    FOCUSED_REGION,
+    focusOnProvince,
+    clearProvinceFocus,
+    IS_PROVINCE_FOCUSED,
+    FOCUSED_PROVINCE,
     getSuggestedPopulationRange,
-    getRegionPopulation
+    getProvincePopulation
 } from './utils/dataHelpers';
+
+// Add a function to calculate appropriate population ranges from real data
+const calculatePopulationRange = (data) => {
+    if (!data || !data.seniorCitizens || data.seniorCitizens.length === 0) {
+        return DEFAULT_POPULATION_RANGE;
+    }
+    
+    // Get min and max from actual data
+    const populations = data.seniorCitizens.map(item => item.population);
+    let min = Math.min(...populations);
+    let max = Math.max(...populations);
+    
+    // Make sure we have a reasonable range
+    if (max - min < 1000) {
+        max = min + 1000;
+    }
+    
+    // Round to nice numbers
+    min = Math.floor(min / 100) * 100;
+    max = Math.ceil(max / 100) * 100;
+    
+    console.log(`Calculated population range from data: ${min}-${max}`);
+    return [min, max];
+};
 
 const SeniorCitizensHeatMap = () => {
     const mapRef = useRef(null);
     const sliderRef = useRef(null);
 
-    // Map data states
-    const [datasource, setDatasource] = useState(makeRandomPopulation());
-    const [populationRange, setPopulationRange] = useState(DEFAULT_POPULATION_RANGE);
-    const [sliderValue, setSliderValue] = useState(DEFAULT_POPULATION_RANGE);
-    const [colormapping, setColormapping] = useState(DEFAULT_COLOR_MAPPING);
+    // Map data states - use the real data
+    const [datasource, setDatasource] = useState(() => {
+        const initialData = makeRandomPopulation(); // This now uses real _sum values
+        return initialData;
+    });
+    
+    const [populationRange, setPopulationRange] = useState(() => {
+        const initialData = makeRandomPopulation();
+        return calculatePopulationRange(initialData);
+    });
+    
+    const [sliderValue, setSliderValue] = useState(() => {
+        const initialData = makeRandomPopulation();
+        return calculatePopulationRange(initialData);
+    });
+    
+    const [colormapping, setColormapping] = useState(() => {
+        const initialData = makeRandomPopulation();
+        const range = calculatePopulationRange(initialData);
+        return generateColorMapping(range[0], range[1]);
+    });
+    
     const [key, setKey] = useState(0); // Force re-render key
 
     // GeoJSON level state
@@ -52,9 +93,9 @@ const SeniorCitizensHeatMap = () => {
     const [animationDuration, setAnimationDuration] = useState(500);
     const [controlsExpanded, setControlsExpanded] = useState(false);
 
-    // Region focus state
-    const [isRegionFocused, setIsRegionFocused] = useState(IS_REGION_FOCUSED);
-    const [focusedRegion, setFocusedRegion] = useState(FOCUSED_REGION);
+    // Province focus state
+    const [isProvinceFocused, setIsProvinceFocused] = useState(IS_PROVINCE_FOCUSED);
+    const [focusedProvince, setFocusedProvince] = useState(FOCUSED_PROVINCE);
 
     // Add state for fullscreen mode
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -189,10 +230,10 @@ const SeniorCitizensHeatMap = () => {
             }
 
             // Show a toast notification if many cities are filtered out
-            if (isRegionFocused && citiesInRange < totalCities * 0.5) {
+            if (isProvinceFocused && citiesInRange < totalCities * 0.5) {
                 setGeoJsonStatus({
                     success: true,
-                    message: `Showing ${citiesInRange} of ${totalCities} cities in ${focusedRegion} (population range: ${min.toLocaleString()}-${max.toLocaleString()})`
+                    message: `Showing ${citiesInRange} of ${totalCities} cities in ${focusedProvince} (population range: ${min.toLocaleString()}-${max.toLocaleString()})`
                 });
                 setOpenToast(true);
             }
@@ -201,7 +242,7 @@ const SeniorCitizensHeatMap = () => {
         }
 
         console.timeEnd('Color filter apply');
-    }, [colormapping, datasource, isRegionFocused, focusedRegion]);
+    }, [colormapping, datasource, isProvinceFocused, focusedProvince]);
 
     // Update data source when population range changes
     const updateDataSource = (min, max) => {
@@ -312,7 +353,7 @@ const SeniorCitizensHeatMap = () => {
                 // Show success message
                 setGeoJsonStatus({
                     success: true,
-                    message: `Switched to ${newLevel === GEO_LEVELS.REGION ? 'regional' : 'city/municipality'} view`
+                    message: `Switched to ${newLevel === GEO_LEVELS.PROVINCE ? 'provincial' : 'city/municipality'} view`
                 });
                 setOpenToast(true);
             } else {
@@ -326,40 +367,21 @@ const SeniorCitizensHeatMap = () => {
         }
     };
 
-    // Handle region focus with improved color mapping
-    const handleFocusRegion = (regionName) => {
-        if (focusOnRegion(regionName)) {
+    // Handle province focus with improved color mapping
+    const handleFocusProvince = (provinceName) => {
+        if (focusOnProvince(provinceName)) {
             // Update component state
-            setIsRegionFocused(true);
-            setFocusedRegion(regionName);
+            setIsProvinceFocused(true);
+            setFocusedProvince(provinceName);
             
-            // Get region's total population
-            const regionPopulation = getRegionPopulation(regionName);
+            // Get province's total population from real data
+            const provincePopulation = getProvincePopulation(provinceName);
             
-            // Generate new data with cities in that region and distributed population
+            // Generate new data with cities in that province and real or distributed population
             const newData = makeRandomPopulation();
             
-            // First analyze the population range in the data to ensure colormapping fits
-            const cityPops = newData.seniorCitizens.map(city => city.population);
-            const actualMin = Math.min(...cityPops);
-            const actualMax = Math.max(...cityPops);
-            
-            console.log(`City population actual range: ${actualMin}-${actualMax}, Count: ${cityPops.length}`);
-            
-            // Use suggested population range for better color distribution
-            const suggestedRange = getSuggestedPopulationRange();
-            console.log('Suggested population range:', suggestedRange);
-            
-            // Use the better of actual vs suggested ranges
-            const newPopulationRange = [
-                Math.min(actualMin, suggestedRange[0]),
-                Math.max(actualMax, suggestedRange[1])
-            ];
-            
-            // Ensure minimum range spread for good visualization
-            if (newPopulationRange[1] - newPopulationRange[0] < 5000) {
-                newPopulationRange[1] = newPopulationRange[0] + 5000;
-            }
+            // Calculate appropriate range from the actual data
+            const newPopulationRange = calculatePopulationRange(newData);
             
             console.log('Setting new population range:', newPopulationRange);
             
@@ -377,20 +399,20 @@ const SeniorCitizensHeatMap = () => {
             // Show notification
             setGeoJsonStatus({
                 success: true,
-                message: `Now viewing cities in ${regionName} (Total Population: ${regionPopulation.toLocaleString()} seniors)`
+                message: `Now viewing cities in ${provinceName} (Total Population: ${provincePopulation.toLocaleString()} seniors)`
             });
             setOpenToast(true);
         }
     };
 
-    // Handle returning to all regions view with appropriate ranges
-    const handleClearRegionFocus = () => {
-        if (clearRegionFocus()) {
+    // Handle returning to all provinces view with appropriate ranges
+    const handleClearProvinceFocus = () => {
+        if (clearProvinceFocus()) {
             // Update component state
-            setIsRegionFocused(false);
-            setFocusedRegion(null);
+            setIsProvinceFocused(false);
+            setFocusedProvince(null);
             
-            // Reset data to all regions
+            // Reset data to all provinces
             const newData = makeRandomPopulation();
             setDatasource(newData);
             
@@ -408,7 +430,7 @@ const SeniorCitizensHeatMap = () => {
             // Show notification
             setGeoJsonStatus({
                 success: true,
-                message: 'Returned to all regions view'
+                message: 'Returned to all provinces view'
             });
             setOpenToast(true);
         }
@@ -439,8 +461,8 @@ const SeniorCitizensHeatMap = () => {
                 
                 <div className="fullscreen-content">
                     <div className="fullscreen-controls">
-                        {/* GeoJSON Level Selector - only show when not focused on a region */}
-                        {!isRegionFocused && (
+                        {/* GeoJSON Level Selector - only show when not focused on a province */}
+                        {!isProvinceFocused && (
                             <GeoJsonLevelSelector
                                 currentGeoLevel={currentGeoLevel}
                                 onGeoLevelChange={handleGeoLevelChange}
@@ -454,9 +476,9 @@ const SeniorCitizensHeatMap = () => {
                             onSliderChange={handleSyncfusionSliderChange}
                             sliderRef={sliderRef}
                             colormapping={colormapping}
-                            isRegionFocused={isRegionFocused}
-                            focusedRegion={focusedRegion}
-                            regionTotal={datasource?.regionTotal || 0}
+                            isProvinceFocused={isProvinceFocused}
+                            focusedProvince={focusedProvince}
+                            provinceTotal={datasource?.regionTotal || 0}
                         />
                     </div>
                     
@@ -470,10 +492,10 @@ const SeniorCitizensHeatMap = () => {
                         onMapsLoad={onMapsLoad}
                         geoLevel={currentGeoLevel}
                         propertyPath={PROPERTY_PATH}
-                        onFocusRegion={handleFocusRegion}
-                        onClearRegionFocus={handleClearRegionFocus}
-                        isRegionFocused={isRegionFocused}
-                        focusedRegion={focusedRegion}
+                        onFocusProvince={handleFocusProvince}
+                        onClearProvinceFocus={handleClearProvinceFocus}
+                        isProvinceFocused={isProvinceFocused}
+                        focusedProvince={focusedProvince}
                         isFullscreen={isFullscreen}
                         onToggleFullscreen={toggleFullscreen}
                     />
@@ -530,8 +552,8 @@ const SeniorCitizensHeatMap = () => {
 
                 {/* GeoJSON Level Selector */}
                 <Box sx={{ 
-                    opacity: isRegionFocused ? 0.5 : 1, 
-                    pointerEvents: isRegionFocused ? 'none' : 'auto'
+                    opacity: isProvinceFocused ? 0.5 : 1, 
+                    pointerEvents: isProvinceFocused ? 'none' : 'auto'
                 }}>
                     <GeoJsonLevelSelector
                         currentGeoLevel={currentGeoLevel}
@@ -552,10 +574,10 @@ const SeniorCitizensHeatMap = () => {
                         onMapsLoad={onMapsLoad}
                         geoLevel={currentGeoLevel}
                         propertyPath={PROPERTY_PATH}
-                        onFocusRegion={handleFocusRegion}
-                        onClearRegionFocus={handleClearRegionFocus}
-                        isRegionFocused={isRegionFocused}
-                        focusedRegion={focusedRegion}
+                        onFocusProvince={handleFocusProvince}
+                        onClearProvinceFocus={handleClearProvinceFocus}
+                        isProvinceFocused={isProvinceFocused}
+                        focusedProvince={focusedProvince}
                         isFullscreen={isFullscreen}
                         onToggleFullscreen={toggleFullscreen}
                     />
@@ -567,9 +589,9 @@ const SeniorCitizensHeatMap = () => {
                     onSliderChange={handleSyncfusionSliderChange}
                     sliderRef={sliderRef}
                     colormapping={colormapping}
-                    isRegionFocused={isRegionFocused}
-                    focusedRegion={focusedRegion}
-                    regionTotal={datasource?.regionTotal || 0}
+                    isProvinceFocused={isProvinceFocused}
+                    focusedProvince={focusedProvince}
+                    provinceTotal={datasource?.regionTotal || 0}
                 />
 
                 {/* Map Navigation Controls */}

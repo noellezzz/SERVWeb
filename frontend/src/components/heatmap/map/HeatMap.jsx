@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { MapsComponent, Inject, LayersDirective, LayerDirective, MapsTooltip, Legend, Marker, Zoom, Selection, Highlight } from '@syncfusion/ej2-react-maps';
-import { getGeoJsonData, PROPERTY_PATH, getLevelTitle, GEO_LEVELS, IS_REGION_FOCUSED, FOCUSED_REGION, getRegionPopulation, getSuggestedPopulationRange } from '../utils/dataHelpers';
+import { getGeoJsonData, PROPERTY_PATH, getLevelTitle, GEO_LEVELS, IS_PROVINCE_FOCUSED, FOCUSED_PROVINCE, getProvincePopulation, getSuggestedPopulationRange } from '../utils/dataHelpers';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { POPUP_CSS } from '../utils/constants';
 import FullscreenToggle from '../controls/FullscreenToggle';
@@ -15,10 +15,10 @@ const HeatMap = React.memo(({
     onMapsLoad,
     geoLevel,
     propertyPath = PROPERTY_PATH,
-    onFocusRegion,
-    onClearRegionFocus,
-    isRegionFocused = IS_REGION_FOCUSED,
-    focusedRegion = FOCUSED_REGION,
+    onFocusProvince,
+    onClearProvinceFocus,
+    isProvinceFocused = IS_PROVINCE_FOCUSED,
+    focusedProvince = FOCUSED_PROVINCE,
     isFullscreen,
     onToggleFullscreen,
     // Add a prop to control auto-zooming
@@ -26,7 +26,7 @@ const HeatMap = React.memo(({
 }) => {
     // State for popup
     const [popupDisplay, setPopupDisplay] = useState('none');
-    const [selectedRegion, setSelectedRegion] = useState({
+    const [selectedArea, setSelectedArea] = useState({
         name: '',
         population: 0
     });
@@ -121,12 +121,12 @@ const HeatMap = React.memo(({
     const titleSettings = useMemo(() => {
         let title = getLevelTitle();
         
-        if (isRegionFocused && focusedRegion) {
-            const regionPop = datasource?.regionTotal || getRegionPopulation(focusedRegion);
+        if (isProvinceFocused && focusedProvince) {
+            const provincePop = datasource?.regionTotal || getProvincePopulation(focusedProvince);
             const visibleCount = datasource?.seniorCitizens?.length || 0;
             
-            title = `Cities/Municipalities in ${focusedRegion} Region`;
-            title += ` (${visibleCount} Cities, Total Population: ${regionPop.toLocaleString()} Seniors)`;
+            title = `Cities/Municipalities in ${focusedProvince} Province`;
+            title += ` (${visibleCount} Cities, Total Population: ${provincePop.toLocaleString()} Seniors)`;
             
             // Add population range indicator when filtered
             if (colormapping?.length > 0) {
@@ -145,18 +145,18 @@ const HeatMap = React.memo(({
             text: title,
             textStyle: { size: '16px' }
         };
-    }, [geoLevel, isRegionFocused, focusedRegion, datasource, colormapping]);
+    }, [geoLevel, isProvinceFocused, focusedProvince, datasource, colormapping]);
     
-    // Enhanced tooltip settings for focused region view
+    // Enhanced tooltip settings for focused province view
     const tooltipSettings = useMemo(() => ({ 
         visible: true, 
         valuePath: 'population', 
-        format: isRegionFocused 
+        format: isProvinceFocused 
             ? 'City/Municipality: ${Name} <br> Senior Population: ${population}'
-            : (geoLevel === 'region' 
-                ? 'Region: ${Name} <br> Senior Population: ${population}' 
+            : (geoLevel === GEO_LEVELS.PROVINCE 
+                ? 'Province: ${Name} <br> Senior Population: ${population}' 
                 : 'City/Municipality: ${Name} <br> Senior Population: ${population}')
-    }), [geoLevel, isRegionFocused]);
+    }), [geoLevel, isProvinceFocused]);
     
     // Memoize shape settings based on colormapping and add hover effects
     const shapeSettings = useMemo(() => {
@@ -199,10 +199,10 @@ const HeatMap = React.memo(({
     // Handle shape selection event - enhanced for city detection
     const handleShapeSelected = (args) => {
         if (!isNullOrUndefined(args.shapeData) && args.data) {
-            // Determine if we're looking at a city in a focused region
-            const isCityInFocusedRegion = isRegionFocused && FOCUSED_REGION;
+            // Determine if we're looking at a city in a focused province
+            const isCityInFocusedProvince = isProvinceFocused && FOCUSED_PROVINCE;
             
-            // Check if this region's population falls within our visible range
+            // Check if this area's population falls within our visible range
             let isInVisibleRange = false;
             if (colormapping.length > 0) {
                 const population = args.data.population;
@@ -218,14 +218,14 @@ const HeatMap = React.memo(({
                 isInVisibleRange = true; // Default to visible if no mapping
             }
             
-            // Update selected region data
-            setSelectedRegion({
+            // Update selected area data
+            setSelectedArea({
                 name: args.data.Name,
                 population: args.data.population,
-                // Add the parent region name if we're viewing a city
-                parentRegion: isCityInFocusedRegion ? FOCUSED_REGION : null,
+                // Add the parent province name if we're viewing a city
+                parentProvince: isCityInFocusedProvince ? FOCUSED_PROVINCE : null,
                 // Store the type for display purposes
-                type: isCityInFocusedRegion ? 'city' : (geoLevel === GEO_LEVELS.REGION ? 'region' : 'city'),
+                type: isCityInFocusedProvince ? 'city' : (geoLevel === GEO_LEVELS.PROVINCE ? 'province' : 'city'),
                 // Store visibility status
                 isInVisibleRange: isInVisibleRange
             });
@@ -234,8 +234,8 @@ const HeatMap = React.memo(({
             setPopupDisplay('block');
             
             console.log(
-                isCityInFocusedRegion 
-                    ? `Selected city: ${args.data.Name} in ${FOCUSED_REGION} with population: ${args.data.population}`
+                isCityInFocusedProvince 
+                    ? `Selected city: ${args.data.Name} in ${FOCUSED_PROVINCE} with population: ${args.data.population}`
                     : `Selected ${geoLevel}: ${args.data.Name} with population: ${args.data.population}`
             );
         }
@@ -246,21 +246,21 @@ const HeatMap = React.memo(({
         setPopupDisplay('none');
     };
     
-    // Handle view region button click
-    const handleViewRegion = () => {
-        console.log(`View region button clicked for: ${selectedRegion.name}`);
+    // Handle view province button click
+    const handleViewProvince = () => {
+        console.log(`View province button clicked for: ${selectedArea.name}`);
         setPopupDisplay('none'); // Close popup
-        if (onFocusRegion) {
-            onFocusRegion(selectedRegion.name);
+        if (onFocusProvince) {
+            onFocusProvince(selectedArea.name);
         }
     };
     
-    // Handle back to all regions button click
-    const handleBackToAllRegions = () => {
-        console.log('Back to all regions button clicked');
+    // Handle back to all provinces button click
+    const handleBackToAllProvinces = () => {
+        console.log('Back to all provinces button clicked');
         setPopupDisplay('none'); // Close popup
-        if (onClearRegionFocus) {
-            onClearRegionFocus();
+        if (onClearProvinceFocus) {
+            onClearProvinceFocus();
         }
     };
     
@@ -323,8 +323,8 @@ const HeatMap = React.memo(({
                     </div>
                 )}
                 
-                {/* Back to all regions button - now positioned inside the map */}
-                {isRegionFocused && (
+                {/* Back to all provinces button - now positioned inside the map */}
+                {isProvinceFocused && (
                     <div style={{ 
                         position: 'absolute', 
                         zIndex: 1000, 
@@ -334,7 +334,7 @@ const HeatMap = React.memo(({
                         transition: 'all 0.3s ease'
                     }}>
                         <button 
-                            onClick={handleBackToAllRegions}
+                            onClick={handleBackToAllProvinces}
                             style={{ 
                                 backgroundColor: '#3f51b5', 
                                 color: 'white', 
@@ -359,7 +359,7 @@ const HeatMap = React.memo(({
                                 e.currentTarget.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
                             }}
                         >
-                            <span>← Back to All Regions</span>
+                            <span>← Back to All Provinces</span>
                         </button>
                     </div>
                 )}
@@ -381,7 +381,7 @@ const HeatMap = React.memo(({
                     <LayersDirective>
                         <LayerDirective 
                             shapeData={geojsonData} 
-                            shapePropertyPath={isRegionFocused ? 'NAME_2' : propertyPath} 
+                            shapePropertyPath={isProvinceFocused ? 'NAME_2' : propertyPath} 
                             shapeDataPath='Name'
                             dataSource={datasource.seniorCitizens}
                             animationDuration={animationDuration}
@@ -389,40 +389,40 @@ const HeatMap = React.memo(({
                             shapeSettings={shapeSettings}
                             selectionSettings={selectionSettings}
                             highlightSettings={highlightSettings}
-                            // Prevent auto-zoom on region focus
+                            // Prevent auto-zoom on province focus
                             zoomOnSelection={false}
                         />
                     </LayersDirective>
                 </MapsComponent>
                 
-                {/* Popup for selected region/city details - enhanced with dynamic positioning */}
+                {/* Popup for selected province/city details - enhanced with dynamic positioning */}
                 <div className="popup" style={popupStyle}>
                     <span className="close-btn" onClick={handleClosePopup}>×</span>
-                    <div className="region-name">{selectedRegion.name}</div>
+                    <div className="region-name">{selectedArea.name}</div>
                     
-                    {/* Show parent region for cities in focused mode */}
-                    {selectedRegion.parentRegion && (
+                    {/* Show parent province for cities in focused mode */}
+                    {selectedArea.parentProvince && (
                         <div className="detail-row">
                             <span>Located in: </span>
-                            <strong>{selectedRegion.parentRegion} Region</strong>
+                            <strong>{selectedArea.parentProvince} Province</strong>
                         </div>
                     )}
                     
                     <div className="detail-row">
                         <span>Type: </span>
                         <strong>
-                            {selectedRegion.type === 'region' 
-                                ? 'Region' 
+                            {selectedArea.type === 'province' 
+                                ? 'Province' 
                                 : 'City/Municipality'}
                         </strong>
                     </div>
                     
                     <div className="detail-row">
                         <span>Senior Population: </span>
-                        <span className="population-value">{selectedRegion.population.toLocaleString()}</span>
+                        <span className="population-value">{selectedArea.population.toLocaleString()}</span>
                         
                         {/* Add visual indicator if population is outside filtered range */}
-                        {!selectedRegion.isInVisibleRange && (
+                        {!selectedArea.isInVisibleRange && (
                             <span style={{ 
                                 marginLeft: '5px', 
                                 color: 'orange', 
@@ -434,35 +434,35 @@ const HeatMap = React.memo(({
                         )}
                     </div>
                     
-                    {/* Show percentage of region total for cities in focused view */}
-                    {isRegionFocused && datasource?.regionTotal && (
+                    {/* Show percentage of province total for cities in focused view */}
+                    {isProvinceFocused && datasource?.regionTotal && (
                         <div className="detail-row">
-                            <span>Percentage of Region: </span>
+                            <span>Percentage of Province: </span>
                             <strong>
-                                {((selectedRegion.population / datasource.regionTotal) * 100).toFixed(1)}%
+                                {((selectedArea.population / datasource.regionTotal) * 100).toFixed(1)}%
                             </strong>
                         </div>
                     )}
                     
                     {colormapping.some(cm => 
-                        selectedRegion.population >= cm.from && 
-                        selectedRegion.population <= cm.to) && (
+                        selectedArea.population >= cm.from && 
+                        selectedArea.population <= cm.to) && (
                         <div className="detail-row">
                             <span>Population Category: </span>
                             <strong>
                                 {colormapping.find(cm => 
-                                    selectedRegion.population >= cm.from && 
-                                    selectedRegion.population <= cm.to
+                                    selectedArea.population >= cm.from && 
+                                    selectedArea.population <= cm.to
                                 )?.label || 'N/A'}
                             </strong>
                         </div>
                     )}
                     
-                    {/* View Region button - only show for regions when not already focused */}
-                    {selectedRegion.type === 'region' && !isRegionFocused && (
+                    {/* View Province button - only show for provinces when not already focused */}
+                    {selectedArea.type === 'province' && !isProvinceFocused && (
                         <div className="detail-row" style={{ marginTop: '15px', textAlign: 'center' }}>
                             <button
-                                onClick={handleViewRegion}
+                                onClick={handleViewProvince}
                                 style={{
                                     backgroundColor: '#4caf50',
                                     color: 'white',
@@ -473,7 +473,7 @@ const HeatMap = React.memo(({
                                     width: '100%'
                                 }}
                             >
-                                View Cities in {selectedRegion.name}
+                                View Cities in {selectedArea.name}
                             </button>
                         </div>
                     )}

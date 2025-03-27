@@ -1,48 +1,50 @@
-import * as geojsonDataLevel1 from '@/assets/data/gadm41_PHL_1.json';
-import * as geojsonDataLevel2 from '@/assets/data/gadm41_PHL_2.json';
+import * as geojsonDataLevel0 from '@/assets/data/region.json';
+import * as geojsonDataLevel1 from '@/assets/data/provinces.json';
+import * as geojsonDataLevel2 from '@/assets/data/cities.json';
 import { COLOR_CODES } from './constants';
 
-// GeoJSON levels configuration
+// GeoJSON levels configurationF
 export const GEO_LEVELS = {
     REGION: 'region',
+    PROVINCE: 'province',
     CITY: 'city'
 };
 
 // Property paths for each level
 export const PROPERTY_PATHS = {
-    [GEO_LEVELS.REGION]: 'NAME_1',
+    [GEO_LEVELS.PROVINCE]: 'NAME_1',
     [GEO_LEVELS.CITY]: 'NAME_2'
 };
 
 // Data sources for each level
 const DATA_SOURCES = {
-    [GEO_LEVELS.REGION]: geojsonDataLevel1,
+    [GEO_LEVELS.PROVINCE]: geojsonDataLevel1,
     [GEO_LEVELS.CITY]: geojsonDataLevel2
 };
 
 // Current active level and property path
-export let CURRENT_LEVEL = GEO_LEVELS.REGION;
+export let CURRENT_LEVEL = GEO_LEVELS.PROVINCE;
 export let PROPERTY_PATH = PROPERTY_PATHS[CURRENT_LEVEL];
 
 // Cache for processed geojson data (one per level)
 const processedGeoJsonCache = {
-    [GEO_LEVELS.REGION]: null,
+    [GEO_LEVELS.PROVINCE]: null,
     [GEO_LEVELS.CITY]: null
 };
 
 const filteredFeaturesCache = {
-    [GEO_LEVELS.REGION]: null,
+    [GEO_LEVELS.PROVINCE]: null,
     [GEO_LEVELS.CITY]: null
 };
 
-// Track focused region state
-export let FOCUSED_REGION = null;
-export let IS_REGION_FOCUSED = false;
+// Track focused province state
+export let FOCUSED_PROVINCE = null;
+export let IS_PROVINCE_FOCUSED = false;
 
 // Cache for region total populations to ensure consistency
 const regionPopulationCache = new Map();
 
-// Function to switch between region and city levels
+// Function to switch between province and city levels
 export const switchGeoLevel = (level) => {
     if (!Object.values(GEO_LEVELS).includes(level)) {
         console.error(`Invalid level: ${level}. Must be one of: ${Object.values(GEO_LEVELS).join(', ')}`);
@@ -112,17 +114,17 @@ const preprocessGeoJson = () => {
     };
 };
 
-// Optimized random population generator with caching
+// Optimized population generator with data from GeoJSON
 const populationCache = new Map();
 export const makeRandomPopulation = (min = 1000, max = 100000) => {
-    // Special case for focused region
-    if (IS_REGION_FOCUSED && FOCUSED_REGION) {
-        const regionPopulation = getRegionPopulation(FOCUSED_REGION);
-        const cityPopulations = distributeCityPopulations(FOCUSED_REGION, regionPopulation);
+    // Special case for focused province
+    if (IS_PROVINCE_FOCUSED && FOCUSED_PROVINCE) {
+        const provincePopulation = getProvincePopulation(FOCUSED_PROVINCE);
+        const cityPopulations = distributeCityPopulations(FOCUSED_PROVINCE, provincePopulation);
 
         return {
             seniorCitizens: cityPopulations,
-            regionTotal: regionPopulation
+            regionTotal: provincePopulation
         };
     }
 
@@ -140,12 +142,19 @@ export const makeRandomPopulation = (min = 1000, max = 100000) => {
         return { seniorCitizens: [] };
     }
 
-    // Generate populations in one pass
-    const range = max - min + 1;
-    const areas = filteredFeatures.map(feature => ({
-        Name: feature.properties[PROPERTY_PATH],
-        population: Math.floor(Math.random() * range) + min
-    }));
+    // Extract real population data from _sum or generate random as fallback
+    const areas = filteredFeatures.map(feature => {
+        const properties = feature.properties;
+        // Use _sum as the real population value, or generate random data if missing
+        const population = properties._sum !== undefined ?
+            Math.round(properties._sum) :
+            Math.floor(Math.random() * (max - min + 1)) + min;
+
+        return {
+            Name: properties[PROPERTY_PATH],
+            population: population
+        };
+    });
 
     const result = { seniorCitizens: areas };
 
@@ -154,7 +163,7 @@ export const makeRandomPopulation = (min = 1000, max = 100000) => {
     return result;
 };
 
-// Optimize data source preparation with caching
+// Update data source preparation to use real population data
 const dataSourceCache = new Map();
 export const prepareDataSource = (min = 1000, max = 100000) => {
     const cacheKey = `${CURRENT_LEVEL}-${PROPERTY_PATH}-${min}-${max}`;
@@ -171,12 +180,24 @@ export const prepareDataSource = (min = 1000, max = 100000) => {
         return { seniorCitizens: [] };
     }
 
-    // Generate populations in one pass
-    const range = max - min + 1;
-    const areas = filteredFeatures.map(feature => ({
-        Name: feature.properties[PROPERTY_PATH],
-        population: Math.floor(Math.random() * range) + min
-    }));
+    // Extract real population data, filtering based on min/max range
+    const areas = filteredFeatures
+        .map(feature => {
+            const properties = feature.properties;
+            // Use _sum as the real population value, or generate random as fallback
+            const population = properties._sum !== undefined ?
+                Math.round(properties._sum) :
+                Math.floor(Math.random() * (max - min + 1)) + min;
+
+            return {
+                Name: properties[PROPERTY_PATH],
+                population: population,
+                // Store the original feature for reference
+                originalFeature: feature
+            };
+        })
+        // Optionally filter to only include values within range
+        .filter(area => area.population >= min && area.population <= max);
 
     const result = { seniorCitizens: areas };
 
@@ -277,16 +298,16 @@ export const updateColorMappingByRange = (colorMapping, min, max, colorCodes) =>
     return updatedMapping;
 };
 
-// Function to focus on a specific region (showing its cities)
-export const focusOnRegion = (regionName) => {
-    if (!regionName || CURRENT_LEVEL !== GEO_LEVELS.REGION) {
-        console.error('Cannot focus: Invalid region name or not in region level');
+// Function to focus on a specific province (showing its cities)
+export const focusOnProvince = (provinceName) => {
+    if (!provinceName || CURRENT_LEVEL !== GEO_LEVELS.PROVINCE) {
+        console.error('Cannot focus: Invalid province name or not in province level');
         return false;
     }
 
-    console.log(`Focusing on region: ${regionName}`);
-    FOCUSED_REGION = regionName;
-    IS_REGION_FOCUSED = true;
+    console.log(`Focusing on province: ${provinceName}`);
+    FOCUSED_PROVINCE = provinceName;
+    IS_PROVINCE_FOCUSED = true;
 
     // Reset caches for the focused view
     populationCache.clear();
@@ -295,11 +316,11 @@ export const focusOnRegion = (regionName) => {
     return true;
 };
 
-// Function to clear region focus and return to full map
-export const clearRegionFocus = () => {
-    console.log('Clearing region focus');
-    FOCUSED_REGION = null;
-    IS_REGION_FOCUSED = false;
+// Function to clear province focus and return to full map
+export const clearProvinceFocus = () => {
+    console.log('Clearing province focus');
+    FOCUSED_PROVINCE = null;
+    IS_PROVINCE_FOCUSED = false;
 
     // Reset caches when returning to full view
     populationCache.clear();
@@ -308,9 +329,9 @@ export const clearRegionFocus = () => {
     return true;
 };
 
-// Get filtered GeoJSON data for the focused region
-export const getFilteredRegionData = () => {
-    if (!IS_REGION_FOCUSED || !FOCUSED_REGION) {
+// Get filtered GeoJSON data for the focused province
+export const getFilteredProvinceData = () => {
+    if (!IS_PROVINCE_FOCUSED || !FOCUSED_PROVINCE) {
         return getGeoJsonData(); // Return normal data if not focused
     }
 
@@ -322,12 +343,12 @@ export const getFilteredRegionData = () => {
         return null;
     }
 
-    // Filter features to only include those in the focused region
+    // Filter features to only include those in the focused province
     const filteredFeatures = level2Data.features.filter(
-        feature => feature?.properties?.NAME_1 === FOCUSED_REGION
+        feature => feature?.properties?.NAME_1 === FOCUSED_PROVINCE
     );
 
-    console.log(`Found ${filteredFeatures.length} cities/municipalities in region ${FOCUSED_REGION}`);
+    console.log(`Found ${filteredFeatures.length} cities/municipalities in province ${FOCUSED_PROVINCE}`);
 
     // Create a new GeoJSON object with only the filtered features
     return {
@@ -336,10 +357,10 @@ export const getFilteredRegionData = () => {
     };
 };
 
-// Update getGeoJsonData to handle focused region mode
+// Update getGeoJsonData to handle focused province mode
 export const getGeoJsonData = () => {
-    if (IS_REGION_FOCUSED && FOCUSED_REGION) {
-        return getFilteredRegionData();
+    if (IS_PROVINCE_FOCUSED && FOCUSED_PROVINCE) {
+        return getFilteredProvinceData();
     }
 
     // Use the original implementation for normal mode
@@ -347,71 +368,123 @@ export const getGeoJsonData = () => {
     return fullData;
 };
 
-// Function to get the population of a region from the current data
-export const getRegionPopulation = (regionName) => {
-    // Check if we have cached the region population
-    if (regionPopulationCache.has(regionName)) {
-        return regionPopulationCache.get(regionName);
+// Function to get the population of a province from real data
+export const getProvincePopulation = (provinceName) => {
+    // Check if we have cached the province population
+    if (regionPopulationCache.has(provinceName)) {
+        return regionPopulationCache.get(provinceName);
     }
 
-    // Get current region data
-    const regionData = populationCache.get(`${GEO_LEVELS.REGION}-${PROPERTY_PATHS[GEO_LEVELS.REGION]}-1000-100000`);
+    // Try to find the province feature in the GeoJSON data
+    const provinceData = DATA_SOURCES[GEO_LEVELS.PROVINCE];
 
-    if (!regionData || !regionData.seniorCitizens) {
-        // If no cached data, generate a random population
-        const randomPop = Math.floor(Math.random() * 90000) + 10000;
-        regionPopulationCache.set(regionName, randomPop);
-        return randomPop;
+    if (provinceData && provinceData.features) {
+        const provinceFeature = provinceData.features.find(
+            feature => feature?.properties?.[PROPERTY_PATHS[GEO_LEVELS.PROVINCE]] === provinceName
+        );
+
+        if (provinceFeature && provinceFeature.properties._sum !== undefined) {
+            // Use the real population data
+            const realPopulation = Math.round(provinceFeature.properties._sum);
+            regionPopulationCache.set(provinceName, realPopulation);
+            return realPopulation;
+        }
     }
 
-    // Find the region in the data
-    const region = regionData.seniorCitizens.find(r => r.Name === regionName);
+    // Fallback to cached generated data if real data is unavailable
+    const fallbackData = populationCache.get(`${GEO_LEVELS.PROVINCE}-${PROPERTY_PATHS[GEO_LEVELS.PROVINCE]}-1000-100000`);
 
-    if (!region) {
-        // If region not found, generate a random population
-        const randomPop = Math.floor(Math.random() * 90000) + 10000;
-        regionPopulationCache.set(regionName, randomPop);
-        return randomPop;
+    if (fallbackData && fallbackData.seniorCitizens) {
+        const province = fallbackData.seniorCitizens.find(r => r.Name === provinceName);
+
+        if (province) {
+            regionPopulationCache.set(provinceName, province.population);
+            return province.population;
+        }
     }
 
-    // Cache and return the population
-    regionPopulationCache.set(regionName, region.population);
-    return region.population;
+    // Last resort: generate a random population
+    const randomPop = Math.floor(Math.random() * 90000) + 10000;
+    regionPopulationCache.set(provinceName, randomPop);
+    return randomPop;
 };
 
-// Get cities for a specific region from level 2 data
-export const getCitiesForRegion = (regionName) => {
+// Get cities for a specific province from level 2 data
+export const getCitiesForProvince = (provinceName) => {
     const level2Data = DATA_SOURCES[GEO_LEVELS.CITY];
 
     if (!level2Data || !level2Data.features) {
         return [];
     }
 
-    // Filter features to get cities in this region
+    // Filter features to get cities in this province
     return level2Data.features
-        .filter(feature => feature?.properties?.NAME_1 === regionName)
+        .filter(feature => feature?.properties?.NAME_1 === provinceName)
         .map(feature => feature.properties.NAME_2);
 };
 
-// Improved distribution of city populations
-export const distributeCityPopulations = (regionName, totalPopulation, min = null, max = null) => {
-    const cities = getCitiesForRegion(regionName);
+// Improved distribution of city populations using real data when available
+export const distributeCityPopulations = (provinceName, totalPopulation, min = null, max = null) => {
+    const cities = getCitiesForProvince(provinceName);
 
     if (!cities.length) {
-        console.error(`No cities found for region: ${regionName}`);
+        console.error(`No cities found for province: ${provinceName}`);
         return [];
     }
 
-    // Calculate more appropriate min/max values based on total population and city count
+    // Get the city data from the GeoJSON
+    const cityData = DATA_SOURCES[GEO_LEVELS.CITY];
+    const cityFeatures = cityData?.features?.filter(
+        feature => feature?.properties?.NAME_1 === provinceName
+    ) || [];
+
+    // Check if we have real population data for these cities
+    const hasRealData = cityFeatures.some(feature => feature.properties._sum !== undefined);
+
+    if (hasRealData) {
+        console.log(`Using real population data for cities in ${provinceName}`);
+
+        // Extract real populations
+        let cityPopulations = cityFeatures
+            .filter(feature => feature.properties._sum !== undefined)
+            .map(feature => ({
+                Name: feature.properties.NAME_2,
+                population: Math.round(feature.properties._sum)
+            }));
+
+        // Calculate actual total from real data
+        const actualTotal = cityPopulations.reduce((sum, city) => sum + city.population, 0);
+
+        // If there's a significant difference between expected total and actual total,
+        // scale the populations to match the expected total
+        if (Math.abs(actualTotal - totalPopulation) > totalPopulation * 0.1) {
+            const scaleFactor = totalPopulation / actualTotal;
+            cityPopulations = cityPopulations.map(city => ({
+                ...city,
+                population: Math.round(city.population * scaleFactor)
+            }));
+
+            console.log(`Scaled city populations by factor ${scaleFactor.toFixed(2)} to match province total`);
+        }
+
+        // Sort by population for better visualization
+        cityPopulations.sort((a, b) => a.population - b.population);
+
+        return cityPopulations;
+    }
+
+    // If no real data is available, fall back to the existing proportional distribution
+    console.log(`No real population data for cities in ${provinceName}`);
+
+    // The rest of the original function for distribution calculation
     const cityCount = cities.length;
     const avgPopulation = Math.floor(totalPopulation / cityCount);
 
-    // Determine realistic population ranges to ensure better distribution
-    // Smallest city should be at least 10% of average, largest no more than 300% of average
+    // Calculate more appropriate min/max values based on total population and city count
     const calculatedMin = min || Math.max(100, Math.floor(avgPopulation * 0.1));
     const calculatedMax = max || Math.max(calculatedMin + 5000, Math.floor(avgPopulation * 3));
 
-    console.log(`City population range for ${regionName}: ${calculatedMin}-${calculatedMax}, Avg: ${avgPopulation}`);
+    console.log(`City population range for ${provinceName}: ${calculatedMin} -${calculatedMax}, Avg: ${avgPopulation} `);
 
     // Generate weighted distribution based on a power-law like distribution
     // This creates more realistic population patterns where few cities have high populations
@@ -490,7 +563,7 @@ export const distributeCityPopulations = (regionName, totalPopulation, min = nul
 
     // Verify the total is correct
     const finalTotal = cityPopulations.reduce((sum, city) => sum + city.population, 0);
-    console.log(`City population distribution: Target=${totalPopulation}, Actual=${finalTotal}, Diff=${finalTotal - totalPopulation}`);
+    console.log(`City population distribution: Target = ${totalPopulation}, Actual = ${finalTotal}, Diff = ${finalTotal - totalPopulation} `);
 
     // Sort by population to ensure color mapping works better
     cityPopulations.sort((a, b) => a.population - b.population);
@@ -500,20 +573,20 @@ export const distributeCityPopulations = (regionName, totalPopulation, min = nul
 
 // Improved population range suggestion for cities
 export const getSuggestedPopulationRange = () => {
-    // If focused on a region, adjust range based on city populations
-    if (IS_REGION_FOCUSED && FOCUSED_REGION) {
-        const regionPopulation = getRegionPopulation(FOCUSED_REGION);
-        const cityCount = getCitiesForRegion(FOCUSED_REGION).length;
+    // If focused on a province, adjust range based on city populations
+    if (IS_PROVINCE_FOCUSED && FOCUSED_PROVINCE) {
+        const provincePopulation = getProvincePopulation(FOCUSED_PROVINCE);
+        const cityCount = getCitiesForProvince(FOCUSED_PROVINCE).length;
 
         if (cityCount > 0) {
-            const avgPopulation = Math.floor(regionPopulation / cityCount);
+            const avgPopulation = Math.floor(provincePopulation / cityCount);
 
             // Set range to include at least 5% of avg at minimum and 5x avg at maximum
             // This ensures good spread for color mapping
             const minPop = Math.max(100, Math.floor(avgPopulation * 0.05));
             const maxPop = Math.max(minPop + 5000, Math.ceil(avgPopulation * 5));
 
-            console.log(`Suggested city population range: ${minPop}-${maxPop}, Avg: ${avgPopulation}`);
+            console.log(`Suggested city population range: ${minPop} -${maxPop}, Avg: ${avgPopulation} `);
 
             // Make sure the range is wide enough for reasonable color distribution
             return [minPop, maxPop];
@@ -529,7 +602,7 @@ preprocessGeoJson();
 
 // Helper function to get a descriptive title based on current level
 export const getLevelTitle = () => {
-    return CURRENT_LEVEL === GEO_LEVELS.REGION
-        ? "Senior Citizen Population by Region in the Philippines"
+    return CURRENT_LEVEL === GEO_LEVELS.PROVINCE
+        ? "Senior Citizen Population by Province in the Philippines"
         : "Senior Citizen Population by Municipality/City in the Philippines";
 };
